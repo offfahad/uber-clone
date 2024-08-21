@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "311663641676",
+    "firebase_url": "https://everyone-2de50-default-rtdb.firebaseio.com",
+    "project_id": "everyone-2de50",
+    "storage_bucket": "everyone-2de50.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311663641676:android:e4cf8001ceacd074b8a0e9",
+        "android_client_info": {
+          "package_name": "com.example.uber_users_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMTI-xVId1DTz9DS0-LEJZhF-eAFv352c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311663641676:android:27d895dee9ff623db8a0e9",
+        "android_client_info": {
+          "package_name": "com.fahad.uberU"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMTI-xVId1DTz9DS0-LEJZhF-eAFv352c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
