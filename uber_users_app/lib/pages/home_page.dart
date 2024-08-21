@@ -2,11 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:uber_users_app/authentication/login_screen.dart';
 import 'package:uber_users_app/global/global_var.dart';
+import 'package:uber_users_app/methods/common_methods.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,6 +25,8 @@ class _HomePageState extends State<HomePage> {
       Completer<GoogleMapController>();
   GoogleMapController? controllerGoogleMap;
   Position? currentPositionUser;
+
+  CommonMethods commonMethods = CommonMethods();
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
   void updateMapTheme(GoogleMapController? controller) {
     getJsonFileFromThemes("themes/night_style.json")
@@ -48,7 +55,42 @@ class _HomePageState extends State<HomePage> {
           CameraPosition(target: positionOfUserInLatLang, zoom: 15);
       controllerGoogleMap!
           .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+      await getUserInfoAndCheckBlockStatus();
     }
+  }
+
+  getUserInfoAndCheckBlockStatus() async {
+    DatabaseReference userRef = FirebaseDatabase.instance
+        .ref()
+        .child("users")
+        .child(FirebaseAuth.instance.currentUser!.uid);
+
+    await userRef.once().then(
+      (snap) {
+        if (snap.snapshot.value != null) {
+          if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
+            setState(() {
+              userName = (snap.snapshot.value as Map)["name"];
+            });
+          } else {
+            FirebaseAuth.instance.signOut();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (c) => const LoginScreen(),
+              ),
+            );
+            commonMethods.displaySnackBar(
+                "You are blocked. Contact admin: mughalfahad544@gmail.com",
+                context);
+          }
+        } else {
+          FirebaseAuth.instance.signOut();
+          commonMethods.displaySnackBar(
+              "You record do not exists as a User", context);
+        }
+      },
+    );
   }
 
   @override
@@ -122,17 +164,28 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(color: Colors.grey),
                   ),
                 ),
-                ListTile(
-                  leading: IconButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.logout,
-                      color: Colors.grey,
+                GestureDetector(
+                  onTap: () {
+                    FirebaseAuth.instance.signOut();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(),
+                      ),
+                    );
+                  },
+                  child: ListTile(
+                    leading: IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.logout,
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                  title: const Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.grey),
+                    title: const Text(
+                      "Logout",
+                      style: TextStyle(color: Colors.grey),
+                    ),
                   ),
                 ),
               ],
@@ -143,7 +196,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             GoogleMap(
               mapType: MapType.normal,
-              myLocationEnabled: false,
+              myLocationEnabled: true,
               initialCameraPosition: googlePlexInitialPosition,
               onMapCreated: (GoogleMapController mapController) {
                 controllerGoogleMap = mapController;
@@ -154,8 +207,8 @@ class _HomePageState extends State<HomePage> {
             ),
             //Drawer Button
             Positioned(
-              top: 20,
-              left: 20,
+              top: 15,
+              left: 25,
               child: GestureDetector(
                 onTap: () {
                   if (sKey.currentState != null) {
