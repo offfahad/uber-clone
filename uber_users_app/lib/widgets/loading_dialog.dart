@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 
-
-class LoadingDialog extends StatelessWidget
-{
+class LoadingDialog extends StatelessWidget {
   String messageText;
 
-  LoadingDialog({super.key, required this.messageText,});
-
-
+  LoadingDialog({
+    super.key,
+    required this.messageText,
+  });
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -28,15 +26,15 @@ class LoadingDialog extends StatelessWidget
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-
-              const SizedBox(width: 5,),
-
+              const SizedBox(
+                width: 5,
+              ),
               const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
-
-              const SizedBox(width: 8,),
-
+              const SizedBox(
+                width: 8,
+              ),
               Text(
                 messageText,
                 style: const TextStyle(
@@ -44,7 +42,6 @@ class LoadingDialog extends StatelessWidget
                   color: Colors.white,
                 ),
               ),
-
             ],
           ),
         ),

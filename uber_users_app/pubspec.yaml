@@ -30,25 +30,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_maps_flutter: ^2.7.0
-  geolocator: ^12.0.0
-  flutter_polyline_points: ^2.1.0
-  http: ^1.2.2
-  get: ^4.6.6
-  font_awesome_flutter: ^10.7.0
-  dio: ^5.4.1
-  status_alert: ^1.0.1
-  flutter_iconly: ^1.0.2
-  google_fonts: ^6.2.1
-  shimmer: ^3.0.0
-  uuid: ^4.4.2
-  geocoding: ^3.0.0
-  connectivity_plus: ^6.0.4
-  firebase_auth: ^5.1.2
-  cloud_firestore: ^5.1.0
+  google_maps_flutter:
+  connectivity_plus: 
+  firebase_auth:
+  cloud_firestore:
   firebase_database:
   firebase_storage:
-  permission_handler: ^11.3.1
+  permission_handler:
+  geolocator:
 
 
   # The following adds the Cupertino Icons font to your application.
