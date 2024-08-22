@@ -12,6 +12,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_users_app/authentication/login_screen.dart';
 import 'package:uber_users_app/global/global_var.dart';
 import 'package:uber_users_app/methods/common_methods.dart';
+import 'package:uber_users_app/pages/search_destination_place.dart';
+import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,7 +27,8 @@ class _HomePageState extends State<HomePage> {
       Completer<GoogleMapController>();
   GoogleMapController? controllerGoogleMap;
   Position? currentPositionUser;
-
+  double seachContainerHeight = 276;
+  double bottomMapPadding = 0;
   CommonMethods commonMethods = CommonMethods();
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
   void updateMapTheme(GoogleMapController? controller) {
@@ -49,12 +52,14 @@ class _HomePageState extends State<HomePage> {
       Position positionOfUser = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
       currentPositionUser = positionOfUser;
+      print("postion of the user = $positionOfUser");
       LatLng positionOfUserInLatLang =
           LatLng(currentPositionUser!.latitude, currentPositionUser!.longitude);
       CameraPosition cameraPosition =
           CameraPosition(target: positionOfUserInLatLang, zoom: 15);
       controllerGoogleMap!
           .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+      await CommonMethods.fetchFormattedAddress(positionOfUser.latitude, positionOfUser.longitude, context);
       await getUserInfoAndCheckBlockStatus();
     }
   }
@@ -167,10 +172,10 @@ class _HomePageState extends State<HomePage> {
                 GestureDetector(
                   onTap: () {
                     FirebaseAuth.instance.signOut();
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => LoginScreen(),
+                        builder: (context) => const LoginScreen(),
                       ),
                     );
                   },
@@ -195,6 +200,7 @@ class _HomePageState extends State<HomePage> {
         body: Stack(
           children: [
             GoogleMap(
+              padding: EdgeInsets.only(top: 5, bottom: bottomMapPadding),
               mapType: MapType.normal,
               myLocationEnabled: true,
               initialCameraPosition: googlePlexInitialPosition,
@@ -203,6 +209,9 @@ class _HomePageState extends State<HomePage> {
                 updateMapTheme(controllerGoogleMap);
                 googleMapCompleterController.complete(controllerGoogleMap);
                 getCurrentLiveLocationOfUser();
+                setState(() {
+                  bottomMapPadding = 120;
+                });
               },
             ),
             //Drawer Button
@@ -245,7 +254,63 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-            )
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: -80,
+              child: SizedBox(
+                height: seachContainerHeight,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        backgroundColor: Colors.grey,
+                        padding: const EdgeInsets.all(24),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (c) => const SearchDestinationPlace(),
+                          ),
+                        );
+                      },
+                      child: const Icon(
+                        Icons.search,
+                        color: Colors.white,
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        backgroundColor: Colors.grey,
+                        padding: const EdgeInsets.all(24),
+                      ),
+                      onPressed: () {},
+                      child: const Icon(
+                        Icons.home,
+                        color: Colors.white,
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shape: const CircleBorder(),
+                        backgroundColor: Colors.grey,
+                        padding: const EdgeInsets.all(24),
+                      ),
+                      onPressed: () {},
+                      child: const Icon(
+                        Icons.work,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

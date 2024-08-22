@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:uber_users_app/authentication/signup_screen.dart';
 import 'package:uber_users_app/global/global_var.dart';
+import 'package:uber_users_app/main.dart';
 import '../methods/common_methods.dart';
 import '../pages/home_page.dart';
 import '../widgets/loading_dialog.dart';
@@ -67,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (snap.snapshot.value != null) {
           if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
             userName = (snap.snapshot.value as Map)["name"];
-            Navigator.push(
+            Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (c) => HomePage()));
           } else {
             FirebaseAuth.instance.signOut();
@@ -85,94 +86,99 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    mq = MediaQuery.sizeOf(context);
     return Scaffold(
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Image.asset("assets/images/logo.png"),
-
-              const Text(
-                "Login as a User",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              //text fields + button
-              Padding(
-                padding: const EdgeInsets.all(22),
-                child: Column(
+        child: SizedBox(
+          height: mq.height,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 30, bottom: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
                   children: [
-                    TextField(
-                      controller: emailTextEditingController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: "User Email",
-                        labelStyle: TextStyle(
-                          fontSize: 14,
-                        ),
-                      ),
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15,
+                    Image.asset(
+                      "assets/images/logo.png",
+                      width: mq.width * 0.5,
+                      height: mq.height * 0.3,
+                    ),
+                    const Text(
+                      "Login as a User",
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(
-                      height: 22,
-                    ),
-                    TextField(
-                      controller: passwordTextEditingController,
-                      obscureText: true,
-                      keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
-                        labelText: "User Password",
-                        labelStyle: TextStyle(
-                          fontSize: 14,
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.all(30),
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: emailTextEditingController,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: const InputDecoration(
+                              labelText: "User Email",
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                            ),
+                          ),
+                          SizedBox(
+                            height: mq.height * 0.02,
+                          ),
+                          TextField(
+                            controller: passwordTextEditingController,
+                            obscureText: true,
+                            keyboardType: TextInputType.text,
+                            decoration: const InputDecoration(
+                              labelText: "User Password",
+                              labelStyle: TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                            ),
+                          ),
+                          SizedBox(
+                            height: mq.height * 0.05,
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              checkIfNetworkIsAvailable();
+                            },
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.purple,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 80, vertical: 10)),
+                            child: const Text("Login"),
+                          ),
+                        ],
                       ),
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 15,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 32,
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        checkIfNetworkIsAvailable();
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 80, vertical: 10)),
-                      child: const Text("Login"),
                     ),
                   ],
                 ),
-              ),
-
-              const SizedBox(
-                height: 12,
-              ),
-
-              //textbutton
-              TextButton(
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (c) => SignUpScreen()));
-                },
-                child: const Text(
-                  "Don\'t have an Account? Register Here",
-                  style: TextStyle(
-                    color: Colors.grey,
+                // TextButton at the bottom
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (c) => SignUpScreen()));
+                  },
+                  child: const Text(
+                    "Don\'t have an Account? Register Here",
+                    style: TextStyle(
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

@@ -75,5 +75,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'everyone-2de50.appspot.com',
     iosBundleId: 'com.example.uberUsersApp',
   );
-
 }
