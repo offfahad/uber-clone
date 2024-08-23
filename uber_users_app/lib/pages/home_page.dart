@@ -7,13 +7,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:uber_users_app/appInfo/app_info.dart';
 import 'package:uber_users_app/authentication/login_screen.dart';
 import 'package:uber_users_app/global/global_var.dart';
 import 'package:uber_users_app/methods/common_methods.dart';
+import 'package:uber_users_app/models/direction_details.dart';
 import 'package:uber_users_app/pages/search_destination_place.dart';
 import 'package:http/http.dart' as http;
+
+import '../widgets/loading_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,8 +35,10 @@ class _HomePageState extends State<HomePage> {
   Position? currentPositionUser;
   double seachContainerHeight = 276;
   double bottomMapPadding = 0;
+  double rideDetailsContainerHeight = 0;
   CommonMethods commonMethods = CommonMethods();
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
+  DirectionDetails? tripDirectionDetailsInfo;
   void updateMapTheme(GoogleMapController? controller) {
     getJsonFileFromThemes("themes/night_style.json")
         .then((value) => setGoogleMapStyle(value, controller!));
@@ -59,7 +67,8 @@ class _HomePageState extends State<HomePage> {
           CameraPosition(target: positionOfUserInLatLang, zoom: 15);
       controllerGoogleMap!
           .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-      await CommonMethods.fetchFormattedAddress(positionOfUser.latitude, positionOfUser.longitude, context);
+      await CommonMethods.fetchFormattedAddress(
+          positionOfUser.latitude, positionOfUser.longitude, context);
       await getUserInfoAndCheckBlockStatus();
     }
   }
@@ -96,6 +105,44 @@ class _HomePageState extends State<HomePage> {
         }
       },
     );
+  }
+
+  displayUserRideDetailsContainer() async {
+    //draw routes
+    await retrieveDirectionDetails();
+
+    setState(() {
+      seachContainerHeight = 0;
+      bottomMapPadding = MediaQuery.of(context).size.height * .30;
+      rideDetailsContainerHeight = MediaQuery.of(context).size.height * .25;
+    });
+  }
+
+  retrieveDirectionDetails() async {
+    var pickUpLocation =
+        Provider.of<AppInfo>(context, listen: false).pickUpLocation;
+    var dropOffDestinationLocation =
+        Provider.of<AppInfo>(context, listen: false).dropOffLocation;
+    var pickupGeoGraphicCoordinate = LatLng(
+        pickUpLocation!.latitudePosition!, pickUpLocation.longitudePosition!);
+    var dropOffGeoGraphicCoordinate = LatLng(
+        dropOffDestinationLocation!.latitudePosition!,
+        dropOffDestinationLocation.longitudePosition!);
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) =>
+          LoadingDialog(messageText: "Getting details..."),
+    );
+    var detailsFromDirectionAPI =
+        await CommonMethods.getDirectionDetailsFromAPI(
+            pickupGeoGraphicCoordinate, dropOffGeoGraphicCoordinate);
+    setState(() {
+      tripDirectionDetailsInfo = detailsFromDirectionAPI;
+    });
+
+    // Close the loading dialog
+    Navigator.pop(context);
   }
 
   @override
@@ -224,7 +271,7 @@ class _HomePageState extends State<HomePage> {
                     sKey.currentState!.openDrawer();
                   } else {
                     // You can add a delayed attempt to open the drawer
-                    Future.delayed(Duration(milliseconds: 100), () {
+                    Future.delayed(const Duration(milliseconds: 100), () {
                       if (sKey.currentState != null) {
                         sKey.currentState!.openDrawer();
                       }
@@ -270,13 +317,25 @@ class _HomePageState extends State<HomePage> {
                         backgroundColor: Colors.grey,
                         padding: const EdgeInsets.all(24),
                       ),
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        var responseFromSearchPage = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (c) => const SearchDestinationPlace(),
                           ),
                         );
+                        if (responseFromSearchPage == "placeSelected") {
+                          var dropOffLocation =
+                              Provider.of<AppInfo>(context, listen: false)
+                                  .dropOffLocation;
+                          if (dropOffLocation != null) {
+                            String placeName = dropOffLocation.placeName ?? "";
+                            displayUserRideDetailsContainer();
+                            print("Drop Off Location: $placeName");
+                          } else {
+                            print("Drop Off Location is null.");
+                          }
+                        }
                       },
                       child: const Icon(
                         Icons.search,
@@ -308,6 +367,106 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: rideDetailsContainerHeight,
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white12,
+                      blurRadius: 15.0,
+                      spreadRadius: 0.5,
+                      offset: Offset(0.7, 0.7),
+                    )
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 16),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * .25,
+                          child: Card(
+                            elevation: 10,
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              color: Colors.grey.shade900,
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 8, bottom: 8),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Text(
+                                          (tripDirectionDetailsInfo != null)
+                                              ? tripDirectionDetailsInfo!.distanceTextString!
+                                              : "",
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white70,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          (tripDirectionDetailsInfo != null)
+                                              ? tripDirectionDetailsInfo!
+                                                  .durationTextString!
+                                              : "0 Sec",
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white70,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: Image.asset(
+                                        "assets/images/uberexec.png",
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.1,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.3,
+                                      ),
+                                    ),
+                                    Text(
+                                      (tripDirectionDetailsInfo != null)
+                                          ? "\Rs ${(commonMethods.calculateFareAmountInPKR(tripDirectionDetailsInfo!)).toString()}"
+                                          : "",
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white70,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
