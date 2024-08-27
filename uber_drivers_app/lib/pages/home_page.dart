@@ -20,6 +20,9 @@ class _HomePageState extends State<HomePage> {
       Completer<GoogleMapController>();
   GoogleMapController? controllerGoogleMap;
   Position? currentPositionUser;
+  Color colorToShow = Colors.green;
+  String titleToShow = 'Go Online Now';
+  bool isDriverAvailable = false;
 
   void updateMapTheme(GoogleMapController? controller) {
     getJsonFileFromThemes("themes/night_style.json")
@@ -67,6 +70,140 @@ class _HomePageState extends State<HomePage> {
                 googleMapCompleterController.complete(controllerGoogleMap);
                 getCurrentLiveLocationOfUser();
               },
+            ),
+            Positioned(
+              top: 8,
+              left: 10,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          isDismissible: false,
+                          builder: (BuildContext context) {
+                            return Container(
+                              decoration: const BoxDecoration(
+                                color: Colors.black87,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 5.0,
+                                    spreadRadius: 0.5,
+                                    offset: Offset(
+                                      0.7,
+                                      0.7,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              height: 221,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 32, vertical: 18),
+                                child: Column(
+                                  children: [
+                                    const SizedBox(height: 11),
+                                    Text(
+                                      (!isDriverAvailable)
+                                          ? "Go Online Now"
+                                          : "Go Offline Now",
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        color: Colors.white70,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 21,
+                                    ),
+                                    Text(
+                                      (!isDriverAvailable)
+                                          ? "You are about to go online, you will become available to receive trip requests from users."
+                                          : "You are about to go offline, you will stop receiving new trip requests from users",
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        //fontSize: 22,
+                                        color: Colors.white30,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 22,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text(
+                                              "Back",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 16,
+                                        ),
+                                        Expanded(
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              if (!isDriverAvailable) {
+                                              Navigator.pop(context);
+                                                //go inline
+                                                //get driver location
+                                                setState(() {
+                                                  colorToShow = Colors.pink;
+                                                  titleToShow =
+                                                      "Go Offline Now";
+                                                  isDriverAvailable = true;
+                                                });
+                                              } else {
+                                                //go offline
+                                                Navigator.pop(context);
+                                                setState(() {
+                                                  colorToShow = Colors.green;
+                                                  titleToShow = "Go Online Now";
+                                                  isDriverAvailable = false;
+                                                });
+                                              }
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: (titleToShow ==
+                                                      "Go Online Now"
+                                                  ? Colors.green
+                                                  : Colors.pink),
+                                            ),
+                                            child: const Text(
+                                              "Confirm",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
+                    },
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: colorToShow,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(0))),
+                    child: Text(
+                      titleToShow,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  )
+                ],
+              ),
             )
           ],
         ),
