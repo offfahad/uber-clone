@@ -58,6 +58,7 @@ class _HomePageState extends State<HomePage> {
   String stateOfApp = "normal";
   bool nearbyOnlineDriversKeysLoaded = false;
   BitmapDescriptor? carIconNearbyDriver;
+  DatabaseReference? tripRequestRef;
 
   makeDriverNearbyCarIcon() {
     if (carIconNearbyDriver == null) {
@@ -121,6 +122,7 @@ class _HomePageState extends State<HomePage> {
           if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
             setState(() {
               userName = (snap.snapshot.value as Map)["name"];
+              userPhone = (snap.snapshot.value as Map)["phone"];
             });
           } else {
             FirebaseAuth.instance.signOut();
@@ -164,6 +166,52 @@ class _HomePageState extends State<HomePage> {
     });
 
     //send ride request
+    makeTripRequest();
+  }
+
+  makeTripRequest() {
+    tripRequestRef =
+        FirebaseDatabase.instance.ref().child("tripRequest").push();
+
+    var pickUpLocation =
+        Provider.of<AppInfo>(context, listen: false).pickUpLocation;
+    var dropOffDestinationLocation =
+        Provider.of<AppInfo>(context, listen: false).dropOffLocation;
+    Map pickUpCoOrdinatesMap = {
+      "latitude": pickUpLocation!.latitudePosition.toString(),
+      "longitude": pickUpLocation.longitudePosition.toString(),
+    };
+    Map dropOffDesitinationCoOrdinatesMap = {
+      "latitude": dropOffDestinationLocation!.latitudePosition.toString(),
+      "longitude": dropOffDestinationLocation.longitudePosition.toString(),
+    };
+
+    Map driverCoOrdinates = {
+      "latitude": "",
+      "longitude": "",
+    };
+
+    Map dataMap = {
+      "tripID": tripRequestRef!.key,
+      "publishDateTime": DateTime.now().toString(),
+      "username": userName,
+      "userPhone": userPhone,
+      "userID": userID,
+      "pickUpLatLng": pickUpCoOrdinatesMap,
+      "dropOffLatLng": dropOffDesitinationCoOrdinatesMap,
+      "pickUpAddress": pickUpLocation.placeName,
+      "dropOffAddress": dropOffDestinationLocation.placeName,
+      "driverId": "waiting",
+      "carDetails": "",
+      "driverLocation": driverCoOrdinates,
+      "driverName": "",
+      "driverPhone": "",
+      "driverPhoto": "",
+      "fareAmount": "",
+      "status": "new"
+    };
+
+    tripRequestRef!.set(dataMap);
   }
 
   retrieveDirectionDetails() async {
@@ -793,6 +841,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   cancelRideRequest() {
+    tripRequestRef!.remove();
     setState(() {
       stateOfApp = "normal";
     });
