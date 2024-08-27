@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_drivers_app/global/global.dart';
@@ -23,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   Color colorToShow = Colors.green;
   String titleToShow = 'Go Online Now';
   bool isDriverAvailable = false;
+  DatabaseReference? newTripRequestReference;
 
   void updateMapTheme(GoogleMapController? controller) {
     getJsonFileFromThemes("themes/night_style.json")
@@ -52,6 +56,42 @@ class _HomePageState extends State<HomePage> {
       controllerGoogleMap!
           .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
     }
+  }
+
+  goOnlineNow() {
+    //all drivers who are available for work
+    Geofire.initialize("onlineDrivers");
+    Geofire.setLocation(FirebaseAuth.instance.currentUser!.uid,
+        currentPositionUser!.latitude, currentPositionUser!.longitude);
+    newTripRequestReference = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .child("newTripStatus");
+    newTripRequestReference!.set("waiting");
+    newTripRequestReference!.onValue.listen((event) {});
+  }
+
+  goOfflineNow() {
+    Geofire.removeLocation(FirebaseAuth.instance.currentUser!.uid);
+    newTripRequestReference!.onDisconnect();
+    newTripRequestReference!.remove();
+    newTripRequestReference = null;
+  }
+
+  setAndGetLocationUpdates() {
+    positionStreamHomePage =
+        Geolocator.getPositionStream().listen((Position position) {
+      currentPositionUser = position;
+      if (isDriverAvailable == true) {
+        Geofire.setLocation(FirebaseAuth.instance.currentUser!.uid,
+            currentPositionUser!.latitude, currentPositionUser!.longitude);
+      }
+      LatLng positionLatLang =
+          LatLng(currentPositionUser!.latitude, currentPositionUser!.longitude);
+      controllerGoogleMap!
+          .animateCamera(CameraUpdate.newLatLng(positionLatLang));
+    });
   }
 
   @override
@@ -153,9 +193,11 @@ class _HomePageState extends State<HomePage> {
                                           child: ElevatedButton(
                                             onPressed: () {
                                               if (!isDriverAvailable) {
-                                              Navigator.pop(context);
-                                                //go inline
+                                                //go online
+                                                goOnlineNow();
                                                 //get driver location
+                                                setAndGetLocationUpdates();
+                                                Navigator.pop(context);
                                                 setState(() {
                                                   colorToShow = Colors.pink;
                                                   titleToShow =
@@ -164,6 +206,7 @@ class _HomePageState extends State<HomePage> {
                                                 });
                                               } else {
                                                 //go offline
+                                                goOfflineNow();
                                                 Navigator.pop(context);
                                                 setState(() {
                                                   colorToShow = Colors.green;

@@ -39,6 +39,7 @@ dependencies:
   firebase_storage:
   permission_handler: ^11.3.1
   image_picker: ^1.1.2
+  flutter_geofire: 
 
 
   # The following adds the Cupertino Icons font to your application.
