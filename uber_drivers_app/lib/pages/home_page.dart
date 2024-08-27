@@ -10,6 +10,7 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_drivers_app/global/global.dart';
+import 'package:uber_drivers_app/pushNotifications/push_notification.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -92,6 +93,18 @@ class _HomePageState extends State<HomePage> {
       controllerGoogleMap!
           .animateCamera(CameraUpdate.newLatLng(positionLatLang));
     });
+  }
+  initalizePushNotificationSystem(){
+    PushNotificationSystem notificationSystem = PushNotificationSystem();
+    notificationSystem.generateDeviceRegistrationToken();
+    notificationSystem.startListeningForNewNotification();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initalizePushNotificationSystem();
   }
 
   @override
