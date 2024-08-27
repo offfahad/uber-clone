@@ -23,6 +23,7 @@ import 'package:uber_users_app/models/direction_details.dart';
 import 'package:uber_users_app/models/online_nearby_drivers.dart';
 import 'package:uber_users_app/pages/search_destination_place.dart';
 import 'package:http/http.dart' as http;
+import 'package:uber_users_app/widgets/info_dialog.dart';
 
 import '../widgets/loading_dialog.dart';
 import '../global/trip_var.dart';
@@ -59,7 +60,7 @@ class _HomePageState extends State<HomePage> {
   bool nearbyOnlineDriversKeysLoaded = false;
   BitmapDescriptor? carIconNearbyDriver;
   DatabaseReference? tripRequestRef;
-
+  List<OnlineNearbyDrivers> availableNearbyOnlineDriversList = [];
   makeDriverNearbyCarIcon() {
     if (carIconNearbyDriver == null) {
       ImageConfiguration configuration = createLocalImageConfiguration(
@@ -433,6 +434,31 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  noDriverAvailable() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => InfoDialog(
+          title: "No Driver Available",
+          description:
+              "No driver found in the nearby. Please try again shortly."),
+    );
+  }
+
+  searchDriver() {
+    if (availableNearbyOnlineDriversList.length == 0) {
+      cancelRideRequest();
+      resetAppNow();
+      noDriverAvailable();
+      return;
+    }
+    var currentDriver = availableNearbyOnlineDriversList[0];
+
+    //send push notification
+
+    availableNearbyOnlineDriversList!.removeAt(0);
+  }
+
   @override
   Widget build(BuildContext context) {
     makeDriverNearbyCarIcon();
@@ -736,7 +762,12 @@ class _HomePageState extends State<HomePage> {
                                         });
                                         displayRequestContainer();
 
-                                        //get nearset availbe driver
+                                        //get nearest availbe driver
+                                        availableNearbyOnlineDriversList =
+                                            ManageDriversMethods
+                                                .nearbyOnlineDriversList;
+                                        //search driver
+                                        searchDriver();
                                       },
                                       child: Image.asset(
                                         "assets/images/uberexec.png",
