@@ -42,6 +42,7 @@ dependencies:
   provider:
   flutter_polyline_points:
   loading_animation_widget:
+  flutter_geofire:
 
 
   # The following adds the Cupertino Icons font to your application.
