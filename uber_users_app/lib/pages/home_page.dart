@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_users_app/appInfo/app_info.dart';
 import 'package:uber_users_app/authentication/login_screen.dart';
@@ -21,6 +22,7 @@ import 'package:uber_users_app/pages/search_destination_place.dart';
 import 'package:http/http.dart' as http;
 
 import '../widgets/loading_dialog.dart';
+import '../global/trip_var.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,6 +39,9 @@ class _HomePageState extends State<HomePage> {
   double seachContainerHeight = 276;
   double bottomMapPadding = 0;
   double rideDetailsContainerHeight = 0;
+  double requestContainerHeight = 0;
+  double tripContainerHeight = 0;
+
   CommonMethods commonMethods = CommonMethods();
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
   DirectionDetails? tripDirectionDetailsInfo;
@@ -45,6 +50,9 @@ class _HomePageState extends State<HomePage> {
 
   List<LatLng> polylineCoordinates = [];
   Set<Polyline> polylineSet = {};
+
+  bool isDrawerOpen = true;
+  String stateOfApp = "normal";
 
   void updateMapTheme(GoogleMapController? controller) {
     getJsonFileFromThemes("themes/night_style.json")
@@ -121,8 +129,20 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       seachContainerHeight = 0;
       bottomMapPadding = MediaQuery.of(context).size.height * .30;
-      rideDetailsContainerHeight = MediaQuery.of(context).size.height * .25;
+      rideDetailsContainerHeight = MediaQuery.of(context).size.height * .30;
+      isDrawerOpen = false;
     });
+  }
+
+  displayRequestContainer() {
+    setState(() {
+      rideDetailsContainerHeight = 0;
+      requestContainerHeight =  MediaQuery.of(context).size.height * .30;
+      bottomMapPadding = MediaQuery.of(context).size.height * .30;
+      isDrawerOpen = true;
+    });
+
+    //send ride request
   }
 
   retrieveDirectionDetails() async {
@@ -165,7 +185,7 @@ class _HomePageState extends State<HomePage> {
     }
     setState(() {
       Polyline polyline = Polyline(
-          polylineId: PolylineId("polylineID"),
+          polylineId: const PolylineId("polylineID"),
           color: Colors.blue,
           points: polylineCoordinates,
           jointType: JointType.round,
@@ -252,6 +272,28 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       circleSet.add(pickUpPointCircle);
       circleSet.add(dropOffDestinationCircle);
+    });
+  }
+
+  resetAppNow() {
+    setState(() {
+      polylineCoordinates.clear();
+      polylineSet.clear();
+      markerSet.clear();
+      circleSet.clear();
+      rideDetailsContainerHeight = 0;
+      requestContainerHeight = 0;
+      tripContainerHeight = 0;
+      seachContainerHeight = 276;
+      bottomMapPadding = 300;
+      isDrawerOpen == true;
+
+      status = "";
+      nameDriver = "";
+      photoNumber = "";
+      photoNumberDriver = "";
+      carDetailsDriver = "";
+      tripStatusDisplay = "Diver is Arriving";
     });
   }
 
@@ -380,16 +422,14 @@ class _HomePageState extends State<HomePage> {
               left: 25,
               child: GestureDetector(
                 onTap: () {
-                  if (sKey.currentState != null) {
+                  if (isDrawerOpen == true) {
                     sKey.currentState!.openDrawer();
                   } else {
-                    // You can add a delayed attempt to open the drawer
-                    Future.delayed(const Duration(milliseconds: 100), () {
-                      if (sKey.currentState != null) {
-                        sKey.currentState!.openDrawer();
-                      }
-                    });
+                    resetAppNow();
                   }
+                  setState(() {
+                    isDrawerOpen = !isDrawerOpen; // Toggle the drawer state
+                  });
                 },
                 child: Container(
                   decoration: BoxDecoration(
@@ -404,11 +444,11 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                     backgroundColor: Colors.grey,
                     radius: 20,
                     child: Icon(
-                      Icons.menu,
+                      isDrawerOpen == true ? Icons.menu : Icons.close,
                       color: Colors.black87,
                     ),
                   ),
@@ -505,7 +545,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 0),
+                  padding: const EdgeInsets.symmetric(vertical: 0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -519,7 +559,8 @@ class _HomePageState extends State<HomePage> {
                               width: MediaQuery.of(context).size.width,
                               color: Colors.grey.shade900,
                               child: Padding(
-                                padding: EdgeInsets.only(top: 8, bottom: 8),
+                                padding:
+                                    const EdgeInsets.only(top: 8, bottom: 8),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -552,7 +593,14 @@ class _HomePageState extends State<HomePage> {
                                       ],
                                     ),
                                     GestureDetector(
-                                      onTap: () {},
+                                      onTap: () {
+                                        setState(() {
+                                          stateOfApp = "requesting";
+                                        });
+                                        displayRequestContainer();
+
+                                        //get nearset availbe driver
+                                      },
                                       child: Image.asset(
                                         "assets/images/uberexec.png",
                                         height:
@@ -584,9 +632,80 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: requestContainerHeight,
+                decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 15.0,
+                        spreadRadius: 0.5,
+                        offset: Offset(0.7, 0.7),
+                      )
+                    ]),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      SizedBox(
+                        width: 200,
+                        child: LoadingAnimationWidget.flickr(
+                          leftDotColor: Colors.greenAccent,
+                          rightDotColor: Colors.pinkAccent,
+                          size: 50,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          resetAppNow();
+                          cancelRideRequest();
+                        },
+                        child: Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white70,
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(width: 1.0, color: Colors.grey),
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.black,
+                            size: 25,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
           ],
         ),
       ),
     );
+  }
+  
+  cancelRideRequest() {
+    setState(() {
+      stateOfApp = "normal";
+    });
   }
 }
