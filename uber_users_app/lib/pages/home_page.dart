@@ -14,11 +14,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:restart_app/restart_app.dart';
 import 'package:uber_users_app/appInfo/app_info.dart';
 import 'package:uber_users_app/authentication/login_screen.dart';
 import 'package:uber_users_app/global/global_var.dart';
 import 'package:uber_users_app/methods/common_methods.dart';
 import 'package:uber_users_app/methods/manage_drivers_methods.dart';
+import 'package:uber_users_app/methods/push_notification_service.dart';
 import 'package:uber_users_app/models/direction_details.dart';
 import 'package:uber_users_app/models/online_nearby_drivers.dart';
 import 'package:uber_users_app/pages/search_destination_place.dart';
@@ -103,8 +105,8 @@ class _HomePageState extends State<HomePage> {
           CameraPosition(target: positionOfUserInLatLang, zoom: 15);
       controllerGoogleMap!
           .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-      await CommonMethods.fetchFormattedAddress(
-          positionOfUser.latitude, positionOfUser.longitude, context);
+      await CommonMethods.convertGeoGraphicCoOrdinatesIntoHumanReadableAddress(
+          currentPositionUser!, context);
       await getUserInfoAndCheckBlockStatus();
 
       await initlaizeGeoFireListner();
@@ -365,6 +367,7 @@ class _HomePageState extends State<HomePage> {
       carDetailsDriver = "";
       tripStatusDisplay = "Diver is Arriving";
     });
+    Restart.restartApp();
   }
 
   updateAvailableNearbyOnlineDriversOnMap() {
@@ -441,7 +444,7 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context) => InfoDialog(
           title: "No Driver Available",
           description:
-              "No driver found in the nearby. Please try again shortly."),
+              "No driver found in the nearby.\nPlease try again shortly."),
     );
   }
 
@@ -455,8 +458,36 @@ class _HomePageState extends State<HomePage> {
     var currentDriver = availableNearbyOnlineDriversList[0];
 
     //send push notification
+    sendNotificationToDriver(currentDriver);
 
     availableNearbyOnlineDriversList!.removeAt(0);
+  }
+
+  sendNotificationToDriver(OnlineNearbyDrivers currentDriver) {
+    DatabaseReference currentDriverRef = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(currentDriver.uidDriver.toString())
+        .child("newTripStatus");
+
+    currentDriverRef.set(tripRequestRef!.key);
+    //send notification to that driver
+    DatabaseReference tokenOfCurrentDriverRef = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(currentDriver.uidDriver.toString())
+        .child("deviceToken");
+
+    tokenOfCurrentDriverRef.once().then((dataSnapshot) {
+      if (dataSnapshot.snapshot.value != null) {
+        String deviceToken = dataSnapshot.snapshot.value.toString();
+        //send notification
+        PushNotificationService.sendNotificationToSelectedDriver(
+            deviceToken, context, tripRequestRef!.key.toString());
+      } else {
+        return;
+      }
+    });
   }
 
   @override

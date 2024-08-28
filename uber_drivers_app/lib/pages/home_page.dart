@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
   initalizePushNotificationSystem(){
     PushNotificationSystem notificationSystem = PushNotificationSystem();
     notificationSystem.generateDeviceRegistrationToken();
-    notificationSystem.startListeningForNewNotification();
+    notificationSystem.startListeningForNewNotification(context);
   }
 
   @override

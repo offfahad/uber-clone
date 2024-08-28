@@ -48,62 +48,42 @@ class CommonMethods {
     }
   }
 
-// Example function to extract the formatted address from the API response
+  ///Reverse GeoCoding
   static Future<String> convertGeoGraphicCoOrdinatesIntoHumanReadableAddress(
       Position position, BuildContext context) async {
     String humanReadableAddress = "";
     String apiGeoCodingUrl =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$googleMapKey";
+
     var responseFromAPI = await sendRequestToAPI(apiGeoCodingUrl);
 
-    if (responseFromAPI != "error" && responseFromAPI["results"].isNotEmpty) {
-      // Extracting the formatted address
+    if (responseFromAPI != "error") {
       humanReadableAddress = responseFromAPI["results"][0]["formatted_address"];
-      print("HumanReadableAddress = $humanReadableAddress");
-    } else {
-      //humanReadableAddress = "Address not found";
-      print("address not found");
+
+      AddressModel model = AddressModel();
+      model.humanReadableAddress = humanReadableAddress;
+      model.placeName = humanReadableAddress;
+      model.longitudePosition = position.longitude;
+      model.latitudePosition = position.latitude;
+
+      Provider.of<AppInfo>(context, listen: false).updatePickUpLocation(model);
     }
+
     return humanReadableAddress;
   }
 
-  static Future<String?> fetchFormattedAddress(
-      double latitude, double longitude, BuildContext context) async {
-    const String apiKey = googleMapKey;
-    const String baseUrl = 'https://maps.googleapis.com/maps/api/geocode/json';
+  /// This method shortens the full address by extracting key parts.
+  static String shortenAddress(String fullAddress) {
+    // Split the address by commas
+    List<String> parts = fullAddress.split(',');
 
-    final String latlng = '$latitude,$longitude';
-    final Uri url = Uri.parse('$baseUrl?latlng=$latlng&key=$apiKey');
-
-    print("API Request URL: $url"); // Debug line to check the URL
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-
-      if (jsonResponse['status'] == 'OK') {
-        String formattedAddress =
-            jsonResponse['results'][0]['formatted_address'];
-        print('Formatted Address: $formattedAddress');
-
-        AddressModel model = AddressModel();
-        model.humanReadableAddress = formattedAddress;
-        model.latitudePosition = latitude;
-        model.longitudePosition = longitude;
-
-        Provider.of<AppInfo>(context, listen: false)
-            .updatePickUpLocation(model);
-        return formattedAddress;
-      } else {
-        print(
-            'Error: ${jsonResponse['status']} - ${jsonResponse['error_message']}');
-        return null;
-      }
-    } else {
-      print('Failed to load data: ${response.statusCode}');
-      return null;
+    // Return a shorter version of the address: e.g., "Street Name, City"
+    if (parts.length >= 2) {
+      return "${parts[0].trim()}, ${parts[1].trim()}";
     }
+
+    // If the address has fewer parts, return it as is
+    return fullAddress;
   }
 
   static Future<DirectionDetails?> getDirectionDetailsFromAPI(

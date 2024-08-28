@@ -25,6 +25,7 @@ class _SearchDestinationPlaceState extends State<SearchDestinationPlace> {
     if (locationName.length > 1) {
       String apiPlacesUrl =
           "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$locationName&key=$googleMapKey&components=country:pk";
+      print('API PLACE URL ${apiPlacesUrl}');
       var responseFromPlacesAPI =
           await CommonMethods.sendRequestToAPI(apiPlacesUrl);
       if (responseFromPlacesAPI == "error") {
@@ -52,6 +53,8 @@ class _SearchDestinationPlaceState extends State<SearchDestinationPlace> {
             .pickUpLocation!
             .humanReadableAddress ??
         '';
+
+    print('User Pick Up Location ${userAddress}');
 
     
     pickUpTextEditingController.text = userAddress;
