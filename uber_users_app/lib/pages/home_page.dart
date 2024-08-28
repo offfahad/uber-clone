@@ -367,7 +367,6 @@ class _HomePageState extends State<HomePage> {
       carDetailsDriver = "";
       tripStatusDisplay = "Diver is Arriving";
     });
-    Restart.restartApp();
   }
 
   updateAvailableNearbyOnlineDriversOnMap() {
@@ -487,6 +486,33 @@ class _HomePageState extends State<HomePage> {
       } else {
         return;
       }
+      const oneTickPerSec = Duration(seconds: 1);
+      var timerCountDown = Timer.periodic(oneTickPerSec, (timer) {
+        requestTimeoutDriver = requestTimeoutDriver - 1;
+        //when trip request is not requsting
+        if (stateOfApp != "requesting") {
+          timer.cancel();
+          currentDriverRef.set("cancelled");
+          currentDriverRef.onDisconnect();
+          requestTimeoutDriver = 20;
+        }
+        currentDriverRef.onValue.listen((dataSnapshot) {
+          if (dataSnapshot.snapshot.value.toString() == "accepted") {
+            timer.cancel();
+            currentDriverRef.onDisconnect();
+            requestTimeoutDriver = 20;
+          }
+        });
+        if (requestTimeoutDriver == 0) {
+          tripRequestRef!.set("timeout");
+          timer.cancel();
+          currentDriverRef.onDisconnect();
+          requestTimeoutDriver = 20;
+
+          //send notification to next nearset online availabe driver
+          searchDriver();
+        }
+      });
     });
   }
 

@@ -20,17 +20,19 @@ class _SearchDestinationPlaceState extends State<SearchDestinationPlace> {
       TextEditingController();
 
   List<PredictionModel> dropOffPredictionsPlacesList = [];
-
   searchLocation(String locationName) async {
     if (locationName.length > 1) {
       String apiPlacesUrl =
           "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$locationName&key=$googleMapKey&components=country:pk";
-      print('API PLACE URL ${apiPlacesUrl}');
+      print('API PLACE URL $apiPlacesUrl');
+
       var responseFromPlacesAPI =
           await CommonMethods.sendRequestToAPI(apiPlacesUrl);
+
       if (responseFromPlacesAPI == "error") {
         return;
       }
+
       if (responseFromPlacesAPI["status"] == "OK") {
         var predictionsResultsInJson = responseFromPlacesAPI["predictions"];
         var predictionsList = (predictionsResultsInJson as List)
@@ -39,10 +41,14 @@ class _SearchDestinationPlaceState extends State<SearchDestinationPlace> {
                   PredictionModel.fromJson(eachPlacePrediction),
             )
             .toList();
-        setState(() {
-          dropOffPredictionsPlacesList = predictionsList;
-        });
-        print("predicted places = " + predictionsResultsInJson.toString());
+
+        // Check if the widget is still mounted before calling setState
+        if (mounted) {
+          setState(() {
+            dropOffPredictionsPlacesList = predictionsList;
+          });
+          print("predicted places = " + predictionsResultsInJson.toString());
+        }
       }
     }
   }
@@ -56,7 +62,6 @@ class _SearchDestinationPlaceState extends State<SearchDestinationPlace> {
 
     print('User Pick Up Location ${userAddress}');
 
-    
     pickUpTextEditingController.text = userAddress;
     mq = MediaQuery.sizeOf(context);
     return Scaffold(

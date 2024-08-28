@@ -10,6 +10,7 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_drivers_app/global/global.dart';
+import 'package:uber_drivers_app/methods/map_theme_methods.dart';
 import 'package:uber_drivers_app/pushNotifications/push_notification.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   String titleToShow = 'Go Online Now';
   bool isDriverAvailable = false;
   DatabaseReference? newTripRequestReference;
+  MapThemeMethods themeMethods = MapThemeMethods();
 
   void updateMapTheme(GoogleMapController? controller) {
     getJsonFileFromThemes("themes/night_style.json")
@@ -50,6 +52,7 @@ class _HomePageState extends State<HomePage> {
       Position positionOfUser = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
       currentPositionUser = positionOfUser;
+      driverCurrentPosition = currentPositionUser;
       LatLng positionOfUserInLatLang =
           LatLng(currentPositionUser!.latitude, currentPositionUser!.longitude);
       CameraPosition cameraPosition =
@@ -94,7 +97,8 @@ class _HomePageState extends State<HomePage> {
           .animateCamera(CameraUpdate.newLatLng(positionLatLang));
     });
   }
-  initalizePushNotificationSystem(){
+
+  initalizePushNotificationSystem() {
     PushNotificationSystem notificationSystem = PushNotificationSystem();
     notificationSystem.generateDeviceRegistrationToken();
     notificationSystem.startListeningForNewNotification(context);
@@ -119,6 +123,7 @@ class _HomePageState extends State<HomePage> {
               initialCameraPosition: googlePlexInitialPosition,
               onMapCreated: (GoogleMapController mapController) {
                 controllerGoogleMap = mapController;
+                themeMethods.updateMapTheme(controllerGoogleMap!);
                 updateMapTheme(controllerGoogleMap);
                 googleMapCompleterController.complete(controllerGoogleMap);
                 getCurrentLiveLocationOfUser();

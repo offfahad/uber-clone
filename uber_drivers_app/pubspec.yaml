@@ -44,6 +44,8 @@ dependencies:
   # For creating notification channel
   flutter_notification_channel: ^3.1.0
   assets_audio_player:
+  http:
+  flutter_polyline_points:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
