@@ -109,7 +109,7 @@ class PushNotificationSystem {
           (dataSnapshot.snapshot.value! as Map)["dropOffAddress"];
 
       tripDetailsInfo.userName =
-          (dataSnapshot.snapshot.value! as Map)["userName"];
+          (dataSnapshot.snapshot.value! as Map)["username"];
       tripDetailsInfo.userPhone =
           (dataSnapshot.snapshot.value! as Map)["userPhone"];
 

@@ -24,49 +24,33 @@ class _HomePageState extends State<HomePage> {
   final Completer<GoogleMapController> googleMapCompleterController =
       Completer<GoogleMapController>();
   GoogleMapController? controllerGoogleMap;
-  Position? currentPositionUser;
+  Position? currentPositionOfDriver;
   Color colorToShow = Colors.green;
-  String titleToShow = 'Go Online Now';
+  String titleToShow = "Go Online Now";
   bool isDriverAvailable = false;
   DatabaseReference? newTripRequestReference;
   MapThemeMethods themeMethods = MapThemeMethods();
 
-  void updateMapTheme(GoogleMapController? controller) {
-    getJsonFileFromThemes("themes/night_style.json")
-        .then((value) => setGoogleMapStyle(value, controller!));
-  }
+  getCurrentLiveLocationOfDriver() async {
+    Position positionOfUser = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.bestForNavigation);
+    currentPositionOfDriver = positionOfUser;
+    driverCurrentPosition = currentPositionOfDriver;
 
-  Future<String> getJsonFileFromThemes(String mapStylePath) async {
-    ByteData byteData = await rootBundle.load(mapStylePath);
-    var list = byteData.buffer
-        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
-    return utf8.decode(list);
-  }
+    LatLng positionOfUserInLatLng = LatLng(
+        currentPositionOfDriver!.latitude, currentPositionOfDriver!.longitude);
 
-  setGoogleMapStyle(String googleMapStyle, GoogleMapController controller) {
-    controller.setMapStyle(googleMapStyle);
-  }
-
-  getCurrentLiveLocationOfUser() async {
-    if (controllerGoogleMap != null) {
-      Position positionOfUser = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      currentPositionUser = positionOfUser;
-      driverCurrentPosition = currentPositionUser;
-      LatLng positionOfUserInLatLang =
-          LatLng(currentPositionUser!.latitude, currentPositionUser!.longitude);
-      CameraPosition cameraPosition =
-          CameraPosition(target: positionOfUserInLatLang, zoom: 15);
-      controllerGoogleMap!
-          .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-    }
+    CameraPosition cameraPosition =
+        CameraPosition(target: positionOfUserInLatLng, zoom: 15);
+    controllerGoogleMap!
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
   goOnlineNow() {
     //all drivers who are available for work
     Geofire.initialize("onlineDrivers");
     Geofire.setLocation(FirebaseAuth.instance.currentUser!.uid,
-        currentPositionUser!.latitude, currentPositionUser!.longitude);
+        currentPositionOfDriver!.latitude, currentPositionOfDriver!.longitude);
     newTripRequestReference = FirebaseDatabase.instance
         .ref()
         .child("drivers")
@@ -86,15 +70,19 @@ class _HomePageState extends State<HomePage> {
   setAndGetLocationUpdates() {
     positionStreamHomePage =
         Geolocator.getPositionStream().listen((Position position) {
-      currentPositionUser = position;
+      currentPositionOfDriver = position;
+
       if (isDriverAvailable == true) {
-        Geofire.setLocation(FirebaseAuth.instance.currentUser!.uid,
-            currentPositionUser!.latitude, currentPositionUser!.longitude);
+        Geofire.setLocation(
+          FirebaseAuth.instance.currentUser!.uid,
+          currentPositionOfDriver!.latitude,
+          currentPositionOfDriver!.longitude,
+        );
       }
-      LatLng positionLatLang =
-          LatLng(currentPositionUser!.latitude, currentPositionUser!.longitude);
+
+      LatLng positionLatLng = LatLng(position.latitude, position.longitude);
       controllerGoogleMap!
-          .animateCamera(CameraUpdate.newLatLng(positionLatLang));
+          .animateCamera(CameraUpdate.newLatLng(positionLatLng));
     });
   }
 
@@ -124,9 +112,10 @@ class _HomePageState extends State<HomePage> {
               onMapCreated: (GoogleMapController mapController) {
                 controllerGoogleMap = mapController;
                 themeMethods.updateMapTheme(controllerGoogleMap!);
-                updateMapTheme(controllerGoogleMap);
+
                 googleMapCompleterController.complete(controllerGoogleMap);
-                getCurrentLiveLocationOfUser();
+
+                getCurrentLiveLocationOfDriver();
               },
             ),
             Positioned(

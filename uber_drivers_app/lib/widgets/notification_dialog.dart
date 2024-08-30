@@ -73,7 +73,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
         .child(FirebaseAuth.instance.currentUser!.uid)
         .child("newTripStatus");
 
-    await driverTripStatusRef.once().then((snap) {
+    await driverTripStatusRef.once().then((snap) async {
       Navigator.pop(context);
       Navigator.pop(context);
 
@@ -90,7 +90,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
         //disable homepage location updates
         cMethods.turnOffLocationUpdatesForHomePage();
 
-        Navigator.push(
+        await Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (c) =>
@@ -266,14 +266,14 @@ class _NotificationDialogState extends State<NotificationDialog> {
                   ),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         audioPlayer.stop();
 
                         setState(() {
                           tripRequestStatus = "accepted";
                         });
 
-                        checkAvailabilityOfTripRequest(context);
+                        await checkAvailabilityOfTripRequest(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
