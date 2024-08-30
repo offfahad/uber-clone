@@ -93,20 +93,36 @@ class CommonMethods {
     return detailsModel;
   }
 
-  calculateFareAmount(DirectionDetails directionDetails) {
-    double distancePerKmAmount = 0.4;
-    double durationPerMinuteAmount = 0.3;
-    double baseFareAmount = 2;
+  calculateFareAmountInPKR(DirectionDetails directionDetails,
+      {double surgeMultiplier = 1.0}) {
+    double distancePerKmAmountPKR = 20; // 20 PKR per km
+    double durationPerMinuteAmountPKR = 15; // 15 PKR per minute
+    double baseFareAmountPKR = 150; // Base fare in PKR
+    double bookingFeePKR = 50; // Booking fee in PKR
+    double minimumFarePKR = 200; // Minimum fare in PKR
 
-    double totalDistanceTravelFareAmount =
-        (directionDetails.distanceValueDigits! / 1000) * distancePerKmAmount;
-    double totalDurationSpendFareAmount =
-        (directionDetails.durationValueDigits! / 60) * durationPerMinuteAmount;
+    // Calculate fare based on distance and time
+    double totalDistanceTravelledFareAmountPKR =
+        (directionDetails.distanceValueDigits! / 1000) * distancePerKmAmountPKR;
+    double totalDurationSpendFareAmountPKR =
+        (directionDetails.durationValueDigits! / 60) *
+            durationPerMinuteAmountPKR;
 
-    double overAllTotalFareAmount = baseFareAmount +
-        totalDistanceTravelFareAmount +
-        totalDurationSpendFareAmount;
+    // Total fare before applying surge
+    double totalFareBeforeSurgePKR = baseFareAmountPKR +
+        totalDistanceTravelledFareAmountPKR +
+        totalDurationSpendFareAmountPKR +
+        bookingFeePKR;
 
-    return overAllTotalFareAmount.toStringAsFixed(1);
+    // Apply surge pricing
+    double overAllTotalFareAmountPKR =
+        totalFareBeforeSurgePKR * surgeMultiplier;
+
+    // Apply minimum fare
+    if (overAllTotalFareAmountPKR < minimumFarePKR) {
+      overAllTotalFareAmountPKR = minimumFarePKR;
+    }
+
+    return overAllTotalFareAmountPKR.toStringAsFixed(2);
   }
 }

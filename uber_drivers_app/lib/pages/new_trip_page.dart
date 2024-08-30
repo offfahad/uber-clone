@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,7 @@ import 'package:uber_drivers_app/methods/common_method.dart';
 import 'package:uber_drivers_app/methods/map_theme_methods.dart';
 import 'package:uber_drivers_app/models/trip_details.dart';
 import 'package:uber_drivers_app/widgets/loading_dialog.dart';
+import 'package:uber_drivers_app/widgets/payment_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../global/global.dart';
@@ -60,8 +62,6 @@ class _NewTripPageState extends State<NewTripPage> {
       sourceLocationLatLng, destinationLocationLatLng) async {
     try {
       // Start by logging the method entry
-      print(
-          "obtainDirectionAndDrawRoute called with source: $sourceLocationLatLng and destination: $destinationLocationLatLng");
 
       showDialog(
         barrierDismissible: false,
@@ -74,23 +74,15 @@ class _NewTripPageState extends State<NewTripPage> {
       var tripDetailsInfo = await CommonMethods.getDirectionDetailsFromAPI(
           sourceLocationLatLng, destinationLocationLatLng);
 
-      // Log the received trip details info
-      print("Received trip details: $tripDetailsInfo");
-
       Navigator.pop(context);
 
       if (tripDetailsInfo == null || tripDetailsInfo.encodedPoints == null) {
-        // Log and return if tripDetailsInfo or encodedPoints is null
-        print("tripDetailsInfo or encodedPoints is null");
         return;
       }
 
       PolylinePoints pointsPolyline = PolylinePoints();
       List<PointLatLng> latLngPoints =
           pointsPolyline.decodePolyline(tripDetailsInfo.encodedPoints!);
-
-      // Log the decoded polyline points
-      print("Decoded polyline points: $latLngPoints");
 
       coordinatesPolylineLatLngList.clear();
 
@@ -119,9 +111,6 @@ class _NewTripPageState extends State<NewTripPage> {
 
         polyLinesSet.add(polyline);
       });
-
-      // Log after drawing the polyline
-      print("Polyline drawn");
 
       // Fit the polyline on google map
       LatLngBounds boundsLatLng;
@@ -156,9 +145,6 @@ class _NewTripPageState extends State<NewTripPage> {
         );
       }
 
-      // Log before animating the camera
-      print("Animating camera with bounds: $boundsLatLng");
-
       controllerGoogleMap!
           .animateCamera(CameraUpdate.newLatLngBounds(boundsLatLng, 72));
 
@@ -179,9 +165,6 @@ class _NewTripPageState extends State<NewTripPage> {
         markersSet.add(sourceMarker);
         markersSet.add(destinationMarker);
       });
-
-      // Log after adding markers
-      print("Markers added");
 
       // Add circle
       Circle sourceCircle = Circle(
@@ -206,9 +189,6 @@ class _NewTripPageState extends State<NewTripPage> {
         circlesSet.add(sourceCircle);
         circlesSet.add(destinationCircle);
       });
-
-      // Log after adding circles
-      print("Circles added");
     } catch (e, stackTrace) {
       // Catch and log any errors that occur
       print("Error in obtainDirectionAndDrawRoute: $e");
@@ -314,7 +294,7 @@ class _NewTripPageState extends State<NewTripPage> {
             driverCurrentLocationLatLng);
     Navigator.pop(context);
     String fareamount =
-        (commonMethods.calculateFareAmount(directionDetailsEndTripInfo!))
+        (commonMethods.calculateFareAmountInPKR(directionDetailsEndTripInfo!))
             .toString();
     FirebaseDatabase.instance
         .ref()
@@ -331,14 +311,78 @@ class _NewTripPageState extends State<NewTripPage> {
         .set("ended");
 
     positionStreamNewTripPage!.cancel();
-    // 
-    
+
+    displayLoadingDialog(fareamount);
+
+    saveFareAmountToDriverTotalEearning(fareamount);
+  }
+
+  displayLoadingDialog(faremmount) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => PaymentDialog(fareAmount: faremmount),
+    );
+  }
+
+  saveFareAmountToDriverTotalEearning(String fareAmount) async {
+    DatabaseReference driverEarningRef = FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .child("earnings");
+    await driverEarningRef.once().then((snap) {
+      if (snap.snapshot.value != null) {
+        double previousTotalEarning = double.parse(
+          snap.snapshot.value.toString(),
+        );
+        double fareAmountForThisAmount = double.parse(fareAmount);
+        double newTotalEarning = previousTotalEarning + fareAmountForThisAmount;
+        driverEarningRef.set(newTotalEarning);
+      } else {
+        driverEarningRef.set(fareAmount);
+      }
+    });
+  }
+
+  saveDriverDataToTripInfo() async {
+    Map<String, dynamic> driverDataMap = {
+      "status": "accepted",
+      "driverId": FirebaseAuth.instance.currentUser!.uid,
+      "driverName": driverName,
+      "driverPhone": driverPhone,
+      "driverPhoto": driverPhone,
+      "carDetails": "$carColor - $carModel - $carNumber",
+    };
+
+    Map<String, dynamic> driverCurrentLocation = {
+      'latitude': driverCurrentPosition!.latitude.toString(),
+      'longitude': driverCurrentPosition!.longitude.toString(),
+    };
+
+    await FirebaseDatabase.instance
+        .ref()
+        .child("tripRequest")
+        .child(widget.newTripDetailsInfo!.tripID!)
+        .update(driverDataMap);
+    await FirebaseDatabase.instance
+        .ref()
+        .child("tripRequest")
+        .child(widget.newTripDetailsInfo!.tripID!)
+        .child("driverLocation")
+        .update(driverCurrentLocation);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    saveDriverDataToTripInfo();
   }
 
   @override
   Widget build(BuildContext context) {
     makeMarker();
-    print("username ${widget.newTripDetailsInfo!.userName}");
     return Scaffold(
       body: Stack(
         children: [

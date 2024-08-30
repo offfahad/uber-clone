@@ -92,11 +92,30 @@ class _HomePageState extends State<HomePage> {
     notificationSystem.startListeningForNewNotification(context);
   }
 
+  retriveCurrentDriverInfo() {
+    FirebaseDatabase.instance
+        .ref()
+        .child("drivers")
+        .child(FirebaseAuth.instance.currentUser!.uid)
+        .once()
+        .then((snap) {
+      driverName = (snap.snapshot.value as Map)["name"];
+      driverPhone = (snap.snapshot.value as Map)["phone"];
+      driverPhoto = (snap.snapshot.value as Map)["photo"];
+      carColor = (snap.snapshot.value as Map)["car_details"]["carColor"];
+      carModel = (snap.snapshot.value as Map)["car_details"]["carModel"];
+      carNumber = (snap.snapshot.value as Map)["car_details"]["carNumber"];
+    });
+
+    initalizePushNotificationSystem();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    initalizePushNotificationSystem();
+
+    retriveCurrentDriverInfo();
   }
 
   @override
