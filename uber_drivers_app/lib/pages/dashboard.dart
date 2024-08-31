@@ -53,7 +53,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         controller: controller,
         children: const [
           HomePage(),
-          EarningPage(),
+          EarningsPage(),
           TripsPage(),
           ProfilePage(),
         ],
