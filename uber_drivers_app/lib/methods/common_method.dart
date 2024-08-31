@@ -31,20 +31,35 @@ class CommonMethods {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  turnOffLocationUpdatesForHomePage() {
-    positionStreamHomePage!.pause();
-
-    Geofire.removeLocation(FirebaseAuth.instance.currentUser!.uid);
+  void turnOffLocationUpdatesForHomePage() {
+    if (positionStreamHomePage != null) {
+      positionStreamHomePage!.pause();
+    } else {
+      // Handle the case where the stream is null (optional)
+      print("positionStreamHomePage is null, cannot pause.");
+    }
   }
 
-  turnOnLocationUpdatesForHomePage() {
-    positionStreamHomePage!.resume();
+  void turnOnLocationUpdatesForHomePage() {
+    // Check if positionStreamHomePage is not null before resuming
+    if (positionStreamHomePage != null) {
+      positionStreamHomePage!.resume();
+    } else {
+      // Handle the case where the stream is null (optional)
+      print("positionStreamHomePage is null, cannot resume.");
+    }
 
-    Geofire.setLocation(
-      FirebaseAuth.instance.currentUser!.uid,
-      driverCurrentPosition!.latitude,
-      driverCurrentPosition!.longitude,
-    );
+    // Check if driverCurrentPosition is not null before updating Geofire
+    if (driverCurrentPosition != null) {
+      Geofire.setLocation(
+        FirebaseAuth.instance.currentUser!.uid,
+        driverCurrentPosition!.latitude,
+        driverCurrentPosition!.longitude,
+      );
+    } else {
+      // Handle the case where driverCurrentPosition is null (optional)
+      print("driverCurrentPosition is null, cannot update Geofire.");
+    }
   }
 
   static sendRequestToAPI(String apiUrl) async {

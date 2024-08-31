@@ -33,11 +33,12 @@ class _TripsPageState extends State<TripsPage> {
             }
           }
         });
-
-        setState(() {
-          currentDriverTotalTripsCompleted =
-              tripsCompletedByCurrentDriver.length.toString();
-        });
+        if (mounted) {
+          setState(() {
+            currentDriverTotalTripsCompleted =
+                tripsCompletedByCurrentDriver.length.toString();
+          });
+        }
       }
     });
   }

@@ -12,6 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_drivers_app/widgets/loading_dialog.dart';
 
 import '../global/global.dart';
+import '../main.dart';
 import '../models/trip_details.dart';
 import '../widgets/notification_dialog.dart';
 
@@ -70,57 +71,62 @@ class PushNotificationSystem {
   }
 
   retrieveTripRequestInfo(String tripID, BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) =>
-          const LoadingDialog(messageText: "getting details..."),
-    );
+    // Use the global navigatorKey to get the current context
+    final currentContext = navigatorKey.currentContext;
 
-    DatabaseReference tripRequestsRef =
-        FirebaseDatabase.instance.ref().child("tripRequest").child(tripID);
-
-    tripRequestsRef.once().then((dataSnapshot) {
-      Navigator.pop(context);
-
-      audioPlayer.open(
-        Audio("assets/audio/alert-sound.mp3"),
-      );
-
-      audioPlayer.play();
-
-      TripDetails tripDetailsInfo = TripDetails();
-      double pickUpLat = double.parse(
-          (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["latitude"]);
-      double pickUpLng = double.parse(
-          (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["longitude"]);
-      tripDetailsInfo.pickUpLatLng = LatLng(pickUpLat, pickUpLng);
-
-      tripDetailsInfo.pickupAddress =
-          (dataSnapshot.snapshot.value! as Map)["pickUpAddress"];
-
-      double dropOffLat = double.parse(
-          (dataSnapshot.snapshot.value! as Map)["dropOffLatLng"]["latitude"]);
-      double dropOffLng = double.parse(
-          (dataSnapshot.snapshot.value! as Map)["dropOffLatLng"]["longitude"]);
-      tripDetailsInfo.dropOffLatLng = LatLng(dropOffLat, dropOffLng);
-
-      tripDetailsInfo.dropOffAddress =
-          (dataSnapshot.snapshot.value! as Map)["dropOffAddress"];
-
-      tripDetailsInfo.userName =
-          (dataSnapshot.snapshot.value! as Map)["username"];
-      tripDetailsInfo.userPhone =
-          (dataSnapshot.snapshot.value! as Map)["userPhone"];
-
-      tripDetailsInfo.tripID = tripID;
-
+    if (currentContext != null) {
       showDialog(
-        context: context,
-        builder: (BuildContext context) => NotificationDialog(
-          tripDetailsInfo: tripDetailsInfo,
-        ),
+        context: currentContext,
+        barrierDismissible: false,
+        builder: (BuildContext context) =>
+            const LoadingDialog(messageText: "getting details..."),
       );
-    });
+
+      DatabaseReference tripRequestsRef =
+          FirebaseDatabase.instance.ref().child("tripRequest").child(tripID);
+
+      tripRequestsRef.once().then((dataSnapshot) {
+        Navigator.pop(currentContext);
+
+        audioPlayer.open(
+          Audio("assets/audio/alert-sound.mp3"),
+        );
+
+        audioPlayer.play();
+
+        TripDetails tripDetailsInfo = TripDetails();
+        double pickUpLat = double.parse(
+            (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["latitude"]);
+        double pickUpLng = double.parse(
+            (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["longitude"]);
+        tripDetailsInfo.pickUpLatLng = LatLng(pickUpLat, pickUpLng);
+
+        tripDetailsInfo.pickupAddress =
+            (dataSnapshot.snapshot.value! as Map)["pickUpAddress"];
+
+        double dropOffLat = double.parse(
+            (dataSnapshot.snapshot.value! as Map)["dropOffLatLng"]["latitude"]);
+        double dropOffLng = double.parse((dataSnapshot.snapshot.value!
+            as Map)["dropOffLatLng"]["longitude"]);
+        tripDetailsInfo.dropOffLatLng = LatLng(dropOffLat, dropOffLng);
+
+        tripDetailsInfo.dropOffAddress =
+            (dataSnapshot.snapshot.value! as Map)["dropOffAddress"];
+
+        tripDetailsInfo.userName =
+            (dataSnapshot.snapshot.value! as Map)["username"];
+        tripDetailsInfo.userPhone =
+            (dataSnapshot.snapshot.value! as Map)["userPhone"];
+
+        tripDetailsInfo.tripID = tripID;
+
+        showDialog(
+          context: currentContext,
+          builder: (BuildContext context) => NotificationDialog(
+            tripDetailsInfo: tripDetailsInfo,
+          ),
+        );
+      });
+    }
   }
 }
