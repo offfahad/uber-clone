@@ -351,7 +351,7 @@ class _NewTripPageState extends State<NewTripPage> {
       "driverId": FirebaseAuth.instance.currentUser!.uid,
       "driverName": driverName,
       "driverPhone": driverPhone,
-      "driverPhoto": driverPhone,
+      "driverPhoto": driverPhoto,
       "carDetails": "$carColor - $carModel - $carNumber",
     };
 
@@ -372,7 +372,7 @@ class _NewTripPageState extends State<NewTripPage> {
         .child("driverLocation")
         .update(driverCurrentLocation);
   }
-
+ 
   @override
   void initState() {
     // TODO: implement initState

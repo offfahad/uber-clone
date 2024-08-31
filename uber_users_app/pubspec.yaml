@@ -47,6 +47,7 @@ dependencies:
   googleapis_auth:
   assets_audio_player:
   restart_app: ^1.2.1
+  url_launcher:
 
 
   # The following adds the Cupertino Icons font to your application.
