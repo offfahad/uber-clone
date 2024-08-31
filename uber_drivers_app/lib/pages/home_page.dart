@@ -10,8 +10,9 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_drivers_app/global/global.dart';
-import 'package:uber_drivers_app/methods/map_theme_methods.dart';
-import 'package:uber_drivers_app/pushNotifications/push_notification.dart';
+
+import '../methods/map_theme_methods.dart';
+import '../pushNotifications/push_notification.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,7 +27,7 @@ class _HomePageState extends State<HomePage> {
   GoogleMapController? controllerGoogleMap;
   Position? currentPositionOfDriver;
   Color colorToShow = Colors.green;
-  String titleToShow = "Go Online Now";
+  String titleToShow = "GO ONLINE NOW";
   bool isDriverAvailable = false;
   DatabaseReference? newTripRequestReference;
   MapThemeMethods themeMethods = MapThemeMethods();
@@ -47,24 +48,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   goOnlineNow() {
-    //all drivers who are available for work
+    //all drivers who are Available for new trip requests
     Geofire.initialize("onlineDrivers");
-    Geofire.setLocation(FirebaseAuth.instance.currentUser!.uid,
-        currentPositionOfDriver!.latitude, currentPositionOfDriver!.longitude);
+
+    Geofire.setLocation(
+      FirebaseAuth.instance.currentUser!.uid,
+      currentPositionOfDriver!.latitude,
+      currentPositionOfDriver!.longitude,
+    );
+
     newTripRequestReference = FirebaseDatabase.instance
         .ref()
         .child("drivers")
         .child(FirebaseAuth.instance.currentUser!.uid)
         .child("newTripStatus");
     newTripRequestReference!.set("waiting");
-    newTripRequestReference!.onValue.listen((event) {});
-  }
 
-  goOfflineNow() {
-    Geofire.removeLocation(FirebaseAuth.instance.currentUser!.uid);
-    newTripRequestReference!.onDisconnect();
-    newTripRequestReference!.remove();
-    newTripRequestReference = null;
+    newTripRequestReference!.onValue.listen((event) {});
   }
 
   setAndGetLocationUpdates() {
@@ -86,14 +86,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  initalizePushNotificationSystem() {
+  goOfflineNow() {
+    //stop sharing driver live location updates
+    Geofire.removeLocation(FirebaseAuth.instance.currentUser!.uid);
+
+    //stop listening to the newTripStatus
+    newTripRequestReference!.onDisconnect();
+    newTripRequestReference!.remove();
+    newTripRequestReference = null;
+  }
+
+  initializePushNotificationSystem() {
     PushNotificationSystem notificationSystem = PushNotificationSystem();
     notificationSystem.generateDeviceRegistrationToken();
     notificationSystem.startListeningForNewNotification(context);
   }
 
-  retriveCurrentDriverInfo() {
-    FirebaseDatabase.instance
+  retrieveCurrentDriverInfo() async {
+    await FirebaseDatabase.instance
         .ref()
         .child("drivers")
         .child(FirebaseAuth.instance.currentUser!.uid)
@@ -107,7 +117,7 @@ class _HomePageState extends State<HomePage> {
       carNumber = (snap.snapshot.value as Map)["car_details"]["carNumber"];
     });
 
-    initalizePushNotificationSystem();
+    initializePushNotificationSystem();
   }
 
   @override
@@ -115,167 +125,171 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
 
-    retriveCurrentDriverInfo();
+    retrieveCurrentDriverInfo();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Stack(
-          children: [
-            GoogleMap(
-              mapType: MapType.normal,
-              myLocationEnabled: true,
-              initialCameraPosition: googlePlexInitialPosition,
-              onMapCreated: (GoogleMapController mapController) {
-                controllerGoogleMap = mapController;
-                themeMethods.updateMapTheme(controllerGoogleMap!);
+    return Scaffold(
+      body: Stack(
+        children: [
+          ///google map
+          GoogleMap(
+            padding: const EdgeInsets.only(top: 136),
+            mapType: MapType.normal,
+            myLocationEnabled: true,
+            initialCameraPosition: googlePlexInitialPosition,
+            onMapCreated: (GoogleMapController mapController) {
+              controllerGoogleMap = mapController;
+              themeMethods.updateMapTheme(controllerGoogleMap!);
 
-                googleMapCompleterController.complete(controllerGoogleMap);
+              googleMapCompleterController.complete(controllerGoogleMap);
 
-                getCurrentLiveLocationOfDriver();
-              },
-            ),
-            Positioned(
-              top: 8,
-              left: 10,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      showModalBottomSheet(
-                          context: context,
-                          isDismissible: false,
-                          builder: (BuildContext context) {
-                            return Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.black87,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 5.0,
-                                    spreadRadius: 0.5,
-                                    offset: Offset(
-                                      0.7,
-                                      0.7,
+              getCurrentLiveLocationOfDriver();
+            },
+          ),
+
+          Container(
+            height: 136,
+            width: double.infinity,
+            color: Colors.black54,
+          ),
+
+          ///go online offline button
+          Positioned(
+            top: 61,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context,
+                        isDismissible: false,
+                        builder: (BuildContext context) {
+                          return Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.black87,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 5.0,
+                                  spreadRadius: 0.5,
+                                  offset: Offset(
+                                    0.7,
+                                    0.7,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            height: 221,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 18),
+                              child: Column(
+                                children: [
+                                  const SizedBox(
+                                    height: 11,
+                                  ),
+                                  Text(
+                                    (!isDriverAvailable)
+                                        ? "GO ONLINE NOW"
+                                        : "GO OFFLINE NOW",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 22,
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.bold,
                                     ),
+                                  ),
+                                  const SizedBox(
+                                    height: 21,
+                                  ),
+                                  Text(
+                                    (!isDriverAvailable)
+                                        ? "You are about to go online, you will become available to receive trip requests from users."
+                                        : "You are about to go offline, you will stop receiving new trip requests from users.",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.white30,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 25,
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text("BACK"),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 16,
+                                      ),
+                                      Expanded(
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            if (!isDriverAvailable) {
+                                              //go online
+                                              goOnlineNow();
+
+                                              //get driver location updates
+                                              setAndGetLocationUpdates();
+
+                                              Navigator.pop(context);
+
+                                              setState(() {
+                                                colorToShow = Colors.pink;
+                                                titleToShow = "GO OFFLINE NOW";
+                                                isDriverAvailable = true;
+                                              });
+                                            } else {
+                                              //go offline
+                                              goOfflineNow();
+
+                                              Navigator.pop(context);
+
+                                              setState(() {
+                                                colorToShow = Colors.green;
+                                                titleToShow = "GO ONLINE NOW";
+                                                isDriverAvailable = false;
+                                              });
+                                            }
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                (titleToShow == "GO ONLINE NOW")
+                                                    ? Colors.green
+                                                    : Colors.pink,
+                                          ),
+                                          child: const Text("CONFIRM"),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                              height: 221,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 32, vertical: 18),
-                                child: Column(
-                                  children: [
-                                    const SizedBox(height: 11),
-                                    Text(
-                                      (!isDriverAvailable)
-                                          ? "Go Online Now"
-                                          : "Go Offline Now",
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontSize: 22,
-                                        color: Colors.white70,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 21,
-                                    ),
-                                    Text(
-                                      (!isDriverAvailable)
-                                          ? "You are about to go online, you will become available to receive trip requests from users."
-                                          : "You are about to go offline, you will stop receiving new trip requests from users",
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        //fontSize: 22,
-                                        color: Colors.white30,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 22,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text(
-                                              "Back",
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          width: 16,
-                                        ),
-                                        Expanded(
-                                          child: ElevatedButton(
-                                            onPressed: () {
-                                              if (!isDriverAvailable) {
-                                                //go online
-                                                goOnlineNow();
-                                                //get driver location
-                                                setAndGetLocationUpdates();
-                                                Navigator.pop(context);
-                                                setState(() {
-                                                  colorToShow = Colors.pink;
-                                                  titleToShow =
-                                                      "Go Offline Now";
-                                                  isDriverAvailable = true;
-                                                });
-                                              } else {
-                                                //go offline
-                                                goOfflineNow();
-                                                Navigator.pop(context);
-                                                setState(() {
-                                                  colorToShow = Colors.green;
-                                                  titleToShow = "Go Online Now";
-                                                  isDriverAvailable = false;
-                                                });
-                                              }
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: (titleToShow ==
-                                                      "Go Online Now"
-                                                  ? Colors.green
-                                                  : Colors.pink),
-                                            ),
-                                            child: const Text(
-                                              "Confirm",
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          });
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: colorToShow,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0))),
-                    child: Text(
-                      titleToShow,
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
+                            ),
+                          );
+                        });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorToShow,
+                  ),
+                  child: Text(
+                    titleToShow,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
