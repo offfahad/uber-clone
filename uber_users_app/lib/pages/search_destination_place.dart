@@ -71,7 +71,7 @@ class _SearchDestinationPlaceState extends State<SearchDestinationPlace> {
             Card(
               elevation: 10,
               child: Container(
-                height: mq.height * 0.33,
+                height: mq.height * 0.35,
                 decoration: const BoxDecoration(
                   color: Colors.black12,
                   boxShadow: [

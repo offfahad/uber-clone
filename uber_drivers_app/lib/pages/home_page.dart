@@ -138,6 +138,8 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.only(top: 136),
             mapType: MapType.normal,
             myLocationEnabled: true,
+            zoomControlsEnabled: false,
+            myLocationButtonEnabled: false,
             initialCameraPosition: googlePlexInitialPosition,
             onMapCreated: (GoogleMapController mapController) {
               controllerGoogleMap = mapController;

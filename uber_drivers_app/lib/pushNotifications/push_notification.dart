@@ -75,57 +75,86 @@ class PushNotificationSystem {
     final currentContext = navigatorKey.currentContext;
 
     if (currentContext != null) {
+      // Show loading dialog
       showDialog(
         context: currentContext,
         barrierDismissible: false,
         builder: (BuildContext context) =>
-            const LoadingDialog(messageText: "getting details..."),
+            const LoadingDialog(messageText: "Getting details..."),
       );
 
+      // Reference to the trip request
       DatabaseReference tripRequestsRef =
           FirebaseDatabase.instance.ref().child("tripRequest").child(tripID);
 
       tripRequestsRef.once().then((dataSnapshot) {
         Navigator.pop(currentContext);
 
-        audioPlayer.open(
-          Audio("assets/audio/alert-sound.mp3"),
-        );
+        // Log the snapshot to see the structure and content
+        log("DataSnapshot: ${dataSnapshot.snapshot.value}");
 
-        audioPlayer.play();
+        if (dataSnapshot.snapshot.value == null) {
+          log("Error: No data found for tripID $tripID");
+          return;
+        }
 
-        TripDetails tripDetailsInfo = TripDetails();
-        double pickUpLat = double.parse(
-            (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["latitude"]);
-        double pickUpLng = double.parse(
-            (dataSnapshot.snapshot.value! as Map)["pickUpLatLng"]["longitude"]);
-        tripDetailsInfo.pickUpLatLng = LatLng(pickUpLat, pickUpLng);
+        try {
+          // Parse the data
+          final data = dataSnapshot.snapshot.value as Map<dynamic, dynamic>;
 
-        tripDetailsInfo.pickupAddress =
-            (dataSnapshot.snapshot.value! as Map)["pickUpAddress"];
+          // Log the received data for debugging
+          log("Trip Data: $data");
 
-        double dropOffLat = double.parse(
-            (dataSnapshot.snapshot.value! as Map)["dropOffLatLng"]["latitude"]);
-        double dropOffLng = double.parse((dataSnapshot.snapshot.value!
-            as Map)["dropOffLatLng"]["longitude"]);
-        tripDetailsInfo.dropOffLatLng = LatLng(dropOffLat, dropOffLng);
+          audioPlayer.open(
+            Audio("assets/audio/alert-sound.mp3"),
+          );
 
-        tripDetailsInfo.dropOffAddress =
-            (dataSnapshot.snapshot.value! as Map)["dropOffAddress"];
+          audioPlayer.play();
 
-        tripDetailsInfo.userName =
-            (dataSnapshot.snapshot.value! as Map)["username"];
-        tripDetailsInfo.userPhone =
-            (dataSnapshot.snapshot.value! as Map)["userPhone"];
+          TripDetails tripDetailsInfo = TripDetails();
 
-        tripDetailsInfo.tripID = tripID;
+          // Extracting pickup location
+          final pickUpLatLng = data["pickUpLatLng"] as Map<dynamic, dynamic>;
+          double pickUpLat = double.parse(pickUpLatLng["latitude"].toString());
+          double pickUpLng = double.parse(pickUpLatLng["longitude"].toString());
+          tripDetailsInfo.pickUpLatLng = LatLng(pickUpLat, pickUpLng);
 
-        showDialog(
-          context: currentContext,
-          builder: (BuildContext context) => NotificationDialog(
-            tripDetailsInfo: tripDetailsInfo,
-          ),
-        );
+          // Pickup address
+          tripDetailsInfo.pickupAddress = data["pickUpAddress"].toString();
+
+          // Extracting dropoff location
+          final dropOffLatLng = data["dropOffLatLng"] as Map<dynamic, dynamic>;
+          double dropOffLat =
+              double.parse(dropOffLatLng["latitude"].toString());
+          double dropOffLng =
+              double.parse(dropOffLatLng["longitude"].toString());
+          tripDetailsInfo.dropOffLatLng = LatLng(dropOffLat, dropOffLng);
+
+          // Dropoff address
+          tripDetailsInfo.dropOffAddress = data["dropOffAddress"].toString();
+
+          // User details
+          tripDetailsInfo.userName = data["userName"].toString();
+          tripDetailsInfo.userPhone = data["userPhone"].toString();
+
+          // Trip ID
+          tripDetailsInfo.tripID = tripID;
+
+          // Show the notification dialog with trip details
+          showDialog(
+            context: currentContext,
+            builder: (BuildContext context) => NotificationDialog(
+              tripDetailsInfo: tripDetailsInfo,
+            ),
+          );
+        } catch (e, stackTrace) {
+          // Catch any errors during parsing or UI update
+          log("Error parsing trip request info: $e\n$stackTrace");
+        }
+      }).catchError((error) {
+        // Handle errors from the Firebase call itself
+        Navigator.pop(currentContext);
+        log("Firebase error: $error");
       });
     }
   }

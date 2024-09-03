@@ -391,6 +391,8 @@ class _NewTripPageState extends State<NewTripPage> {
               padding: EdgeInsets.only(bottom: googleMapPaddingFromBottom),
               mapType: MapType.normal,
               myLocationEnabled: true,
+              zoomControlsEnabled: false,
+              myLocationButtonEnabled: false,
               markers: markersSet,
               circles: circlesSet,
               polylines: polyLinesSet,

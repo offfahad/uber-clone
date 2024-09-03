@@ -9,7 +9,7 @@
 
     <application
     
-        android:label="uber_users_app"
+        android:label="Uber Users App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -1,0 +1,168 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
+import 'package:restart_app/restart_app.dart';
+import 'package:uber_users_app/global/global_var.dart';
+
+import '../authentication/login_screen.dart';
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  TextEditingController nameTextEditingController = TextEditingController();
+  TextEditingController phoneTextEditingController = TextEditingController();
+  TextEditingController emailTextEditingController = TextEditingController();
+
+  setDriverInfo() {
+    setState(() {
+      nameTextEditingController.text = userName;
+      phoneTextEditingController.text = userPhone;
+      emailTextEditingController.text =
+          FirebaseAuth.instance.currentUser!.email.toString();
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    setDriverInfo();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "My Profile",
+          style: TextStyle(fontSize: 15, color: Colors.white),
+        ),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              //image
+              Container(
+                width: 150,
+                height: 150,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                ),
+                child: CircleAvatar(
+                  child: Image.asset("assets/images/avatarman.png"),
+                ),
+              ),
+
+              const SizedBox(
+                height: 16,
+              ),
+
+              //driver name
+              Padding(
+                padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 8),
+                child: TextField(
+                  controller: nameTextEditingController,
+                  textAlign: TextAlign.center,
+                  enabled: false,
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white24,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.white,
+                        width: 2,
+                      ),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.person,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+
+              //driver phone
+              Padding(
+                padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 4),
+                child: TextField(
+                  controller: phoneTextEditingController,
+                  textAlign: TextAlign.center,
+                  enabled: false,
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white24,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.white,
+                        width: 2,
+                      ),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.phone_android_outlined,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+
+              //driver email
+              Padding(
+                padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 4),
+                child: TextField(
+                  controller: emailTextEditingController,
+                  textAlign: TextAlign.center,
+                  enabled: false,
+                  style: const TextStyle(fontSize: 16, color: Colors.white),
+                  decoration: const InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white24,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.white,
+                        width: 2,
+                      ),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.email,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+
+              // const SizedBox(
+              //   height: 12,
+              // ),
+
+              // //logout btn
+              // ElevatedButton(
+              //   onPressed: () {
+              //     FirebaseAuth.instance.signOut();
+              //     Navigator.push(context,
+              //         MaterialPageRoute(builder: (c) => const LoginScreen()));
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.pink,
+              //       padding: const EdgeInsets.symmetric(
+              //           horizontal: 80, vertical: 18)),
+              //   child: const Text("Logout"),
+              // ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
