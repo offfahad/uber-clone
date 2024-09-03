@@ -22,7 +22,7 @@ class CommonMethods {
     );
   }
 
-  Widget data(int headerFlexValue, String headerTitle) {
+  Widget data(int headerFlexValue, Widget widget) {
     return Expanded(
       flex: headerFlexValue,
       child: Container(
@@ -34,12 +34,10 @@ class CommonMethods {
         ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
-          child: Text(
-            headerTitle,
-            style: const TextStyle(color: Colors.white),
+          child: widget,
+          
           ),
         ),
-      ),
-    );
+      );
   }
 }
