@@ -157,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 backgroundColor: Colors.purple,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 80, vertical: 10)),
-                            child: const Text("Login"),
+                            child: const Text("Login", style: TextStyle(color: Colors.white),),
                           ),
                         ],
                       ),

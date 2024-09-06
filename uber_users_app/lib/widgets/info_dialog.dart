@@ -15,7 +15,7 @@ class InfoDialog extends StatelessWidget {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.black,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Padding(
@@ -31,7 +31,7 @@ class InfoDialog extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white60),
+                      color: Colors.black),
                 ),
                 const SizedBox(
                   height: 27,
@@ -39,7 +39,7 @@ class InfoDialog extends StatelessWidget {
                 Text(
                   description!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white54),
+                  style: const TextStyle(color: Colors.black),
                 ),
                 const SizedBox(
                   height: 32,
@@ -54,8 +54,10 @@ class InfoDialog extends StatelessWidget {
                       
                     },
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(0),
+                        
                       ),
                     ),
                     child: const Text(

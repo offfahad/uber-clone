@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uber_admin_panel/methods/common_methods.dart';
+import 'package:uber_admin_panel/widgets/users_data_list.dart';
 
 class UserPage extends StatefulWidget {
   static const String id = "\webPageUsers";
@@ -38,7 +39,9 @@ class _UserPageState extends State<UserPage> {
                   commonMethods.header(1, "PHONE"),
                   commonMethods.header(1, "ACTIONS"),
                 ],
-              )
+              ),
+              const SizedBox(),
+              UsersDataList()
             ],
           ),
         ),

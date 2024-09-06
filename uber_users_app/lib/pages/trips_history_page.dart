@@ -16,12 +16,15 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       appBar: AppBar(
+        elevation: 0,
         title: const Text(
           'My Trips History',
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
           ),
+          
         ),
         leading: IconButton(
           onPressed: () {
@@ -29,7 +32,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
           },
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
       ),
@@ -41,7 +44,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
             return const Center(
               child: Text(
                 "Error Occurred.",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
               ),
             );
           }
@@ -57,7 +60,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
             return const Center(
               child: Text(
                 "No record found.",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
               ),
             );
           }
@@ -74,6 +77,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
             });
 
             return ListView.builder(
+              padding: EdgeInsets.all(5),
               shrinkWrap: true,
               itemCount: tripsList.length,
               itemBuilder: (context, index) {
@@ -82,11 +86,11 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
                     tripsList[index]["userID"] ==
                         FirebaseAuth.instance.currentUser!.uid) {
                   return Card(
-                    color: Colors.white12,
+                    color: Colors.white,
                     elevation: 10,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
+                          horizontal: 20, vertical: 20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -105,7 +109,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white38,
+                                    //color: Colors.white38,
                                   ),
                                 ),
                               ),
@@ -115,7 +119,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
                                     tripsList[index]["fareAmount"].toString(),
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  color: Colors.white,
+                                  //color: Colors.white,
                                 ),
                               ),
                             ],
@@ -136,7 +140,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white38,
+                                    //color: Colors.white38,
                                   ),
                                 ),
                               ),

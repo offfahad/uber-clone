@@ -26,7 +26,7 @@ class _PaymentDialogState extends State<PaymentDialog>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      backgroundColor: Colors.black54,
+      backgroundColor: Colors.white,
       child: Container(
         margin: const EdgeInsets.all(5.0),
         width: double.infinity,
@@ -43,7 +43,7 @@ class _PaymentDialogState extends State<PaymentDialog>
             const Text(
               "PAY CASH",
               style: TextStyle(
-                color: Colors.grey,
+                color: Colors.black,
               ),
             ),
 
@@ -51,7 +51,7 @@ class _PaymentDialogState extends State<PaymentDialog>
 
             const Divider(
               height: 1.5,
-              color: Colors.white70,
+              color: Colors.black54,
               thickness: 1.0,
             ),
 
@@ -60,7 +60,7 @@ class _PaymentDialogState extends State<PaymentDialog>
             Text(
               "\Rs ${widget.fareAmount}",
               style: const TextStyle(
-                color: Colors.grey,
+                color: Colors.black,
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
               ),
@@ -74,7 +74,7 @@ class _PaymentDialogState extends State<PaymentDialog>
                 "This is fare amount ( Rs ${widget.fareAmount} ) you have to pay to the driver.",
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  color: Colors.grey
+                  color: Colors.black
                 ),
               ),
             ),

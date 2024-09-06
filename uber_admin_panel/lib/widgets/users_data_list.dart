@@ -2,16 +2,16 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:uber_admin_panel/methods/common_methods.dart';
 
-class DriversDataList extends StatefulWidget {
-  const DriversDataList({super.key});
+class UsersDataList extends StatefulWidget {
+  const UsersDataList({super.key});
 
   @override
-  State<DriversDataList> createState() => _DriversDataListState();
+  State<UsersDataList> createState() => _UsersDataListState();
 }
 
-class _DriversDataListState extends State<DriversDataList> {
+class _UsersDataListState extends State<UsersDataList> {
   final driversRecordsFromDatabase =
-      FirebaseDatabase.instance.ref().child("drivers");
+      FirebaseDatabase.instance.ref().child("users");
   CommonMethods commonMethods = CommonMethods();
 
   @override
@@ -69,18 +69,9 @@ class _DriversDataListState extends State<DriversDataList> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 commonMethods.data(
-                  1,
-                  Image.network(
-                    listItems[index]["photo"].toString(),
-                    width: 100,
-                    height: 100,
-                  ),
-                ),
-                commonMethods.data(
                   2,
                   Text(
                     listItems[index]["id"].toString(),
-                    
                   ),
                 ),
                 commonMethods.data(
@@ -93,7 +84,7 @@ class _DriversDataListState extends State<DriversDataList> {
                 commonMethods.data(
                   1,
                   Text(
-                    "${listItems[index]["car_details"]["carModel"]} ${listItems[index]["car_details"]["carNumber"]}",
+                    listItems[index]["email"].toString(),
                     //style: const TextStyle(color: Colors.white),
                   ),
                 ),
@@ -106,26 +97,14 @@ class _DriversDataListState extends State<DriversDataList> {
                 ),
                 commonMethods.data(
                   1,
-                  listItems[index]["earnings"] != null
-                      ? Text(
-                          //style: const TextStyle(color: Colors.white),
-                          "Rs ${listItems[index]["earnings"].toStringAsFixed(2)}")
-                      : const Text(
-                          "Rs 0.00",
-                          //style: const TextStyle(color: Colors.white),
-                        ),
-                ),
-                commonMethods.data(
-                  1,
                   listItems[index]["blockStatus"] == "no"
                       ? SizedBox(
-                        height: 20,
-                        width: 10,
-                        child: ElevatedButton(
-                        
-                          
+                          height: 20,
+                          width: 10,
+                          child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(221, 39, 57, 99),
+                              backgroundColor:
+                                  const Color.fromARGB(221, 39, 57, 99),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0),
                               ),
@@ -142,13 +121,14 @@ class _DriversDataListState extends State<DriversDataList> {
                               ),
                             ),
                           ),
-                      )
+                        )
                       : SizedBox(
-                                                height: 20,
-                        width: 10,
-                        child: ElevatedButton(
-                                                     style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(221, 39, 57, 99),
+                          height: 20,
+                          width: 10,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(221, 39, 57, 99),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0),
                               ),
@@ -160,13 +140,12 @@ class _DriversDataListState extends State<DriversDataList> {
                             child: const Text(
                               "Unblock",
                               style: TextStyle(
-                                color: Colors.white,
-                                //fontWeight: FontWeight.bold,
-                                fontSize: 12
-                              ),
+                                  color: Colors.white,
+                                  //fontWeight: FontWeight.bold,
+                                  fontSize: 12),
                             ),
                           ),
-                      ),
+                        ),
                 ),
               ],
             );

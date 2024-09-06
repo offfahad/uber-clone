@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_users_app/appInfo/app_info.dart';
+import 'package:uber_users_app/appInfo/auth_provider.dart';
 import 'package:uber_users_app/authentication/login_screen.dart';
+import 'package:uber_users_app/authentication/register_screen.dart';
 import 'package:uber_users_app/pages/home_page.dart';
 
 late Size mq;
@@ -24,15 +26,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AppInfo(),
-      child: MaterialApp(  
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppInfo()),
+        ChangeNotifierProvider(create: (_) => AuthenticationProvider())
+      ],
+      child: MaterialApp(
         title: 'Uber User App',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData.dark().copyWith(
-          scaffoldBackgroundColor: Colors.black,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
         ),
-        home: FirebaseAuth.instance.currentUser == null ? const LoginScreen() : const HomePage(),
+        home: //FirebaseAuth.instance.currentUser == null
+            //? const LoginScreen()
+            //: const HomePage(),
+            const RegisterScreen(),
       ),
     );
   }

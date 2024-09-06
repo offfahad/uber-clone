@@ -668,6 +668,7 @@ class _HomePageState extends State<HomePage> {
         .child("deviceToken");
 
     tokenOfCurrentDriverRef.once().then((dataSnapshot) {
+      print("Fetched deviceToken: ${dataSnapshot.snapshot.value}");
       if (dataSnapshot.snapshot.value != null) {
         String deviceToken = dataSnapshot.snapshot.value.toString();
 
@@ -723,9 +724,9 @@ class _HomePageState extends State<HomePage> {
         key: sKey,
         drawer: Container(
           width: 255,
-          color: Colors.black87,
+          color: Colors.transparent,
           child: Drawer(
-            backgroundColor: Colors.white10,
+            backgroundColor: Colors.white,
             child: ListView(
               children: [
                 const Divider(
@@ -740,7 +741,7 @@ class _HomePageState extends State<HomePage> {
                   height: 160,
                   child: DrawerHeader(
                     decoration: const BoxDecoration(
-                      color: Colors.white10,
+                      color: Colors.white70,
                     ),
                     child: Row(
                       children: [
@@ -778,7 +779,7 @@ class _HomePageState extends State<HomePage> {
                               child: const Text(
                                 "Profile",
                                 style: TextStyle(
-                                  color: Colors.white38,
+                                  color: Colors.grey,
                                 ),
                               ),
                             ),
@@ -880,7 +881,7 @@ class _HomePageState extends State<HomePage> {
               initialCameraPosition: googlePlexInitialPosition,
               onMapCreated: (GoogleMapController mapController) {
                 controllerGoogleMap = mapController;
-                updateMapTheme(controllerGoogleMap!);
+                //updateMapTheme(controllerGoogleMap!);
 
                 googleMapCompleterController.complete(controllerGoogleMap);
 
@@ -894,8 +895,8 @@ class _HomePageState extends State<HomePage> {
 
             ///drawer button
             Positioned(
-              top: 30,
-              left: 19,
+              top: 20,
+              left: 25,
               child: GestureDetector(
                 onTap: () {
                   if (isDrawerOpened == true) {
@@ -907,7 +908,7 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(25),
                     boxShadow: const [
                       BoxShadow(
                         color: Colors.black26,
@@ -918,8 +919,8 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   child: CircleAvatar(
-                    backgroundColor: Colors.grey,
-                    radius: 20,
+                    backgroundColor: Colors.white60,
+                    radius: 25,
                     child: Icon(
                       isDrawerOpened == true ? Icons.menu : Icons.close,
                       color: Colors.black87,
@@ -951,24 +952,25 @@ class _HomePageState extends State<HomePage> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey,
-                          shape: const CircleBorder(),
-                          padding: const EdgeInsets.all(24)),
+                        backgroundColor: Colors.white,
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(24),
+                      ),
                       child: const Icon(
                         Icons.search,
-                        color: Colors.white,
+                        color: Colors.black,
                         size: 25,
                       ),
                     ),
                     ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey,
+                          backgroundColor: Colors.white,
                           shape: const CircleBorder(),
                           padding: const EdgeInsets.all(24)),
                       child: const Icon(
-                        Icons.home,
-                        color: Colors.white,
+                        Icons.home_outlined,
+                        color: Colors.black,
                         size: 25,
                       ),
                     ),
@@ -982,12 +984,12 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey,
+                          backgroundColor: Colors.white,
                           shape: const CircleBorder(),
                           padding: const EdgeInsets.all(24)),
                       child: const Icon(
-                        Icons.work,
-                        color: Colors.white,
+                        Icons.history_outlined,
+                        color: Colors.black,
                         size: 25,
                       ),
                     ),

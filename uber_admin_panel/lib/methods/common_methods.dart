@@ -28,16 +28,15 @@ class CommonMethods {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
-            color: Colors.white,
+            color: const Color.fromARGB(221, 39, 57, 99),
           ),
-          color: const Color.fromARGB(221, 39, 57, 99),
+          //color: const Color.fromARGB(221, 39, 57, 99),
         ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: widget,
-          
-          ),
         ),
-      );
+      ),
+    );
   }
 }

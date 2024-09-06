@@ -198,7 +198,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 backgroundColor: Colors.purple,
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 80, vertical: 10)),
-                            child: const Text("Sign Up"),
+                            child: const Text("Sign Up", style: TextStyle(color: Colors.white ),),
                           ),
                         ],
                       ),
