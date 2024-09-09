@@ -13,6 +13,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:uber_users_app/authentication/register_screen.dart';
 import 'package:uber_users_app/pages/profile_page.dart';
 import 'package:uber_users_app/pages/search_destination_place.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -125,6 +126,7 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             userName = (snap.snapshot.value as Map)["name"];
             userPhone = (snap.snapshot.value as Map)["phone"];
+            userEmail = (snap.snapshot.value as Map)["email"];
           });
         } else {
           FirebaseAuth.instance.signOut();
@@ -133,7 +135,7 @@ class _HomePageState extends State<HomePage> {
               context, MaterialPageRoute(builder: (c) => LoginScreen()));
 
           cMethods.displaySnackBar(
-              "you are blocked. Contact admin: gulzarsoft@gmail.com", context);
+              "You are blocked. Contact admin: gulzarsoft@gmail.com", context);
         }
       } else {
         FirebaseAuth.instance.signOut();
@@ -846,7 +848,7 @@ class _HomePageState extends State<HomePage> {
                     FirebaseAuth.instance.signOut();
 
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (c) => LoginScreen()));
+                        MaterialPageRoute(builder: (c) => RegisterScreen()));
                   },
                   child: ListTile(
                     leading: IconButton(

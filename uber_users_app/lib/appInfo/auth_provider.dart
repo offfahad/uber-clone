@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:uber_users_app/methods/common_methods.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:uber_users_app/pages/home_page.dart';
@@ -67,16 +68,19 @@ class AuthenticationProvider extends ChangeNotifier {
         },
         codeSent: (String verificationId, int? resendToken) {
           stopLoading(); // Stop loading when the code is sent
-
+          _phoneNumber = phoneNumber;
+          notifyListeners();
           // Navigate to the OTP screen
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OTPScreen(
-                verificationId: verificationId,
+          Future.delayed(const Duration(seconds: 1)).whenComplete(() {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OTPScreen(
+                  verificationId: verificationId,
+                ),
               ),
-            ),
-          );
+            );
+          });
         },
         codeAutoRetrievalTimeout: (String verificationId) {
           stopLoading(); // Stop loading when code auto-retrieval times out
@@ -120,7 +124,7 @@ class AuthenticationProvider extends ChangeNotifier {
         notifyListeners();
         onSuccess();
       }
-
+      
       _isLoading = false;
       _isSuccessful = true;
       notifyListeners();
@@ -135,9 +139,9 @@ class AuthenticationProvider extends ChangeNotifier {
   void saveUserDataToFirebase({
     required BuildContext context,
     required UserModel userModel,
-    required Function onSuccess,
+    required VoidCallback onSuccess,
   }) async {
-    _isLoading = true;
+    startLoading();
     notifyListeners();
 
     try {
@@ -145,15 +149,16 @@ class AuthenticationProvider extends ChangeNotifier {
       DatabaseReference usersRef =
           firebaseDatabase.ref().child("users").child(userModel.id);
       await usersRef.set(userModel.toMap()).then((value) {
-        onSuccess();
-        _isLoading = false;
+        stopLoading();
         notifyListeners();
+
+        onSuccess();
       });
 
       // Navigate to the home page or another appropriate screen
       // Navigator.push(context, MaterialPageRoute(builder: (c) => HomePage()));
     } on FirebaseException catch (e) {
-      _isLoading = false;
+      stopLoading();
       notifyListeners();
       commonMethods.displaySnackBar(e.toString(), context);
     }

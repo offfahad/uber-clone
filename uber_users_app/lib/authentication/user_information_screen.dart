@@ -19,11 +19,13 @@ class UserInformationScreen extends StatefulWidget {
 class _UserInformationScreenState extends State<UserInformationScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController gmailController = TextEditingController();
   CommonMethods commonMethods = CommonMethods();
   @override
   void dispose() {
     nameController.dispose();
     phoneController.dispose();
+    gmailController.dispose();
     super.dispose();
   }
 
@@ -35,11 +37,9 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
     phoneController.text = authProvider.phoneNumber;
   }
 
-  final RoundedLoadingButtonController btnController =
-      RoundedLoadingButtonController();
-
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthenticationProvider>(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -57,65 +57,74 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                   const EdgeInsets.symmetric(vertical: 25.0, horizontal: 35),
               child: Column(
                 children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    margin: const EdgeInsets.only(top: 20),
-                    child: Column(
-                      children: [
-                        // textFormFields
-                        myTextFormField(
-                          hintText: 'Enter your full name',
-                          icon: Icons.account_circle,
-                          textInputType: TextInputType.name,
-                          maxLines: 1,
-                          maxLength: 25,
-                          textEditingController: nameController,
-                          enabled: true,
-                        ),
+                  Column(
+                    children: [
+                      // textFormFields
+                      myTextFormField(
+                        hintText: 'Enter Your Full Name',
+                        icon: Icons.account_circle,
+                        textInputType: TextInputType.name,
+                        maxLines: 1,
+                        maxLength: 25,
+                        textEditingController: nameController,
+                        enabled: true,
+                      ),
 
-                        const SizedBox(
-                          height: 20,
-                        ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      myTextFormField(
+                        hintText: 'Enter Your Email Address',
+                        icon: Icons.account_circle,
+                        textInputType: TextInputType.emailAddress,
+                        maxLines: 1,
+                        maxLength: 25,
+                        textEditingController: gmailController,
+                        enabled: true,
+                      ),
+                      const SizedBox(height: 20,),
+                      myTextFormField(
+                        hintText: 'Enter your phone number',
+                        icon: Icons.phone,
+                        textInputType: TextInputType.number,
+                        maxLines: 1,
+                        maxLength: 10,
+                        textEditingController: phoneController,
+                        enabled: false,
+                      ),
 
-                        myTextFormField(
-                          hintText: 'Enter your phone number',
-                          icon: Icons.phone,
-                          textInputType: TextInputType.number,
-                          maxLines: 1,
-                          maxLength: 10,
-                          textEditingController: phoneController,
-                          enabled: false,
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  const SizedBox(
-                    height: 30,
-                  ),
                   SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: RoundedLoadingButton(
-                      controller: btnController,
-                      onPressed: () {
-                        saveUserDataToFireStore();
-                      },
-                      successIcon: Icons.check,
-                      successColor: Colors.green,
-                      errorColor: Colors.red,
-                      color: Colors.deepPurple,
-                      child: const Text(
-                        'Continue',
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5),
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    height: MediaQuery.of(context).size.height * 0.07,
+                    child: ElevatedButton(
+                      onPressed:
+                          saveUserDataToFireStore, // Correctly call the sendPhoneNumber function
+
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black54,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
                       ),
+                      child: authProvider.isLoading
+                          ? const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              "Continue",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -146,7 +155,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
           margin: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
-              color: Colors.deepPurple),
+              color: Colors.black54),
           child: Icon(
             icon,
             size: 20,
@@ -177,8 +186,8 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
     UserModel userModel = UserModel(
         id: authProvider.uid!,
         name: nameController.text.trim(),
-        phone: phoneController.text,
-        email: "",
+        phone: phoneController.text.trim(),
+        email: gmailController.text.trim(),
         blockStatus: "no");
 
     if (nameController.text.length >= 3) {
@@ -197,7 +206,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
         },
       );
     } else {
-      btnController.reset();
+      
       commonMethods.displaySnackBar(
           'Name must be atleast 3 characters', context);
     }

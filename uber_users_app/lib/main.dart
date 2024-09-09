@@ -38,10 +38,10 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: //FirebaseAuth.instance.currentUser == null
-            //? const LoginScreen()
-            //: const HomePage(),
-            const RegisterScreen(),
+        home: FirebaseAuth.instance.currentUser == null
+            ? const RegisterScreen()
+            : const HomePage(),
+            //const RegisterScreen(),
       ),
     );
   }

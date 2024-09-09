@@ -23,8 +23,8 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       nameTextEditingController.text = userName;
       phoneTextEditingController.text = userPhone;
-      emailTextEditingController.text =
-          FirebaseAuth.instance.currentUser!.email.toString();
+      emailTextEditingController.text = userEmail;
+          
     });
   }
 
