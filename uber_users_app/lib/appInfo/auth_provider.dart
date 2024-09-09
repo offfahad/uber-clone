@@ -6,6 +6,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/vmwareengine/v1.dart';
+import 'package:uber_users_app/authentication/register_screen.dart';
 import 'package:uber_users_app/methods/common_methods.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:uber_users_app/pages/home_page.dart';
@@ -36,6 +39,8 @@ class AuthenticationProvider extends ChangeNotifier {
   final FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   final FirebaseDatabase firebaseDatabase =
       FirebaseDatabase.instance; // Add this line
+  final GoogleSignIn googleSignIn = GoogleSignIn(); // Google Sign-In instance
+
   void startLoading() {
     _isLoading = true;
     notifyListeners();
@@ -124,7 +129,7 @@ class AuthenticationProvider extends ChangeNotifier {
         notifyListeners();
         onSuccess();
       }
-      
+
       _isLoading = false;
       _isSuccessful = true;
       notifyListeners();
@@ -237,6 +242,70 @@ class AuthenticationProvider extends ChangeNotifier {
       }
     } catch (e) {
       print("An error occurred while fetching user data: $e");
+    }
+  }
+
+  // Google Sign-In method
+  Future<void> signInWithGoogle(BuildContext context) async {
+    startLoading();
+    try {
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) {
+        stopLoading();
+        return; // User canceled the sign-in
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential =
+          await firebaseAuth.signInWithCredential(credential);
+      final User? user = userCredential.user;
+
+      if (user != null) {
+        _uid = user.uid;
+        _isSignedIn = true;
+        notifyListeners();
+        // Handle any post sign-in logic here (e.g., saving user data)
+      }
+
+      stopLoading();
+    } on FirebaseAuthException catch (e) {
+      stopLoading();
+      commonMethods.displaySnackBar(
+          e.message ?? "Failed to sign in with Google", context);
+    }
+  }
+
+  // Sign out method
+  Future<void> signOut(BuildContext context) async {
+    startLoading();
+    try {
+      await firebaseAuth.signOut();
+      await googleSignIn.signOut();
+
+      _uid = null;
+      _isSignedIn = false;
+      notifyListeners();
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                const RegisterScreen()), // Change to your login page
+        (route) => false,
+      );
+
+      stopLoading();
+    } on FirebaseAuthException catch (e) {
+      stopLoading();
+      commonMethods.displaySnackBar(e.message ?? "Failed to sign out", context);
     }
   }
 }

@@ -132,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.9,
-                  height: MediaQuery.of(context).size.height * 0.10,
+                  height: MediaQuery.of(context).size.height * 0.07,
                   child: ElevatedButton(
                     onPressed:
                         sendPhoneNumber, // Correctly call the sendPhoneNumber function
@@ -191,7 +191,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.9,
-                  height: MediaQuery.of(context).size.height * 0.10,
+                  height: MediaQuery.of(context).size.height * 0.07,
                   child: ElevatedButton.icon(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
@@ -218,7 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.9,
-                  height: MediaQuery.of(context).size.height * 0.10,
+                  height: MediaQuery.of(context).size.height * 0.07,
                   child: ElevatedButton.icon(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
@@ -245,7 +245,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.9,
-                  height: MediaQuery.of(context).size.height * 0.10,
+                  height: MediaQuery.of(context).size.height * 0.07,
                   child: ElevatedButton.icon(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(

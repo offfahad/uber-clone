@@ -14,8 +14,6 @@ class PaymentDialog extends StatefulWidget
   State<PaymentDialog> createState() => _PaymentDialogState();
 }
 
-
-
 class _PaymentDialogState extends State<PaymentDialog>
 {
   CommonMethods cMethods = CommonMethods();
@@ -26,12 +24,11 @@ class _PaymentDialogState extends State<PaymentDialog>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      backgroundColor: Colors.white,
       child: Container(
         margin: const EdgeInsets.all(5.0),
         width: double.infinity,
         decoration: BoxDecoration(
-            color: Colors.black87,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(6),
         ),
         child: Column(
@@ -87,10 +84,11 @@ class _PaymentDialogState extends State<PaymentDialog>
                 Navigator.pop(context, "paid");
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.black,
               ),
               child: const Text(
                 "PAY CASH",
+                style: TextStyle(color: Colors.white),
               ),
             ),
 

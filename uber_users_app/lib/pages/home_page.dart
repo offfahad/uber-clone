@@ -152,7 +152,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       searchContainerHeight = 0;
       bottomMapPadding = 240;
-      rideDetailsContainerHeight = 242;
+      rideDetailsContainerHeight = 250;
       isDrawerOpened = false;
     });
   }

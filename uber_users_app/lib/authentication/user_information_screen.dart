@@ -106,7 +106,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                           saveUserDataToFireStore, // Correctly call the sendPhoneNumber function
 
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black54,
+                        backgroundColor: Colors.black,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
                         ),
@@ -145,7 +145,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
   }) {
     return TextFormField(
       enabled: enabled,
-      cursorColor: Colors.orangeAccent,
+      cursorColor: Colors.grey,
       controller: textEditingController,
       maxLines: maxLines,
       maxLength: maxLength,
@@ -155,7 +155,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
           margin: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
-              color: Colors.black54),
+              color: Colors.black),
           child: Icon(
             icon,
             size: 20,
@@ -173,7 +173,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
         hintText: hintText,
         alignLabelWithHint: true,
         border: InputBorder.none,
-        fillColor: Colors.purple.shade50,
+        fillColor: Colors.white,
         filled: true,
       ),
     );
