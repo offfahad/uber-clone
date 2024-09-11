@@ -34,12 +34,20 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
     super.initState();
     final authProvider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-    phoneController.text = authProvider.phoneNumber;
+    if (authProvider.isGoogleSignedIn == false) {
+      phoneController.text = authProvider.phoneNumber;
+    }
+
+    if (authProvider.isGoogleSignedIn) {
+      gmailController.text = authProvider.firebaseAuth.currentUser!.email.toString();
+      phoneController.text = '';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthenticationProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -80,19 +88,20 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
                         maxLines: 1,
                         maxLength: 25,
                         textEditingController: gmailController,
-                        enabled: true,
+                        enabled: authProvider.isGoogleSignedIn ? false : true,
                       ),
-                      const SizedBox(height: 20,),
+                      const SizedBox(
+                        height: 20,
+                      ),
                       myTextFormField(
                         hintText: 'Enter your phone number',
                         icon: Icons.phone,
                         textInputType: TextInputType.number,
                         maxLines: 1,
-                        maxLength: 10,
+                        maxLength: 13,
                         textEditingController: phoneController,
-                        enabled: false,
+                        enabled: authProvider.isGoogleSignedIn ? true : false,
                       ),
-
                     ],
                   ),
                   const SizedBox(
@@ -154,8 +163,7 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
         prefixIcon: Container(
           margin: const EdgeInsets.all(8.0),
           decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              color: Colors.black),
+              borderRadius: BorderRadius.circular(8.0), color: Colors.black),
           child: Icon(
             icon,
             size: 20,
@@ -206,7 +214,6 @@ class _UserInformationScreenState extends State<UserInformationScreen> {
         },
       );
     } else {
-      
       commonMethods.displaySnackBar(
           'Name must be atleast 3 characters', context);
     }

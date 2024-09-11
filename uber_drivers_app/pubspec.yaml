@@ -53,6 +53,11 @@ dependencies:
   cupertino_icons: ^1.0.6
   firebase_core: ^3.3.0
   restart_app: ^1.2.1
+  country_picker:
+  rounded_loading_button: '2.1.0'
+  google_sign_in:
+  provider:
+  pinput: ^5.0.0
 
 dev_dependencies:
   flutter_test:

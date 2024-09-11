@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uber_drivers_app/authentication/login_screen.dart';
 import 'package:uber_drivers_app/pages/dashboard.dart';
+import 'package:uber_drivers_app/pages/driver_registration/driver_registration.dart';
 import 'package:uber_drivers_app/pages/home_page.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -32,10 +33,12 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: Colors.black,
-      ),
-      home: FirebaseAuth.instance.currentUser == null ? LoginScreen() : Dashboard(),
+      theme: ThemeData.light(),
+      // ThemeData.dark().copyWith(
+      //   scaffoldBackgroundColor: Colors.white,
+      // ),
+      home: DriverRegistration(), 
+      //FirebaseAuth.instance.currentUser == null ? LoginScreen() : Dashboard(),
     );
   }
 }

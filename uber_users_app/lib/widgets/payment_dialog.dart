@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:restart_app/restart_app.dart';
 import '../methods/common_methods.dart';
 
-
-
-class PaymentDialog extends StatefulWidget
-{
+class PaymentDialog extends StatefulWidget {
   String fareAmount;
 
-  PaymentDialog({super.key, required this.fareAmount,});
+  PaymentDialog({
+    super.key,
+    required this.fareAmount,
+  });
 
   @override
   State<PaymentDialog> createState() => _PaymentDialogState();
 }
 
-class _PaymentDialogState extends State<PaymentDialog>
-{
+class _PaymentDialogState extends State<PaymentDialog> {
   CommonMethods cMethods = CommonMethods();
 
   @override
@@ -28,32 +27,32 @@ class _PaymentDialogState extends State<PaymentDialog>
         margin: const EdgeInsets.all(5.0),
         width: double.infinity,
         decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-
-            const SizedBox(height: 21,),
-
+            const SizedBox(
+              height: 21,
+            ),
             const Text(
               "PAY CASH",
               style: TextStyle(
                 color: Colors.black,
               ),
             ),
-
-            const SizedBox(height: 21,),
-
+            const SizedBox(
+              height: 21,
+            ),
             const Divider(
               height: 1.5,
               color: Colors.black54,
               thickness: 1.0,
             ),
-
-            const SizedBox(height: 16,),
-
+            const SizedBox(
+              height: 16,
+            ),
             Text(
               "\Rs ${widget.fareAmount}",
               style: const TextStyle(
@@ -62,25 +61,22 @@ class _PaymentDialogState extends State<PaymentDialog>
                 fontWeight: FontWeight.bold,
               ),
             ),
-
-            const SizedBox(height: 16,),
-
+            const SizedBox(
+              height: 16,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 "This is fare amount ( Rs ${widget.fareAmount} ) you have to pay to the driver.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.black
-                ),
+                style: const TextStyle(color: Colors.black),
               ),
             ),
-
-            const SizedBox(height: 31,),
-
+            const SizedBox(
+              height: 31,
+            ),
             ElevatedButton(
-              onPressed: ()
-              {
+              onPressed: () {
                 Navigator.pop(context, "paid");
               },
               style: ElevatedButton.styleFrom(
@@ -91,9 +87,9 @@ class _PaymentDialogState extends State<PaymentDialog>
                 style: TextStyle(color: Colors.white),
               ),
             ),
-
-            const SizedBox(height: 41,)
-
+            const SizedBox(
+              height: 41,
+            )
           ],
         ),
       ),

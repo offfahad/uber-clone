@@ -7,14 +7,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:googleapis/vmwareengine/v1.dart';
-import 'package:uber_users_app/authentication/register_screen.dart';
-import 'package:uber_users_app/methods/common_methods.dart';
+import 'package:uber_drivers_app/pages/auth/register_screen.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
-import 'package:uber_users_app/pages/home_page.dart';
-
-import '../authentication/otp_screen.dart';
-import '../models/user_model.dart';
+import '../methods/common_method.dart';
+import '../pages/auth/otp_screen.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
   CommonMethods commonMethods = CommonMethods();
@@ -25,9 +21,9 @@ class AuthenticationProvider extends ChangeNotifier {
   String? _uid;
   String? _phoneNumber;
 
-  UserModel? _userModel;
+  // UserModel? _userModel;
 
-  UserModel get userModel => _userModel!;
+  // UserModel get userModel => _userModel!;
 
   String? get uid => _uid;
   String get phoneNumber => _phoneNumber!;
@@ -155,7 +151,7 @@ class AuthenticationProvider extends ChangeNotifier {
 // Method to register a new user
   void saveUserDataToFirebase({
     required BuildContext context,
-    required UserModel userModel,
+    //required UserModel userModel,
     required VoidCallback onSuccess,
   }) async {
     startLoading();
@@ -163,14 +159,14 @@ class AuthenticationProvider extends ChangeNotifier {
 
     try {
       // Save user data to Realtime Database
-      DatabaseReference usersRef =
-          firebaseDatabase.ref().child("users").child(userModel.id);
-      await usersRef.set(userModel.toMap()).then((value) {
-        stopLoading();
-        notifyListeners();
+      // DatabaseReference usersRef =
+      //     firebaseDatabase.ref().child("users").child(userModel.id);
+      // await usersRef.set(userModel.toMap()).then((value) {
+      //   stopLoading();
+      //   notifyListeners();
 
-        onSuccess();
-      });
+      //   onSuccess();
+      // });
 
       // Navigate to the home page or another appropriate screen
       // Navigator.push(context, MaterialPageRoute(builder: (c) => HomePage()));
@@ -237,16 +233,16 @@ class AuthenticationProvider extends ChangeNotifier {
         Map<dynamic, dynamic> userData =
             snapshot.value as Map<dynamic, dynamic>;
 
-        // Create a UserModel object from the retrieved data
-        _userModel = UserModel(
-          id: userData['id'],
-          name: userData['name'],
-          email: userData['email'],
-          phone: userData['phone'],
-          blockStatus: userData['blockStatus'],
-        );
+        // // Create a UserModel object from the retrieved data
+        // _userModel = UserModel(
+        //   id: userData['id'],
+        //   name: userData['name'],
+        //   email: userData['email'],
+        //   phone: userData['phone'],
+        //   blockStatus: userData['blockStatus'],
+        // );
 
-        _uid = _userModel!.id;
+        //_uid = _userModel!.id;
         notifyListeners(); // Notify listeners to update the UI
       } else {
         // Handle the case where user data does not exist

@@ -2,10 +2,11 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
-import 'package:uber_users_app/appInfo/auth_provider.dart';
-import 'package:uber_users_app/authentication/user_information_screen.dart';
-import 'package:uber_users_app/methods/common_methods.dart';
-import 'package:uber_users_app/pages/home_page.dart';
+import 'package:uber_drivers_app/methods/common_method.dart';
+import 'package:uber_drivers_app/pages/driver_registration/driver_registration.dart';
+import 'package:uber_drivers_app/pages/home_page.dart';
+
+import '../../providers/auth_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -373,7 +374,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => const UserInformationScreen()));
+              builder: (context) => DriverRegistration()));
     }
   }
 }

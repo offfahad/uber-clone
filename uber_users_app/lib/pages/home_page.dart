@@ -13,9 +13,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:uber_users_app/appInfo/auth_provider.dart';
 import 'package:uber_users_app/authentication/register_screen.dart';
 import 'package:uber_users_app/pages/profile_page.dart';
 import 'package:uber_users_app/pages/search_destination_place.dart';
+import 'package:uber_users_app/widgets/sign_out_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../appInfo/app_info.dart';
 import '../authentication/login_screen.dart';
@@ -123,11 +125,13 @@ class _HomePageState extends State<HomePage> {
     await usersRef.once().then((snap) {
       if (snap.snapshot.value != null) {
         if ((snap.snapshot.value as Map)["blockStatus"] == "no") {
-          setState(() {
-            userName = (snap.snapshot.value as Map)["name"];
-            userPhone = (snap.snapshot.value as Map)["phone"];
-            userEmail = (snap.snapshot.value as Map)["email"];
-          });
+          if (mounted) {
+            setState(() {
+              userName = (snap.snapshot.value as Map)["name"];
+              userPhone = (snap.snapshot.value as Map)["phone"];
+              userEmail = (snap.snapshot.value as Map)["email"];
+            });
+          }
         } else {
           FirebaseAuth.instance.signOut();
 
@@ -148,13 +152,14 @@ class _HomePageState extends State<HomePage> {
   displayUserRideDetailsContainer() async {
     ///Directions API
     await retrieveDirectionDetails();
-
-    setState(() {
-      searchContainerHeight = 0;
-      bottomMapPadding = 240;
-      rideDetailsContainerHeight = 250;
-      isDrawerOpened = false;
-    });
+    if (mounted) {
+      setState(() {
+        searchContainerHeight = 0;
+        bottomMapPadding = 240;
+        rideDetailsContainerHeight = 260;
+        isDrawerOpened = false;
+      });
+    }
   }
 
   retrieveDirectionDetails() async {
@@ -181,9 +186,11 @@ class _HomePageState extends State<HomePage> {
         await CommonMethods.getDirectionDetailsFromAPI(
             pickupGeoGraphicCoOrdinates,
             dropOffDestinationGeoGraphicCoOrdinates);
-    setState(() {
-      tripDirectionDetailsInfo = detailsFromDirectionAPI;
-    });
+    if (mounted) {
+      setState(() {
+        tripDirectionDetailsInfo = detailsFromDirectionAPI;
+      });
+    }
 
     Navigator.pop(context);
 
@@ -201,20 +208,22 @@ class _HomePageState extends State<HomePage> {
     }
 
     polylineSet.clear();
-    setState(() {
-      Polyline polyline = Polyline(
-        polylineId: const PolylineId("polylineID"),
-        color: Colors.pink,
-        points: polylineCoOrdinates,
-        jointType: JointType.round,
-        width: 4,
-        startCap: Cap.roundCap,
-        endCap: Cap.roundCap,
-        geodesic: true,
-      );
+    if (mounted) {
+      setState(() {
+        Polyline polyline = Polyline(
+          polylineId: const PolylineId("polylineID"),
+          color: Colors.pink,
+          points: polylineCoOrdinates,
+          jointType: JointType.round,
+          width: 4,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap,
+          geodesic: true,
+        );
 
-      polylineSet.add(polyline);
-    });
+        polylineSet.add(polyline);
+      });
+    }
 
     //fit the polyline into the map
     LatLngBounds boundsLatLng;
@@ -269,11 +278,12 @@ class _HomePageState extends State<HomePage> {
           title: dropOffDestinationLocation.placeName,
           snippet: "Destination Location"),
     );
-
-    setState(() {
-      markerSet.add(pickUpPointMarker);
-      markerSet.add(dropOffDestinationPointMarker);
-    });
+    if (mounted) {
+      setState(() {
+        markerSet.add(pickUpPointMarker);
+        markerSet.add(dropOffDestinationPointMarker);
+      });
+    }
 
     //add circles to pickup and dropOffDestination points
     Circle pickUpPointCircle = Circle(
@@ -293,11 +303,12 @@ class _HomePageState extends State<HomePage> {
       center: dropOffDestinationGeoGraphicCoOrdinates,
       fillColor: Colors.pink,
     );
-
-    setState(() {
-      circleSet.add(pickUpPointCircle);
-      circleSet.add(dropOffDestinationPointCircle);
-    });
+    if (mounted) {
+      setState(() {
+        circleSet.add(pickUpPointCircle);
+        circleSet.add(dropOffDestinationPointCircle);
+      });
+    }
   }
 
   resetAppNow() {
@@ -325,28 +336,33 @@ class _HomePageState extends State<HomePage> {
   cancelRideRequest() {
     //remove ride request from database
     tripRequestRef!.remove();
-
-    setState(() {
-      stateOfApp = "normal";
-    });
+    if (mounted) {
+      setState(() {
+        stateOfApp = "normal";
+      });
+    }
   }
 
   displayRequestContainer() {
-    setState(() {
-      rideDetailsContainerHeight = 0;
-      requestContainerHeight = 220;
-      bottomMapPadding = 200;
-      isDrawerOpened = true;
-    });
+    if (mounted) {
+      setState(() {
+        rideDetailsContainerHeight = 0;
+        requestContainerHeight = 220;
+        bottomMapPadding = 200;
+        isDrawerOpened = true;
+      });
+    }
 
     //send ride request
     makeTripRequest();
   }
 
   updateAvailableNearbyOnlineDriversOnMap() {
-    setState(() {
-      markerSet.clear();
-    });
+    if (mounted) {
+      setState(() {
+        markerSet.clear();
+      });
+    }
 
     Set<Marker> markersTempSet = Set<Marker>();
 
@@ -366,7 +382,9 @@ class _HomePageState extends State<HomePage> {
     }
 
     setState(() {
-      markerSet = markersTempSet;
+      if (mounted) {
+        markerSet = markersTempSet;
+      }
     });
   }
 
@@ -569,7 +587,7 @@ class _HomePageState extends State<HomePage> {
   displayTripDetailsContainer() {
     setState(() {
       requestContainerHeight = 0;
-      tripContainerHeight = 291;
+      tripContainerHeight = 295;
       bottomMapPadding = 281;
     });
   }
@@ -670,6 +688,7 @@ class _HomePageState extends State<HomePage> {
         .child("deviceToken");
 
     tokenOfCurrentDriverRef.once().then((dataSnapshot) {
+
       print("Fetched deviceToken: ${dataSnapshot.snapshot.value}");
       if (dataSnapshot.snapshot.value != null) {
         String deviceToken = dataSnapshot.snapshot.value.toString();
@@ -719,6 +738,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
     makeDriverNearbyCarIcon();
 
     return SafeArea(
@@ -844,11 +865,18 @@ class _HomePageState extends State<HomePage> {
                 ),
 
                 GestureDetector(
-                  onTap: () {
-                    FirebaseAuth.instance.signOut();
-
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (c) => RegisterScreen()));
+                  onTap: () async {
+                    Navigator.pop(context);
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SignOutDialog(
+                              title: 'Logout',
+                              description: 'Are you sure you want to logout?',
+                              onSignOut: () async {
+                                await authProvider.signOut(context);
+                              });
+                        });
                   },
                   child: ListTile(
                     leading: IconButton(
