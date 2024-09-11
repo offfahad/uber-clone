@@ -72,7 +72,7 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                         bool? result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const BasicInfoScreen(),
+                            builder: (context) => BasicInfoScreen(),
                           ),
                         );
                         if (result != null && result) {
@@ -156,7 +156,7 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                         // Submit all the data
                       }
                     : null, // Disable button if not all sections are complete
-                child: const Text('Done'),
+                child: const Text('Done',style: TextStyle(color: Colors.black87)),
               ),
             ),
             const SizedBox(height: 5),

@@ -85,6 +85,7 @@ flutter:
   assets:
     - assets/audio/
     - assets/images/
+    - assets/auth/
     - themes/
 
   # An image asset can refer to on e or more resolution-specific "variants", see
