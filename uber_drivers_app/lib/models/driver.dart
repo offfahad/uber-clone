@@ -1,6 +1,7 @@
 import 'package:uber_drivers_app/models/vehicleInfo.dart';
 
 class Driver {
+  final String id;
   final String profilePicture; // Driver's profile picture
   final String firstName; // First name
   final String secondName; // Second name
@@ -17,6 +18,7 @@ class Driver {
   final VehicleInfo vehicleInfo; // Vehicle information
 
   Driver({
+    required this.id,
     required this.profilePicture,
     required this.firstName,
     required this.secondName,
@@ -36,6 +38,7 @@ class Driver {
   // Convert Driver object to Map for Firebase
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'profilePicture': profilePicture,
       'firstName': firstName,
       'secondName': secondName,
@@ -56,6 +59,7 @@ class Driver {
   // Create Driver object from Map (retrieving from Firebase)
   factory Driver.fromMap(Map<String, dynamic> map) {
     return Driver(
+      id: map['id'],
       profilePicture: map['profilePicture'],
       firstName: map['firstName'],
       secondName: map['secondName'],

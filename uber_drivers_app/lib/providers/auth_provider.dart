@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:uber_drivers_app/models/driver.dart';
 import 'package:uber_drivers_app/pages/auth/register_screen.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import '../methods/common_method.dart';
@@ -21,9 +22,9 @@ class AuthenticationProvider extends ChangeNotifier {
   String? _uid;
   String? _phoneNumber;
 
-  // UserModel? _userModel;
+  Driver? _driverModel;
 
-  // UserModel get userModel => _userModel!;
+  Driver get driverModel => _driverModel!;
 
   String? get uid => _uid;
   String get phoneNumber => _phoneNumber!;
@@ -54,7 +55,7 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-    void stopGoogleLoading() {
+  void stopGoogleLoading() {
     _isGoogleSignInLoading = false;
     notifyListeners();
   }
@@ -151,22 +152,22 @@ class AuthenticationProvider extends ChangeNotifier {
 // Method to register a new user
   void saveUserDataToFirebase({
     required BuildContext context,
-    //required UserModel userModel,
+    required Driver driverModel,
     required VoidCallback onSuccess,
   }) async {
     startLoading();
     notifyListeners();
 
     try {
-      // Save user data to Realtime Database
-      // DatabaseReference usersRef =
-      //     firebaseDatabase.ref().child("users").child(userModel.id);
-      // await usersRef.set(userModel.toMap()).then((value) {
-      //   stopLoading();
-      //   notifyListeners();
+      //Save user data to Realtime Database
+      DatabaseReference usersRef =
+          firebaseDatabase.ref().child("drivers").child(driverModel.id);
+      await usersRef.set(driverModel.toMap()).then((value) {
+        stopLoading();
+        notifyListeners();
 
-      //   onSuccess();
-      // });
+        onSuccess();
+      });
 
       // Navigate to the home page or another appropriate screen
       // Navigator.push(context, MaterialPageRoute(builder: (c) => HomePage()));
@@ -206,7 +207,7 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<bool> checkUserExistById() async {
-    DatabaseReference usersRef = firebaseDatabase.ref().child("users");
+    DatabaseReference usersRef = firebaseDatabase.ref().child("drivers");
     DatabaseEvent snapshot = await usersRef
         .orderByChild(
             "id") // Assuming "id" is the field where Firebase Auth ID is stored
@@ -220,29 +221,23 @@ class AuthenticationProvider extends ChangeNotifier {
   Future<void> getUserDataFromFirebaseDatabase() async {
     try {
       // Get a reference to the user's data in the Realtime Database
-      DatabaseReference usersRef = firebaseDatabase
+      DatabaseReference driverRef = firebaseDatabase
           .ref()
-          .child("users")
+          .child("drivers")
           .child(firebaseAuth.currentUser!.uid);
 
       // Fetch user data from the database
-      DataSnapshot snapshot = await usersRef.get();
+      DataSnapshot snapshot = await driverRef.get();
 
       if (snapshot.exists) {
         // Convert the snapshot data into a Map
-        Map<dynamic, dynamic> userData =
+        Map<dynamic, dynamic> driverData =
             snapshot.value as Map<dynamic, dynamic>;
 
-        // // Create a UserModel object from the retrieved data
-        // _userModel = UserModel(
-        //   id: userData['id'],
-        //   name: userData['name'],
-        //   email: userData['email'],
-        //   phone: userData['phone'],
-        //   blockStatus: userData['blockStatus'],
-        // );
+        // Create a Driver object from the retrieved data
+        _driverModel = Driver.fromMap(driverData.cast<String, dynamic>());
 
-        //_uid = _userModel!.id;
+        _uid = _driverModel!.id;
         notifyListeners(); // Notify listeners to update the UI
       } else {
         // Handle the case where user data does not exist

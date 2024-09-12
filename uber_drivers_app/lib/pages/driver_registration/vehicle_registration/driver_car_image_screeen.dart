@@ -18,7 +18,7 @@ class _DriverCarImageScreeenState extends State<DriverCarImageScreeen> {
   // Pick and crop image from gallery or camera
   Future<void> _pickAndCropImage() async {
     final pickedFile = await ImagePickerService().pickCropImage(
-      cropAspectRatio: CropAspectRatio(ratioX: 20, ratioY: 20),
+      cropAspectRatio: const CropAspectRatio(ratioX: 20, ratioY: 20),
       imageSource: ImageSource.camera,
     );
 

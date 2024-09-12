@@ -106,24 +106,11 @@ class _CNICScreenState extends State<CNICScreen> {
                     controller: _cnicController,
                     decoration: const InputDecoration(
                         labelText: 'CNIC Number',
-
-                        // enabledBorder: OutlineInputBorder(
-                        //   borderSide: BorderSide(
-                        //       color: Colors.deepPurple), // Green border when enabled
-                        //   borderRadius: BorderRadius.all(Radius.circular(12)),
-                        // ),
-                        // focusedBorder: OutlineInputBorder(
-                        //   borderSide: BorderSide(
-                        //       color: Colors.green), // Green border when enabled
-                        //   borderRadius: BorderRadius.all(Radius.circular(12)),
-                        // ),
-                        // focusColor: Colors.green
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(
                               Radius.circular(12),
                             ),
                             borderSide: BorderSide())),
-                    //cursorColor: Colors.green,
                     keyboardType: TextInputType.number,
                     maxLength: 13,
                     validator: (value) {

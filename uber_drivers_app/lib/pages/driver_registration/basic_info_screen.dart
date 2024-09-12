@@ -1,7 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/providers/auth_provider.dart';
+import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 class BasicInfoScreen extends StatefulWidget {
   const BasicInfoScreen({super.key});
@@ -12,56 +13,32 @@ class BasicInfoScreen extends StatefulWidget {
 
 class _BasicInfoScreenState extends State<BasicInfoScreen> {
   final _formKey = GlobalKey<FormState>();
-  bool _isPhotoAdded = false;
-  bool _isFormValid = false;
 
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _dobController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-
-  XFile? _photo;
-
-  // Check if all fields are filled
-  void _checkFormValidity() {
-    setState(() {
-      _isFormValid = _formKey.currentState?.validate() == true && _isPhotoAdded;
-    });
-  }
-
-  // Handle picking image
-  Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      setState(() {
-        _photo = image;
-        _isPhotoAdded = true;
-      });
-    }
-
-    //_checkFormValidity();
+  @override
+  void initState() {
+    super.initState();
+    final authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
+    final registrationProvider =
+        Provider.of<RegistrationProvider>(context, listen: false);
+    registrationProvider.initFields(authProvider);
   }
 
   @override
   Widget build(BuildContext context) {
+    final registrationProvider = Provider.of<RegistrationProvider>(context);
+    final bool isLoading = registrationProvider.isLoading;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Basic info',
-          style: TextStyle(color: Colors.black),
-        ),
+        title: const Text('Basic info', style: TextStyle(color: Colors.black)),
         centerTitle: true,
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context, false);
             },
-            child: const Text(
-              'Close',
-              style: TextStyle(color: Colors.black),
-            ),
+            child: const Text('Close', style: TextStyle(color: Colors.black)),
           ),
         ],
       ),
@@ -70,7 +47,9 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
-            onChanged: _checkFormValidity, // Check form validity on changes
+            onChanged: () {
+              registrationProvider.checkFormValidity();
+            },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -88,16 +67,17 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                     ],
                   ),
                   width: double.infinity,
-                  // width: MediaQuery.of(context).size.width *
-                  //     0.9, // 90% of screen width
-                  // height: MediaQuery.of(context).size.height *
-                  //     0.36, // 45% of screen height
                   child: Column(
                     children: [
                       const SizedBox(height: 16),
-                      _photo != null
-                          ? Image.file(File(_photo!.path), height: 150)
-                          : Image.asset('assets/auth/user.jpg', height: 150),
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage: registrationProvider.photo != null
+                            ? FileImage(File(registrationProvider.photo!.path))
+                            : const AssetImage('assets/auth/user.jpg')
+                                as ImageProvider,
+                        backgroundColor: Colors.black,
+                      ),
                       const SizedBox(height: 10),
                       Container(
                         decoration: BoxDecoration(
@@ -105,34 +85,14 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: TextButton.icon(
-                          onPressed: _pickImage,
-                          //icon: const Icon(Icons.camera_alt),
-                          label: const Text(
-                            'Add a photo*',
-                            style: TextStyle(color: Colors.black87),
-                          ),
+                          onPressed: () {
+                            registrationProvider.pickImage();
+                          },
+                          label: const Text('Add a photo*',
+                              style: TextStyle(color: Colors.black87)),
                         ),
-                        
                       ),
-                      SizedBox(height: 20,)
-                      // const SizedBox(height: 20),
-                      // const Column(
-                      //   crossAxisAlignment: CrossAxisAlignment.start,
-                      //   children: [
-                      //     Text(
-                      //       '• Clearly visible face',
-                      //       style: TextStyle(
-                      //           fontSize: 15, fontWeight: FontWeight.w500),
-                      //     ),
-                      //     Text('• Without sunglasses',
-                      //         style: TextStyle(
-                      //             fontSize: 15, fontWeight: FontWeight.w500)),
-                      //     Text('• Good lighting and without filters',
-                      //         style: TextStyle(
-                      //             fontSize: 15, fontWeight: FontWeight.w500)),
-                      //   ],
-                      // ),
-                      // const SizedBox(height: 16),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -149,22 +109,19 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                           blurRadius: 6.0),
                     ],
                   ),
-                  // width: MediaQuery.of(context).size.width *
-                  //     0.9, // 90% of screen width
-                  // height: MediaQuery.of(context).size.height *
-                  //     0.55, // 45% of screen height
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextFormField(
-                          controller: _firstNameController,
+                          controller: registrationProvider.firstNameController,
                           decoration: const InputDecoration(
                             labelText: 'First Name',
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -172,17 +129,18 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                             }
                             return null;
                           },
+                          onChanged: (_) =>
+                              registrationProvider.checkFormValidity(),
                         ),
                         const SizedBox(height: 16),
-
-                        // Last Name field
                         TextFormField(
-                          controller: _lastNameController,
+                          controller: registrationProvider.lastNameController,
                           decoration: const InputDecoration(
                             labelText: 'Last Name',
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -190,16 +148,18 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                             }
                             return null;
                           },
+                          onChanged: (_) =>
+                              registrationProvider.checkFormValidity(),
                         ),
                         const SizedBox(height: 16),
-                        // Last Name field
                         TextFormField(
-                          controller: _emailController,
+                          controller: registrationProvider.emailController,
                           decoration: const InputDecoration(
                             labelText: 'Email',
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
                           ),
                           validator: (value) {
                             if (value == null ||
@@ -209,16 +169,39 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                             }
                             return null;
                           },
+                          onChanged: (_) =>
+                              registrationProvider.checkFormValidity(),
                         ),
                         const SizedBox(height: 16),
-                        // Date of Birth field
                         TextFormField(
-                          controller: _dobController,
+                          controller: registrationProvider.phoneController,
+                          decoration: const InputDecoration(
+                            labelText: 'Phone Number',
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null ||
+                                value.isEmpty ||
+                                value.length < 13) {
+                              return 'Phone number is not valid';
+                            }
+                            return null;
+                          },
+                          onChanged: (_) =>
+                              registrationProvider.checkFormValidity(),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: registrationProvider.dobController,
                           decoration: const InputDecoration(
                             labelText: 'Date Of Birth',
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15)),
+                            ),
                           ),
                           onTap: () async {
                             DateTime? pickedDate = await showDatePicker(
@@ -228,10 +211,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                               lastDate: DateTime.now(),
                             );
                             if (pickedDate != null) {
-                              setState(() {
-                                _dobController.text =
-                                    "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
-                              });
+                              registrationProvider.dobController.text =
+                                  "${pickedDate.day}/${pickedDate.month}/${pickedDate.year}";
                             }
                           },
                           readOnly: true,
@@ -240,31 +221,35 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                     ),
                   ),
                 ),
-                // First Name field
-
                 const SizedBox(height: 16),
-
-                // Submit button
                 SizedBox(
-                  width: MediaQuery.of(context).size.width *
-                      0.9, // 90% of screen width
-                  height: MediaQuery.of(context).size.height *
-                      0.09, // 9% of screen height
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.09,
                   child: ElevatedButton(
-                    onPressed: _isFormValid
-                        ? () {
-                            // Handle form submission
+                    onPressed: registrationProvider.isFormValid && !isLoading
+                        ? () async {
+                            if (_formKey.currentState?.validate() == true) {
+                              registrationProvider.startLoading();
+                              try {
+                                await registrationProvider.saveUserData();
+                                Navigator.pop(context, true);
+                              } catch (e) {
+                                print("Error while saving data: $e");
+                              } finally {
+                                registrationProvider.stopLoading();
+                              }
+                            }
                           }
-                        : null, // Button is disabled until the form is valid
-                    child: const Text(
-                      'Done',
-                      style: TextStyle(color: Colors.white),
-                    ),
+                        : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _isFormValid
+                      backgroundColor: registrationProvider.isFormValid
                           ? Colors.green
-                          : Colors.grey, // Color change based on form status
+                          : Colors.grey,
                     ),
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Done',
+                            style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],

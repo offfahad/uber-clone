@@ -295,33 +295,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(
                   height: 15,
                 ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  height: MediaQuery.of(context).size.height * 0.07,
-                  child: ElevatedButton.icon(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade400,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    label: const Text(
-                      "Continue with Facebook",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                      ),
-                    ),
-                    icon: const Icon(
-                      Icons.facebook,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
+                // SizedBox(
+                //   width: MediaQuery.of(context).size.width * 0.9,
+                //   height: MediaQuery.of(context).size.height * 0.07,
+                //   child: ElevatedButton.icon(
+                //     onPressed: () {},
+                //     style: ElevatedButton.styleFrom(
+                //       backgroundColor: Colors.grey.shade400,
+                //       shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(5),
+                //       ),
+                //     ),
+                //     label: const Text(
+                //       "Continue with Facebook",
+                //       style: TextStyle(
+                //         color: Colors.black,
+                //         fontSize: 14,
+                //       ),
+                //     ),
+                //     icon: const Icon(
+                //       Icons.facebook,
+                //       color: Colors.black,
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(
+                //   height: 25,
+                // ),
                 const Text(
                   "By proceeding, you consent to get calls, whatsApp or SMS messages,including by automated means, from Uber and its affiliates to the number provided.",
                   textAlign: TextAlign.center,
