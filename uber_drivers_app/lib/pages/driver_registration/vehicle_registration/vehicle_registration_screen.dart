@@ -2,38 +2,34 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:uber_drivers_app/methods/image_picker_service.dart';
 
-import '../../methods/image_picker_service.dart';
-
-class CNICScreen extends StatefulWidget {
-  const CNICScreen({super.key});
+class VehicleRegistrationScreen extends StatefulWidget {
+  const VehicleRegistrationScreen({super.key});
 
   @override
-  _CNICScreenState createState() => _CNICScreenState();
+  _VehicleRegistrationScreenState createState() =>
+      _VehicleRegistrationScreenState();
 }
 
-class _CNICScreenState extends State<CNICScreen> {
+class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
 
   XFile? _frontImage;
   XFile? _backImage;
-  final TextEditingController _cnicController = TextEditingController();
   bool _isFormValid = false;
 
   // Check if the form is valid
   void _checkFormValidity() {
     setState(() {
-      _isFormValid = _frontImage != null &&
-          _backImage != null &&
-          _cnicController.text.isNotEmpty &&
-          _cnicController.text.length == 13;
+      _isFormValid = _frontImage != null && _backImage != null;
     });
   }
 
   // Pick and crop image from gallery or camera
   Future<void> _pickAndCropImage(bool isFrontImage) async {
     final pickedFile = await ImagePickerService().pickCropImage(
-      cropAspectRatio: CropAspectRatio(ratioX: 16, ratioY: 9),
+      cropAspectRatio: CropAspectRatio(ratioX: 20, ratioY: 20),
       imageSource: ImageSource.camera,
     );
 
@@ -53,7 +49,10 @@ class _CNICScreenState extends State<CNICScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CNIC'),
+        title: const Text(
+          'Vehicle Registration Certificate',
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
         centerTitle: true,
         actions: [
           TextButton(
@@ -75,7 +74,7 @@ class _CNICScreenState extends State<CNICScreen> {
                 // CNIC Front Side Upload
                 _buildImagePickerFront(
                     context,
-                    'CNIC (Front Side - First Capture Then Crop)',
+                    'Vehicle Certificate (Front Side)',
                     _frontImage,
                     () => _pickAndCropImage(true)),
                 const SizedBox(height: 16),
@@ -83,61 +82,9 @@ class _CNICScreenState extends State<CNICScreen> {
                 // CNIC Back Side Upload
                 _buildImagePickerBack(
                     context,
-                    'CNIC (Back Side - First Capture Then Crop)',
+                    'Vehicle Certificate (Back Side)',
                     _backImage,
                     () => _pickAndCropImage(false)),
-                const SizedBox(height: 16),
-
-                // CNIC Number TextField
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black12),
-                    borderRadius: BorderRadius.circular(15),
-                    color: Colors.white,
-                    boxShadow: const [
-                      BoxShadow(
-                          color: Colors.black12,
-                          offset: Offset(0, 2),
-                          blurRadius: 6.0),
-                    ],
-                  ),
-                  child: TextFormField(
-                    controller: _cnicController,
-                    decoration: const InputDecoration(
-                        labelText: 'CNIC Number',
-
-                        // enabledBorder: OutlineInputBorder(
-                        //   borderSide: BorderSide(
-                        //       color: Colors.deepPurple), // Green border when enabled
-                        //   borderRadius: BorderRadius.all(Radius.circular(12)),
-                        // ),
-                        // focusedBorder: OutlineInputBorder(
-                        //   borderSide: BorderSide(
-                        //       color: Colors.green), // Green border when enabled
-                        //   borderRadius: BorderRadius.all(Radius.circular(12)),
-                        // ),
-                        // focusColor: Colors.green
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(12),
-                            ),
-                            borderSide: BorderSide())),
-                    //cursorColor: Colors.green,
-                    keyboardType: TextInputType.number,
-                    maxLength: 13,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'CNIC Number is required';
-                      }
-                      if (value.length != 13) {
-                        return 'CNIC Number must be 13 digits';
-                      }
-                      return null;
-                    },
-                    onChanged: (value) => _checkFormValidity(),
-                  ),
-                ),
                 const SizedBox(height: 16),
 
                 // Submit button
