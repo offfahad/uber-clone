@@ -58,6 +58,7 @@ dependencies:
   google_sign_in:
   provider:
   pinput: ^5.0.0
+  image_cropper: 
 
 dev_dependencies:
   flutter_test:

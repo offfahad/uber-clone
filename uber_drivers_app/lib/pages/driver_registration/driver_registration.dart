@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uber_drivers_app/pages/driver_registration/basic_info_screen.dart';
 import 'package:uber_drivers_app/pages/driver_registration/cninc_screen.dart';
+import 'package:uber_drivers_app/pages/driver_registration/driving_license_screen.dart';
 import 'package:uber_drivers_app/pages/driver_registration/selfie_screen.dart';
 import 'vehicle_info_screen.dart';
 
@@ -15,6 +16,7 @@ class _DriverRegistrationState extends State<DriverRegistration> {
   bool isSelfieComplete = false;
   bool isReferralCodeComplete = false;
   bool isVehicleInfoComplete = false;
+  bool isDrivingLicenseInfoComplete = false;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,8 @@ class _DriverRegistrationState extends State<DriverRegistration> {
         isCnicComplete &&
         isSelfieComplete &&
         isReferralCodeComplete &&
-        isVehicleInfoComplete;
+        isVehicleInfoComplete &&
+        isDrivingLicenseInfoComplete;
 
     return Scaffold(
       appBar: AppBar(
@@ -50,12 +53,11 @@ class _DriverRegistrationState extends State<DriverRegistration> {
               ),
               width: MediaQuery.of(context).size.width *
                   0.9, // 90% of screen width
-              height: MediaQuery.of(context).size.height *
-                  0.5, // 45% of screen height
+              // height: MediaQuery.of(context).size.height *
+              //     0.5, // 45% of screen height
               child: ListView.separated(
-                
                 shrinkWrap: true,
-                itemCount: 4, // You have 4 items
+                itemCount: 5, // You have 4 items
                 separatorBuilder: (context, index) => const Divider(
                   color: Colors.grey,
                   thickness: 0.3,
@@ -72,7 +74,7 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                         bool? result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => BasicInfoScreen(),
+                            builder: (context) => const BasicInfoScreen(),
                           ),
                         );
                         if (result != null && result) {
@@ -85,13 +87,13 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                   } else if (index == 1) {
                     return _buildListTile(
                       title: 'CNIC',
-                      subtitle: 'Enter CNIC',
+                      subtitle: 'Enter CNIC detail and images',
                       isCompleted: isCnicComplete,
                       onTap: () async {
                         bool? result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CnincScreen(),
+                            builder: (context) => const CNICScreen(),
                           ),
                         );
                         if (result != null && result) {
@@ -103,14 +105,14 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                     );
                   } else if (index == 2) {
                     return _buildListTile(
-                      title: 'Selfie with ID',
-                      subtitle: 'Take a selfie with your ID',
+                      title: 'Selfie with CNIC',
+                      subtitle: 'Take a selfie with your CNIC',
                       isCompleted: isSelfieComplete,
                       onTap: () async {
                         bool? result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SelfieScreen(),
+                            builder: (context) => const SelfieScreen(),
                           ),
                         );
                         if (result != null && result) {
@@ -120,16 +122,35 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                         }
                       },
                     );
+                  } else if (index == 3) {
+                    return _buildListTile(
+                      title: 'Driving License Info',
+                      subtitle: 'Enter driving license number and images',
+                      isCompleted: isDrivingLicenseInfoComplete,
+                      onTap: () async {
+                        bool? result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DrivingLicenseScreen(),
+                          ),
+                        );
+                        if (result != null && result) {
+                          setState(() {
+                            isDrivingLicenseInfoComplete = true;
+                          });
+                        }
+                      },
+                    );
                   } else {
                     return _buildListTile(
                       title: 'Vehicle Info',
-                      subtitle: 'Enter vehicle details',
+                      subtitle: 'Enter vehicle details and images',
                       isCompleted: isVehicleInfoComplete,
                       onTap: () async {
                         bool? result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => VehicleInfoScreen(),
+                            builder: (context) => const VehicleInfoScreen(),
                           ),
                         );
                         if (result != null && result) {
@@ -156,7 +177,8 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                         // Submit all the data
                       }
                     : null, // Disable button if not all sections are complete
-                child: const Text('Done',style: TextStyle(color: Colors.black87)),
+                child:
+                    const Text('Done', style: TextStyle(color: Colors.black87)),
               ),
             ),
             const SizedBox(height: 5),

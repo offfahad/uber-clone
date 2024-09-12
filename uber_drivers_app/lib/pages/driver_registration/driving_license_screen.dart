@@ -5,28 +5,29 @@ import 'package:image_cropper/image_cropper.dart';
 
 import '../../methods/image_picker_service.dart';
 
-class CNICScreen extends StatefulWidget {
-  const CNICScreen({super.key});
+class DrivingLicenseScreen extends StatefulWidget {
+  const DrivingLicenseScreen({super.key});
 
   @override
-  _CNICScreenState createState() => _CNICScreenState();
+  _DrivingLicenseScreenState createState() => _DrivingLicenseScreenState();
 }
 
-class _CNICScreenState extends State<CNICScreen> {
+class _DrivingLicenseScreenState extends State<DrivingLicenseScreen> {
   final _formKey = GlobalKey<FormState>();
 
   XFile? _frontImage;
   XFile? _backImage;
-  final TextEditingController _cnicController = TextEditingController();
+  final TextEditingController _licenseController = TextEditingController();
   bool _isFormValid = false;
+  final RegExp licenseRegExp = RegExp(r'^[A-Z]{2}-\d{2}-\d{4}$');
 
   // Check if the form is valid
   void _checkFormValidity() {
     setState(() {
       _isFormValid = _frontImage != null &&
           _backImage != null &&
-          _cnicController.text.isNotEmpty &&
-          _cnicController.text.length == 13;
+          _licenseController.text.isNotEmpty &&
+          licenseRegExp.hasMatch(_licenseController.text);
     });
   }
 
@@ -53,7 +54,7 @@ class _CNICScreenState extends State<CNICScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CNIC'),
+        title: const Text('Driving License'),
         centerTitle: true,
         actions: [
           TextButton(
@@ -73,16 +74,21 @@ class _CNICScreenState extends State<CNICScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // CNIC Front Side Upload
-                _buildImagePickerFront(context, 'CNIC (Front Side - First Capture Then Crop)',
-                    _frontImage, () => _pickAndCropImage(true)),
+                _buildImagePickerFront(
+                    context,
+                    'License (Front Side - First Capture Then Crop)',
+                    _frontImage,
+                    () => _pickAndCropImage(true)),
                 const SizedBox(height: 16),
 
                 // CNIC Back Side Upload
-                _buildImagePickerBack(context, 'CNIC (Back Side - First Capture Then Crop)', _backImage,
+                _buildImagePickerBack(
+                    context,
+                    'License (Back Side - First Capture Then Crop)',
+                    _backImage,
                     () => _pickAndCropImage(false)),
                 const SizedBox(height: 16),
 
-                // CNIC Number TextField
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -91,41 +97,33 @@ class _CNICScreenState extends State<CNICScreen> {
                     color: Colors.white,
                     boxShadow: const [
                       BoxShadow(
-                          color: Colors.black12,
-                          offset: Offset(0, 2),
-                          blurRadius: 6.0),
+                        color: Colors.black12,
+                        offset: Offset(0, 2),
+                        blurRadius: 6.0,
+                      ),
                     ],
                   ),
                   child: TextFormField(
-                    controller: _cnicController,
+                    controller: _licenseController,
                     decoration: const InputDecoration(
-                      labelText: 'CNIC Number',
+                      labelText: 'License Number',
                       
-                      // enabledBorder: OutlineInputBorder(
-                      //   borderSide: BorderSide(
-                      //       color: Colors.deepPurple), // Green border when enabled
-                      //   borderRadius: BorderRadius.all(Radius.circular(12)),
-                      // ),
-                      // focusedBorder: OutlineInputBorder(
-                      //   borderSide: BorderSide(
-                      //       color: Colors.green), // Green border when enabled
-                      //   borderRadius: BorderRadius.all(Radius.circular(12)),
-                      // ),
-                      // focusColor: Colors.green
+                      helperText:
+                          'Format: ST-24-7174',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(12),),
-                        borderSide: BorderSide()
-                      )
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(12),
+                        ),
+                        borderSide: BorderSide(),
+                      ),
                     ),
-                    //cursorColor: Colors.green,
-                    keyboardType: TextInputType.number,
-                    maxLength: 13,
+                    keyboardType: TextInputType.text,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'CNIC Number is required';
+                        return 'License Number is required';
                       }
-                      if (value.length != 13) {
-                        return 'CNIC Number must be 13 digits';
+                      if (!licenseRegExp.hasMatch(value)) {
+                        return 'Please enter a valid license number in ST-24-7174 format';
                       }
                       return null;
                     },
@@ -188,7 +186,7 @@ class _CNICScreenState extends State<CNICScreen> {
           const SizedBox(height: 16),
           imageFile != null
               ? Image.file(File(imageFile.path), height: 150)
-              : Image.asset('assets/auth/cnic-front.png', height: 150),
+              : Image.asset('assets/auth/license-front.png', height: 150),
           const SizedBox(height: 16),
           Container(
             width: 200,
@@ -198,7 +196,10 @@ class _CNICScreenState extends State<CNICScreen> {
                 borderRadius: BorderRadius.circular(12)),
             child: TextButton.icon(
               onPressed: onPressed,
-              icon: const Icon(Icons.camera_alt, color: Colors.black87,),
+              icon: const Icon(
+                Icons.camera_alt,
+                color: Colors.black87,
+              ),
               label: const Text(
                 'Add a photo',
                 style: TextStyle(color: Colors.black87),
@@ -234,7 +235,7 @@ class _CNICScreenState extends State<CNICScreen> {
           ),
           imageFile != null
               ? Image.file(File(imageFile.path), height: 150)
-              : Image.asset('assets/auth/cnic-back.png', height: 150),
+              : Image.asset('assets/auth/license-back.png', height: 150),
           const SizedBox(height: 16),
           Container(
             width: 200,
@@ -244,7 +245,10 @@ class _CNICScreenState extends State<CNICScreen> {
                 borderRadius: BorderRadius.circular(12)),
             child: TextButton.icon(
               onPressed: onPressed,
-              icon: const Icon(Icons.camera_alt, color: Colors.black87,),
+              icon: const Icon(
+                Icons.camera_alt,
+                color: Colors.black87,
+              ),
               label: const Text(
                 'Add a photo',
                 style: TextStyle(color: Colors.black87),
