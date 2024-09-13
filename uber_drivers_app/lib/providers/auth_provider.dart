@@ -11,6 +11,7 @@ import 'package:uber_drivers_app/models/driver.dart';
 import 'package:uber_drivers_app/pages/auth/register_screen.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import '../methods/common_method.dart';
+import '../models/vehicleInfo.dart';
 import '../pages/auth/otp_screen.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
@@ -217,7 +218,6 @@ class AuthenticationProvider extends ChangeNotifier {
     return snapshot.snapshot.exists;
   }
 
-  // Method to get user data from Firebase Realtime Database
   Future<void> getUserDataFromFirebaseDatabase() async {
     try {
       // Get a reference to the user's data in the Realtime Database
@@ -229,22 +229,136 @@ class AuthenticationProvider extends ChangeNotifier {
       // Fetch user data from the database
       DataSnapshot snapshot = await driverRef.get();
 
-      if (snapshot.exists) {
-        // Convert the snapshot data into a Map
-        Map<dynamic, dynamic> driverData =
-            snapshot.value as Map<dynamic, dynamic>;
+      if (snapshot.exists && snapshot.value != null) {
+        // Cast the snapshot value to a Map
+        Map driverData = snapshot.value as Map;
 
-        // Create a Driver object from the retrieved data
-        _driverModel = Driver.fromMap(driverData.cast<String, dynamic>());
+        // Retrieve individual values from the map and create the Driver object
+        _driverModel = Driver(
+          id: driverData["id"] ?? '',
+          firstName: driverData["firstName"] ?? '',
+          secondName: driverData["secondName"] ?? '',
+          phoneNumber: driverData["phoneNumber"] ?? '',
+          profilePicture: driverData["profilePicture"] ?? '',
+          dob: driverData["dob"] ?? '',
+          email: driverData["email"] ?? '',
+          cnicNumber: driverData["cnicNumber"] ?? '',
+          cnicFrontImage: driverData["cnicFrontImage"] ?? '',
+          cnicBackImage: driverData["cnicBackImage"] ?? '',
+          driverFaceWithCnic: driverData["driverFaceWithCnic"] ?? '',
+          drivingLicenseNumber: driverData["drivingLicenseNumber"] ?? '',
+          drivingLicenseFrontImage:
+              driverData["drivingLicenseFrontImage"] ?? '',
+          drivingLicenseBackImage: driverData["drivingLicenseBackImage"] ?? '',
+          vehicleInfo: VehicleInfo(
+            brand: driverData["vehicleInfo"]?["brand"] ?? '',
+            color: driverData["vehicleInfo"]?["color"] ?? '',
+            productionYear: driverData["vehicleInfo"]?["productionYear"] ?? '',
+            vehiclePicture: driverData["vehicleInfo"]?["vehiclePicture"] ?? '',
+            type: driverData["vehicleInfo"]?["type"] ?? '',
+            registrationPlateNumber:
+                driverData["vehicleInfo"]?["registrationPlateNumber"] ?? '',
+            registrationCertificateFrontImage: driverData["vehicleInfo"]
+                    ?["registrationCertificateFrontImage"] ??
+                '',
+            registrationCertificateBackImage: driverData["vehicleInfo"]
+                    ?["registrationCertificateBackImage"] ??
+                '',
+          ),
+        );
 
+        // Print or use the driver model as needed
+        print(_driverModel);
         _uid = _driverModel!.id;
         notifyListeners(); // Notify listeners to update the UI
       } else {
-        // Handle the case where user data does not exist
-        print("User data not found.");
+        print("User data not found or not in the expected format.");
       }
     } catch (e) {
       print("An error occurred while fetching user data: $e");
+    }
+  }
+
+  Future<bool> checkDriverFieldsFilled() async {
+    try {
+      // Get a reference to the driver's data in the Realtime Database
+      DatabaseReference driverRef = firebaseDatabase
+          .ref()
+          .child("drivers")
+          .child(firebaseAuth.currentUser!.uid);
+
+      // Fetch user data from the database
+      DataSnapshot snapshot = await driverRef.get();
+      print(snapshot.value);
+
+      if (snapshot.exists && snapshot.value != null) {
+        // Cast the snapshot value to a Map
+        Map driverData = snapshot.value as Map;
+
+        // Retrieve individual fields and perform null checks
+        String profilePicture = driverData["profilePicture"] ?? '';
+        String firstName = driverData["firstName"] ?? '';
+        String secondName = driverData["secondName"] ?? '';
+        String phoneNumber = driverData["phoneNumber"] ?? '';
+        String dob = driverData["dob"] ?? '';
+        String email = driverData["email"] ?? '';
+        String cnicNumber = driverData["cnicNumber"] ?? '';
+        String cnicFrontImage = driverData["cnicFrontImage"] ?? '';
+        String cnicBackImage = driverData["cnicBackImage"] ?? '';
+        String driverFaceWithCnic = driverData["driverFaceWithCnic"] ?? '';
+        String drivingLicenseNumber = driverData["drivingLicenseNumber"] ?? '';
+        String drivingLicenseFrontImage =
+            driverData["drivingLicenseFrontImage"] ?? '';
+        String drivingLicenseBackImage =
+            driverData["drivingLicenseBackImage"] ?? '';
+
+        // Extract and check nested vehicle info fields
+        Map vehicleInfo = driverData["vehicleInfo"] ?? {};
+        String carBrand = vehicleInfo["brand"] ?? '';
+        String carColor = vehicleInfo["color"] ?? '';
+        String productionYear = vehicleInfo["productionYear"] ?? '';
+        String vehiclePicture = vehicleInfo["vehiclePicture"] ?? '';
+        String vehicleType = vehicleInfo["type"] ?? '';
+        String registrationPlateNumber =
+            vehicleInfo["registrationPlateNumber"] ?? '';
+        String registrationCertificateFrontImage =
+            vehicleInfo["registrationCertificateFrontImage"] ?? '';
+        String registrationCertificateBackImage =
+            vehicleInfo["registrationCertificateBackImage"] ?? '';
+
+        // Check if any of the required fields are missing or empty
+        if (profilePicture.isEmpty ||
+            firstName.isEmpty ||
+            secondName.isEmpty ||
+            phoneNumber.isEmpty ||
+            dob.isEmpty ||
+            email.isEmpty ||
+            cnicNumber.isEmpty ||
+            cnicFrontImage.isEmpty ||
+            cnicBackImage.isEmpty ||
+            driverFaceWithCnic.isEmpty ||
+            drivingLicenseNumber.isEmpty ||
+            drivingLicenseFrontImage.isEmpty ||
+            drivingLicenseBackImage.isEmpty ||
+            carBrand.isEmpty ||
+            carColor.isEmpty ||
+            productionYear.isEmpty ||
+            vehiclePicture.isEmpty ||
+            vehicleType.isEmpty ||
+            registrationPlateNumber.isEmpty ||
+            registrationCertificateFrontImage.isEmpty ||
+            registrationCertificateBackImage.isEmpty) {
+          return false; // Some fields are missing or empty
+        } else {
+          return true; // All fields are filled
+        }
+      } else {
+        print("Driver data not found or not in the expected format.");
+        return false;
+      }
+    } catch (e) {
+      print("An error occurred while checking driver fields: $e");
+      return false;
     }
   }
 

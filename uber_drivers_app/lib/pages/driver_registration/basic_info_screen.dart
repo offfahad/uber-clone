@@ -48,7 +48,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
           child: Form(
             key: _formKey,
             onChanged: () {
-              registrationProvider.checkFormValidity();
+              registrationProvider.checkBasicFormValidity();
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -72,8 +72,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                       const SizedBox(height: 16),
                       CircleAvatar(
                         radius: 60,
-                        backgroundImage: registrationProvider.photo != null
-                            ? FileImage(File(registrationProvider.photo!.path))
+                        backgroundImage: registrationProvider.profilePhoto != null
+                            ? FileImage(File(registrationProvider.profilePhoto!.path))
                             : const AssetImage('assets/auth/user.jpg')
                                 as ImageProvider,
                         backgroundColor: Colors.black,
@@ -88,7 +88,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                           onPressed: () {
                             registrationProvider.pickImage();
                           },
-                          label: const Text('Add a photo*',
+                          label: const Text('Add a profilePhoto*',
                               style: TextStyle(color: Colors.black87)),
                         ),
                       ),
@@ -130,7 +130,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                             return null;
                           },
                           onChanged: (_) =>
-                              registrationProvider.checkFormValidity(),
+                              registrationProvider.checkBasicFormValidity(),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -149,7 +149,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                             return null;
                           },
                           onChanged: (_) =>
-                              registrationProvider.checkFormValidity(),
+                              registrationProvider.checkBasicFormValidity(),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -170,7 +170,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                             return null;
                           },
                           onChanged: (_) =>
-                              registrationProvider.checkFormValidity(),
+                              registrationProvider.checkBasicFormValidity(),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -191,7 +191,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                             return null;
                           },
                           onChanged: (_) =>
-                              registrationProvider.checkFormValidity(),
+                              registrationProvider.checkBasicFormValidity(),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(

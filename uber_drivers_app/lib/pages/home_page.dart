@@ -109,12 +109,12 @@ class _HomePageState extends State<HomePage> {
         .child(FirebaseAuth.instance.currentUser!.uid)
         .once()
         .then((snap) {
-      driverName = (snap.snapshot.value as Map)["name"];
-      driverPhone = (snap.snapshot.value as Map)["phone"];
-      driverPhoto = (snap.snapshot.value as Map)["photo"];
-      carColor = (snap.snapshot.value as Map)["car_details"]["carColor"];
-      carModel = (snap.snapshot.value as Map)["car_details"]["carModel"];
-      carNumber = (snap.snapshot.value as Map)["car_details"]["carNumber"];
+      driverName = (snap.snapshot.value as Map)["firstName"];
+      driverPhone = (snap.snapshot.value as Map)["phoneNumber"];
+      driverPhoto = (snap.snapshot.value as Map)["profilePicture"];
+      carColor = (snap.snapshot.value as Map)["vehicleInfo"]["color"];
+      carModel = (snap.snapshot.value as Map)["vehicleInfo"]["brand"];
+      carNumber = (snap.snapshot.value as Map)["vehicleInfo"]["registrationPlateNumber"];
     });
 
     initializePushNotificationSystem();
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
             initialCameraPosition: googlePlexInitialPosition,
             onMapCreated: (GoogleMapController mapController) {
               controllerGoogleMap = mapController;
-              themeMethods.updateMapTheme(controllerGoogleMap!);
+              //themeMethods.updateMapTheme(controllerGoogleMap!);
 
               googleMapCompleterController.complete(controllerGoogleMap);
 

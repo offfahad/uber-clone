@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:uber_drivers_app/methods/common_method.dart';
+import 'package:uber_drivers_app/pages/dashboard.dart';
 import 'package:uber_drivers_app/pages/driver_registration/driver_registration.dart';
 import 'package:uber_drivers_app/pages/home_page.dart';
 
@@ -368,7 +369,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (isSingedIn) {
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const Dashboard()),
           (route) => false);
     } else {
       Navigator.push(

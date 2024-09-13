@@ -15,7 +15,7 @@ class RegistrationProvider extends ChangeNotifier {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   bool _isLoading = false;
-  XFile? _photo;
+  XFile? _profilePhoto;
   bool _isPhotoAdded = false;
   bool _isFormValid = false;
 
@@ -27,14 +27,14 @@ class RegistrationProvider extends ChangeNotifier {
   final TextEditingController phoneController = TextEditingController();
 
   // Getters
-  XFile? get photo => _photo;
+  XFile? get profilePhoto => _profilePhoto;
   bool get isPhotoAdded => _isPhotoAdded;
   bool get isFormValid => _isFormValid;
   bool get isLoading => _isLoading;
 
   Timer? _debounce;
 
-  void checkFormValidity() {
+  void checkBasicFormValidity() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
       _isFormValid = firstNameController.text.isNotEmpty &&
@@ -46,6 +46,20 @@ class RegistrationProvider extends ChangeNotifier {
       notifyListeners();
     });
   }
+
+    void checkCNICFormValidity() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      _isFormValid = firstNameController.text.isNotEmpty &&
+          lastNameController.text.isNotEmpty &&
+          emailController.text.isNotEmpty &&
+          phoneController.text.isNotEmpty &&
+          dobController.text.isNotEmpty &&
+          _isPhotoAdded;
+      notifyListeners();
+    });
+  }
+
 
   void startLoading() {
     _isLoading = true;
@@ -62,18 +76,18 @@ class RegistrationProvider extends ChangeNotifier {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      _photo = image;
+      _profilePhoto = image;
       _isPhotoAdded = true;
       notifyListeners();
     }
   }
 
   Future<String> uploadImageToFirebaseStorage() async {
-    if (_photo == null) {
+    if (_profilePhoto == null) {
       throw Exception("No image selected");
     }
     String imageIDName = DateTime.now().millisecondsSinceEpoch.toString();
-    final file = File(_photo!.path);
+    final file = File(_profilePhoto!.path);
     final reference = _storage
         .ref()
         .child(_auth.currentUser!.uid)
@@ -129,6 +143,7 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
+
   void initFields(AuthenticationProvider authProvider) {
     if (!authProvider.isGoogleSignedIn) {
       phoneController.text = authProvider.phoneNumber;
@@ -138,6 +153,6 @@ class RegistrationProvider extends ChangeNotifier {
           authProvider.firebaseAuth.currentUser!.email.toString();
       phoneController.text = '';
     }
-    checkFormValidity();
+    checkBasicFormValidity();
   }
 }

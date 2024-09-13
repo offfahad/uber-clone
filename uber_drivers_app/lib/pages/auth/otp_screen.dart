@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/methods/common_method.dart';
 import 'package:uber_drivers_app/pages/auth/register_screen.dart';
+import 'package:uber_drivers_app/pages/dashboard.dart';
 import 'package:uber_drivers_app/pages/driver_registration/driver_registration.dart';
 import 'package:uber_drivers_app/pages/home_page.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
@@ -16,6 +18,7 @@ class OTPScreen extends StatefulWidget {
 
 class _OTPScreenState extends State<OTPScreen> {
   String? smsCode;
+  CommonMethods commonMethods = CommonMethods();
   @override
   Widget build(BuildContext context) {
     final authRepo = Provider.of<AuthenticationProvider>(context, listen: true);
@@ -154,10 +157,20 @@ class _OTPScreenState extends State<OTPScreen> {
       smsCode: smsCode,
       onSuccess: () async {
         // 1. check database if the current user exist
-        bool userExits = await authProvider.checkUserExistById();
-        if (userExits) {
+        bool driverExits = await authProvider.checkUserExistById();
+        if (driverExits) {
           // 2. get user data from database
           await authProvider.getUserDataFromFirebaseDatabase();
+
+          bool isDriverComplete = await authProvider.checkDriverFieldsFilled();
+
+          if (isDriverComplete) {
+            navigate(isSingedIn: true);
+          } else {
+            navigate(isSingedIn: false);
+            commonMethods.displaySnackBar(
+                "Fill your missing information!", context);
+          }
 
           // 3. save user data to shared preferences
           //await authProvider.saveUserDataToSharedPref();
@@ -166,7 +179,7 @@ class _OTPScreenState extends State<OTPScreen> {
           //await authProvider.setSignedIn();
 
           // 5. navigate to Home
-          navigate(isSingedIn: true);
+          //navigate(isSingedIn: true);
         } else {
           // navigate to user information screen
           navigate(isSingedIn: false);
@@ -179,13 +192,11 @@ class _OTPScreenState extends State<OTPScreen> {
     if (isSingedIn) {
       Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const Dashboard()),
           (route) => false);
     } else {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => DriverRegistration()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => DriverRegistration()));
     }
   }
 }
