@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/providers/auth_provider.dart';
+import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 import '../../methods/image_picker_service.dart';
 
@@ -15,42 +18,10 @@ class CNICScreen extends StatefulWidget {
 class _CNICScreenState extends State<CNICScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  XFile? _frontImage;
-  XFile? _backImage;
-  final TextEditingController _cnicController = TextEditingController();
-  bool _isFormValid = false;
-
-  // Check if the form is valid
-  void _checkFormValidity() {
-    setState(() {
-      _isFormValid = _frontImage != null &&
-          _backImage != null &&
-          _cnicController.text.isNotEmpty &&
-          _cnicController.text.length == 13;
-    });
-  }
-
-  // Pick and crop image from gallery or camera
-  Future<void> _pickAndCropImage(bool isFrontImage) async {
-    final pickedFile = await ImagePickerService().pickCropImage(
-      cropAspectRatio: CropAspectRatio(ratioX: 16, ratioY: 9),
-      imageSource: ImageSource.camera,
-    );
-
-    if (pickedFile != null) {
-      setState(() {
-        if (isFrontImage) {
-          _frontImage = pickedFile;
-        } else {
-          _backImage = pickedFile;
-        }
-        _checkFormValidity();
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final registrationProvider = Provider.of<RegistrationProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('CNIC'),
@@ -76,16 +47,16 @@ class _CNICScreenState extends State<CNICScreen> {
                 _buildImagePickerFront(
                     context,
                     'CNIC (Front Side - First Capture Then Crop)',
-                    _frontImage,
-                    () => _pickAndCropImage(true)),
+                    registrationProvider.cnincFrontImage,
+                    () => registrationProvider.pickAndCropImage(true)),
                 const SizedBox(height: 16),
 
                 // CNIC Back Side Upload
                 _buildImagePickerBack(
                     context,
                     'CNIC (Back Side - First Capture Then Crop)',
-                    _backImage,
-                    () => _pickAndCropImage(false)),
+                    registrationProvider.cnincBackImage,
+                    () => registrationProvider.pickAndCropImage(false)),
                 const SizedBox(height: 16),
 
                 // CNIC Number TextField
@@ -103,7 +74,7 @@ class _CNICScreenState extends State<CNICScreen> {
                     ],
                   ),
                   child: TextFormField(
-                    controller: _cnicController,
+                    controller: registrationProvider.cnicController,
                     decoration: const InputDecoration(
                         labelText: 'CNIC Number',
                         border: OutlineInputBorder(
@@ -122,31 +93,42 @@ class _CNICScreenState extends State<CNICScreen> {
                       }
                       return null;
                     },
-                    onChanged: (value) => _checkFormValidity(),
+                    onChanged: (value) =>
+                        registrationProvider.checkCNICFormValidity(),
                   ),
                 ),
                 const SizedBox(height: 16),
 
                 // Submit button
                 SizedBox(
-                  width: MediaQuery.of(context).size.width *
-                      0.9, // 90% of screen width
-                  height: MediaQuery.of(context).size.height *
-                      0.09, // 9% of screen height
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.09,
                   child: ElevatedButton(
-                    onPressed: _isFormValid
-                        ? () {
-                            // Handle form submission
+                    onPressed: registrationProvider.isFormValidCninc &&
+                            !registrationProvider.isLoading
+                        ? () async {
+                            if (_formKey.currentState?.validate() == true) {
+                              registrationProvider.startLoading();
+                              try {
+                                //await registrationProvider.saveUserData();
+                                Navigator.pop(context, true);
+                              } catch (e) {
+                                print("Error while saving data: $e");
+                              } finally {
+                                registrationProvider.stopLoading();
+                              }
+                            }
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          _isFormValid ? Colors.green : Colors.grey,
-                    ), // Disable if form is not valid
-                    child: const Text(
-                      'Done',
-                      style: TextStyle(color: Colors.white),
+                      backgroundColor: registrationProvider.isFormValidCninc
+                          ? Colors.green
+                          : Colors.grey,
                     ),
+                    child: registrationProvider.isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Done',
+                            style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],

@@ -36,7 +36,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context, false);
+              Navigator.pop(context);
             },
             child: const Text('Close', style: TextStyle(color: Colors.black)),
           ),
@@ -226,12 +226,12 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                   width: MediaQuery.of(context).size.width * 0.9,
                   height: MediaQuery.of(context).size.height * 0.09,
                   child: ElevatedButton(
-                    onPressed: registrationProvider.isFormValid && !isLoading
+                    onPressed: registrationProvider.isFormValidBasic && !isLoading
                         ? () async {
                             if (_formKey.currentState?.validate() == true) {
                               registrationProvider.startLoading();
                               try {
-                                await registrationProvider.saveUserData();
+                                //await registrationProvider.saveUserData();
                                 Navigator.pop(context, true);
                               } catch (e) {
                                 print("Error while saving data: $e");
@@ -242,7 +242,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: registrationProvider.isFormValid
+                      backgroundColor: registrationProvider.isFormValidBasic
                           ? Colors.green
                           : Colors.grey,
                     ),

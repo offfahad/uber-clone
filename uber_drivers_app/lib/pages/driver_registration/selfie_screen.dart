@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/methods/image_picker_service.dart';
+import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 class SelfieScreen extends StatefulWidget {
   const SelfieScreen({super.key});
@@ -12,26 +14,10 @@ class SelfieScreen extends StatefulWidget {
 }
 
 class _SelfieScreenState extends State<SelfieScreen> {
-  XFile? _frontImage; // Store the image
-  bool _isImageSelected = false; // Check if image is selected
-
-  // Pick and crop image from gallery or camera
-  Future<void> _pickAndCropImage() async {
-    final pickedFile = await ImagePickerService().pickCropImage(
-      cropAspectRatio: CropAspectRatio(ratioX: 20, ratioY: 20),
-      imageSource: ImageSource.camera,
-    );
-
-    if (pickedFile != null) {
-      setState(() {
-        _frontImage = pickedFile;
-        _isImageSelected = true; // Enable button when an image is selected
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final registrationProvider = Provider.of<RegistrationProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Selfie With CNIC'),
@@ -53,38 +39,42 @@ class _SelfieScreenState extends State<SelfieScreen> {
             children: [
               // CNIC Front Side Upload
               _buildImagePicker(
-                context,
-                'ID Confirmation',
-                _frontImage,
-                _pickAndCropImage,
-                'Bring your CNIC in front of you and take a photo as an example. The photo should clerly show face and ID card. The photo must be taken in good light and good quality.' // Pick image when button is pressed
-              ),
+                  context,
+                  'ID Confirmation',
+                  registrationProvider.cnicWithSelfieImage,
+                  registrationProvider.pickCnincImageWithSelfie,
+                  'Bring your CNIC in front of you and take a photo as an example. The photo should clerly show face and ID card. The photo must be taken in good light and good quality.' // Pick image when button is pressed
+                  ),
               const SizedBox(height: 16),
 
-              // Submit button
               SizedBox(
-                width: MediaQuery.of(context).size.width *
-                    0.9, // 90% of screen width
-                height: MediaQuery.of(context).size.height *
-                    0.09, // 9% of screen height
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.09,
                 child: ElevatedButton(
-                  onPressed: _isImageSelected
-                      ? () {
-                          // Handle the action when the image is selected
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Image uploaded successfully!')),
-                          );
+                  onPressed: registrationProvider.cnicWithSelfieImage != null &&
+                          !registrationProvider.isLoading
+                      ? () async {
+                          registrationProvider.startLoading();
+                          try {
+                            //await registrationProvider.saveUserData();
+                            Navigator.pop(context, true);
+                          } catch (e) {
+                            print("Error while saving data: $e");
+                          } finally {
+                            registrationProvider.stopLoading();
+                          }
                         }
-                      : null, // Disable button if no image is selected
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        _isImageSelected ? Colors.green : Colors.grey,
+                        registrationProvider.cnicWithSelfieImage != null
+                            ? Colors.green
+                            : Colors.grey,
                   ),
-                  child: const Text(
-                    'Done',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: registrationProvider.isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Done',
+                          style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],
@@ -137,7 +127,10 @@ class _SelfieScreenState extends State<SelfieScreen> {
           const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30.0),
-            child: Text(description, textAlign: TextAlign.justify,),
+            child: Text(
+              description,
+              textAlign: TextAlign.justify,
+            ),
           ),
           const SizedBox(height: 20),
         ],
