@@ -24,6 +24,12 @@ class RegistrationProvider extends ChangeNotifier {
   XFile? _cnicFrontImage;
   XFile? _cnicBackImage;
   XFile? _cnicWithSelfieImage;
+  bool _isFormValidDrivingLicense = false;
+  XFile? _drivingLicenseFrontImage;
+  XFile? _drivingLicenseBackImage;
+  String? _selectedVehicle;
+  bool _isVehicleBasicFormValid = false;
+  final RegExp licenseRegExp = RegExp(r'^[A-Z]{2}-\d{2}-\d{4}$');
 
   // TextEditingControllers
   final TextEditingController firstNameController = TextEditingController();
@@ -32,6 +38,15 @@ class RegistrationProvider extends ChangeNotifier {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController cnicController = TextEditingController();
+  final TextEditingController drivingLicenseController =
+      TextEditingController();
+
+  final TextEditingController modelController = TextEditingController();
+  final TextEditingController colorController = TextEditingController();
+  final TextEditingController numberPlateController = TextEditingController();
+  final TextEditingController productionYearController =
+      TextEditingController();
+
   // Getters
   XFile? get profilePhoto => _profilePhoto;
   bool get isPhotoAdded => _isPhotoAdded;
@@ -40,9 +55,36 @@ class RegistrationProvider extends ChangeNotifier {
   XFile? get cnincFrontImage => _cnicFrontImage;
   XFile? get cnincBackImage => _cnicBackImage;
   bool get isFormValidCninc => _isFormValidCninc;
+  bool get isFormValidDrivingLicnese => _isFormValidDrivingLicense;
   XFile? get cnicWithSelfieImage => _cnicWithSelfieImage;
+  XFile? get drivingLicenseFrontImage => _drivingLicenseFrontImage;
+  XFile? get drivingLicenseBackImage => _drivingLicenseBackImage;
+  bool get isVehicleBasicFormValid => _isVehicleBasicFormValid;
+  String? get selectedVehicle => _selectedVehicle;
 
   Timer? _debounce;
+
+  void startLoading() {
+    _isLoading = true;
+    notifyListeners();
+  }
+
+  void stopLoading() {
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void initFields(AuthenticationProvider authProvider) {
+    if (!authProvider.isGoogleSignedIn) {
+      phoneController.text = authProvider.phoneNumber;
+    }
+    if (authProvider.isGoogleSignedIn) {
+      emailController.text =
+          authProvider.firebaseAuth.currentUser!.email.toString();
+      phoneController.text = '';
+    }
+    checkBasicFormValidity();
+  }
 
   void checkBasicFormValidity() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
@@ -68,25 +110,51 @@ class RegistrationProvider extends ChangeNotifier {
     });
   }
 
-  void checkCNICWithSelfieFormValidity() {
+  // Check if the form is valid
+  void checkDrivingLicenseFormValidity() {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
-      _isFormValidCninc = _cnicFrontImage != null &&
-          _cnicBackImage != null &&
-          cnicController.text.isNotEmpty &&
-          cnicController.text.length == 13;
+      _isFormValidDrivingLicense = _drivingLicenseFrontImage != null &&
+          _drivingLicenseBackImage != null &&
+          drivingLicenseController.text.isNotEmpty &&
+          licenseRegExp.hasMatch(drivingLicenseController.text);
       notifyListeners();
     });
   }
 
-  void startLoading() {
-    _isLoading = true;
+  void checkVehicleBasicFormValidity() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      _isVehicleBasicFormValid = _selectedVehicle != null &&
+          modelController.text.isNotEmpty &&
+          colorController.text.isNotEmpty &&
+          numberPlateController.text.isNotEmpty &&
+          productionYearController.text.isNotEmpty;
+      notifyListeners();
+    });
+  }
+
+  void setSelectedVehicle(String vehicle) {
+    _selectedVehicle = vehicle;
+    checkVehicleBasicFormValidity();
     notifyListeners();
   }
 
-  void stopLoading() {
-    _isLoading = false;
-    notifyListeners();
+  // Dispose controllers
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    lastNameController.dispose();
+    dobController.dispose();
+    cnicController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    drivingLicenseController.dispose();
+    modelController.dispose();
+    colorController.dispose();
+    numberPlateController.dispose();
+    productionYearController.dispose();
+    super.dispose();
   }
 
   Future<void> pickImage() async {
@@ -100,11 +168,11 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> pickAndCropImage(bool isFrontImage) async {
+  Future<void> pickAndCropCnincImage(bool isFrontImage) async {
     final ImagePickerService imagePickerService = ImagePickerService();
 
     final pickedFile = await imagePickerService.pickCropImage(
-      cropAspectRatio: CropAspectRatio(ratioX: 16, ratioY: 9),
+      cropAspectRatio: const CropAspectRatio(ratioX: 16, ratioY: 9),
       imageSource: ImageSource.camera,
     );
 
@@ -118,11 +186,29 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> pickAndCropDrivingLicenseImage(bool isFrontImage) async {
+    final ImagePickerService imagePickerService = ImagePickerService();
+
+    final pickedFile = await imagePickerService.pickCropImage(
+      cropAspectRatio: const CropAspectRatio(ratioX: 16, ratioY: 9),
+      imageSource: ImageSource.camera,
+    );
+
+    if (pickedFile != null) {
+      if (isFrontImage) {
+        _drivingLicenseFrontImage = pickedFile;
+      } else {
+        _drivingLicenseBackImage = pickedFile;
+      }
+      checkCNICFormValidity();
+    }
+  }
+
   Future<void> pickCnincImageWithSelfie() async {
     final ImagePickerService imagePickerService = ImagePickerService();
 
     final pickedFile = await imagePickerService.pickCropImage(
-      cropAspectRatio: CropAspectRatio(ratioX: 16, ratioY: 9),
+      cropAspectRatio: const CropAspectRatio(ratioX: 20, ratioY: 20),
       imageSource: ImageSource.camera,
     );
 
@@ -193,18 +279,6 @@ class RegistrationProvider extends ChangeNotifier {
       stopLoading();
       print("An error occurred while saving user data: $e");
     }
-  }
-
-  void initFields(AuthenticationProvider authProvider) {
-    if (!authProvider.isGoogleSignedIn) {
-      phoneController.text = authProvider.phoneNumber;
-    }
-    if (authProvider.isGoogleSignedIn) {
-      emailController.text =
-          authProvider.firebaseAuth.currentUser!.email.toString();
-      phoneController.text = '';
-    }
-    checkBasicFormValidity();
   }
 
   Future<void> saveCNICData() async {

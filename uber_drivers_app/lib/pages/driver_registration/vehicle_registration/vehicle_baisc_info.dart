@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 class VehicleBasicInfoScreen extends StatefulWidget {
   const VehicleBasicInfoScreen({super.key});
@@ -9,32 +11,33 @@ class VehicleBasicInfoScreen extends StatefulWidget {
 
 class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
   final _formKey = GlobalKey<FormState>();
-  String? _selectedVehicle;
-  bool _isFormValid = false;
+  // String? _selectedVehicle;
+  // bool _isFormValid = false;
 
-  final TextEditingController _modelController = TextEditingController();
-  final TextEditingController _colorController = TextEditingController();
-  final TextEditingController _numberPlateController = TextEditingController();
-  final TextEditingController _productionYear = TextEditingController();
+  // final TextEditingController _modelController = TextEditingController();
+  // final TextEditingController _colorController = TextEditingController();
+  // final TextEditingController _numberPlateController = TextEditingController();
+  // final TextEditingController _productionYear = TextEditingController();
 
-  void _checkFormValidity() {
-    setState(() {
-      _isFormValid =
-          _formKey.currentState?.validate() == true && _selectedVehicle != null;
-    });
-  }
+  // void _checkFormValidity() {
+  //   setState(() {
+  //     _isFormValid =
+  //         _formKey.currentState?.validate() == true && _selectedVehicle != null;
+  //   });
+  // }
 
-  @override
-  void dispose() {
-    _modelController.dispose();
-    _colorController.dispose();
-    _numberPlateController.dispose();
-    _productionYear.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _modelController.dispose();
+  //   _colorController.dispose();
+  //   _numberPlateController.dispose();
+  //   _productionYear.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final registrationProvider = Provider.of<RegistrationProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Vehicle Info"),
@@ -54,7 +57,9 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
-            onChanged: _checkFormValidity, // Check form validity on changes
+            onChanged: () {
+              registrationProvider.checkVehicleBasicFormValidity();
+            }, // Check form validity on changes
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -86,13 +91,10 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                             const Text("Car"),
                           ],
                         ),
-                        value: _selectedVehicle == "Car",
+                        value: registrationProvider.selectedVehicle == "Car",
                         onChanged: (bool? value) {
                           if (value == true) {
-                            setState(() {
-                              _selectedVehicle = "Car";
-                            });
-                            //_checkFormValidity();
+                            registrationProvider.setSelectedVehicle("Car");
                           }
                         },
                       ),
@@ -109,13 +111,10 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                             const Text("Bike"),
                           ],
                         ),
-                        value: _selectedVehicle == "Bike",
+                        value: registrationProvider.selectedVehicle == "Bike",
                         onChanged: (bool? value) {
                           if (value == true) {
-                            setState(() {
-                              _selectedVehicle = "Bike";
-                            });
-                            //_checkFormValidity();
+                            registrationProvider.setSelectedVehicle("bike");
                           }
                         },
                       ),
@@ -132,13 +131,10 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                             const Text("Auto"),
                           ],
                         ),
-                        value: _selectedVehicle == "Auto",
+                        value: registrationProvider.selectedVehicle == "Auto",
                         onChanged: (bool? value) {
                           if (value == true) {
-                            setState(() {
-                              _selectedVehicle = "Auto";
-                            });
-                            //_checkFormValidity();
+                            registrationProvider.setSelectedVehicle("Auto");
                           }
                         },
                       ),
@@ -162,15 +158,13 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                   child: Column(
                     children: [
                       TextFormField(
-                        controller: _modelController,
+                        controller: registrationProvider.modelController,
                         decoration: const InputDecoration(
                           labelText: 'Brand Name',
                           border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(12)),
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 10),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -178,19 +172,18 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                           }
                           return null;
                         },
-                        //onChanged: (_) => _checkFormValidity(),
+                        onChanged: (_) => registrationProvider
+                            .checkVehicleBasicFormValidity(),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
-                        controller: _colorController,
+                        controller: registrationProvider.colorController,
                         decoration: const InputDecoration(
                           labelText: 'Color',
                           border: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(12)),
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 10),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -198,11 +191,13 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                           }
                           return null;
                         },
-                        //onChanged: (_) => _checkFormValidity(),
+                        onChanged: (_) => registrationProvider
+                            .checkVehicleBasicFormValidity(),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
-                        controller: _productionYear,
+                        controller:
+                            registrationProvider.productionYearController,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
                           labelText: 'Production Year',
@@ -217,11 +212,12 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                           }
                           return null;
                         },
-                        //onChanged: (_) => _checkFormValidity(),
+                        onChanged: (_) => registrationProvider
+                            .checkVehicleBasicFormValidity(),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
-                        controller: _numberPlateController,
+                        controller: registrationProvider.numberPlateController,
                         decoration: const InputDecoration(
                           labelText: 'Number Plate',
                           border: OutlineInputBorder(
@@ -235,7 +231,8 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                           }
                           return null;
                         },
-                        //onChanged: (_) => _checkFormValidity(),
+                        onChanged: (_) => registrationProvider
+                            .checkVehicleBasicFormValidity(),
                       ),
                       const SizedBox(height: 16),
                     ],
@@ -245,18 +242,35 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                   height: 20,
                 ),
                 SizedBox(
-                  width: MediaQuery.of(context).size.width *
-                      0.9, // 90% of screen width
-                  height: MediaQuery.of(context).size.height *
-                      0.09, // 9% of screen height
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.09,
                   child: ElevatedButton(
-                    onPressed: _isFormValid
-                        ? () {
-                            // Submit all the data
+                    onPressed: registrationProvider.isVehicleBasicFormValid &&
+                            !registrationProvider.isLoading
+                        ? () async {
+                            if (_formKey.currentState?.validate() == true) {
+                              registrationProvider.startLoading();
+                              try {
+                                //await registrationProvider.saveUserData();
+                                Navigator.pop(context, true);
+                              } catch (e) {
+                                print("Error while saving data: $e");
+                              } finally {
+                                registrationProvider.stopLoading();
+                              }
+                            }
                           }
-                        : null, // Disable button if not all sections are complete
-                    child: const Text('Done',
-                        style: TextStyle(color: Colors.black87)),
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          registrationProvider.isVehicleBasicFormValid
+                              ? Colors.green
+                              : Colors.grey,
+                    ),
+                    child: registrationProvider.isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Done',
+                            style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],

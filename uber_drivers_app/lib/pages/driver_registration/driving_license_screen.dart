@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 import '../../methods/image_picker_service.dart';
 
@@ -15,43 +17,45 @@ class DrivingLicenseScreen extends StatefulWidget {
 class _DrivingLicenseScreenState extends State<DrivingLicenseScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  XFile? _frontImage;
-  XFile? _backImage;
-  final TextEditingController _licenseController = TextEditingController();
-  bool _isFormValid = false;
-  final RegExp licenseRegExp = RegExp(r'^[A-Z]{2}-\d{2}-\d{4}$');
+  // XFile? _frontImage;
+  // XFile? _backImage;
+  // final TextEditingController _licenseController = TextEditingController();
+  // bool _isFormValid = false;
+  // final RegExp licenseRegExp = RegExp(r'^[A-Z]{2}-\d{2}-\d{4}$');
 
-  // Check if the form is valid
-  void _checkFormValidity() {
-    setState(() {
-      _isFormValid = _frontImage != null &&
-          _backImage != null &&
-          _licenseController.text.isNotEmpty &&
-          licenseRegExp.hasMatch(_licenseController.text);
-    });
-  }
+  // // Check if the form is valid
+  // void _checkFormValidity() {
+  //   setState(() {
+  //     _isFormValid = _frontImage != null &&
+  //         _backImage != null &&
+  //         _licenseController.text.isNotEmpty &&
+  //         licenseRegExp.hasMatch(_licenseController.text);
+  //   });
+  //}
 
   // Pick and crop image from gallery or camera
-  Future<void> _pickAndCropImage(bool isFrontImage) async {
-    final pickedFile = await ImagePickerService().pickCropImage(
-      cropAspectRatio: CropAspectRatio(ratioX: 16, ratioY: 9),
-      imageSource: ImageSource.camera,
-    );
+  // Future<void> _pickAndCropImage(bool isFrontImage) async {
+  //   final pickedFile = await ImagePickerService().pickCropImage(
+  //     cropAspectRatio: CropAspectRatio(ratioX: 16, ratioY: 9),
+  //     imageSource: ImageSource.camera,
+  //   );
 
-    if (pickedFile != null) {
-      setState(() {
-        if (isFrontImage) {
-          _frontImage = pickedFile;
-        } else {
-          _backImage = pickedFile;
-        }
-        _checkFormValidity();
-      });
-    }
-  }
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       if (isFrontImage) {
+  //         _frontImage = pickedFile;
+  //       } else {
+  //         _backImage = pickedFile;
+  //       }
+  //       _checkFormValidity();
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final registrationProvider = Provider.of<RegistrationProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Driving License'),
@@ -77,16 +81,18 @@ class _DrivingLicenseScreenState extends State<DrivingLicenseScreen> {
                 _buildImagePickerFront(
                     context,
                     'License (Front Side - First Capture Then Crop)',
-                    _frontImage,
-                    () => _pickAndCropImage(true)),
+                    registrationProvider.drivingLicenseFrontImage,
+                    () => registrationProvider
+                        .pickAndCropDrivingLicenseImage(true)),
                 const SizedBox(height: 16),
 
                 // CNIC Back Side Upload
                 _buildImagePickerBack(
                     context,
                     'License (Back Side - First Capture Then Crop)',
-                    _backImage,
-                    () => _pickAndCropImage(false)),
+                    registrationProvider.drivingLicenseBackImage,
+                    () => registrationProvider
+                        .pickAndCropDrivingLicenseImage(false)),
                 const SizedBox(height: 16),
 
                 Container(
@@ -104,12 +110,10 @@ class _DrivingLicenseScreenState extends State<DrivingLicenseScreen> {
                     ],
                   ),
                   child: TextFormField(
-                    controller: _licenseController,
+                    controller: registrationProvider.drivingLicenseController,
                     decoration: const InputDecoration(
                       labelText: 'License Number',
-                      
-                      helperText:
-                          'Format: ST-24-7174',
+                      helperText: 'Format: ST-24-7174',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(
                           Radius.circular(12),
@@ -122,36 +126,47 @@ class _DrivingLicenseScreenState extends State<DrivingLicenseScreen> {
                       if (value == null || value.isEmpty) {
                         return 'License Number is required';
                       }
-                      if (!licenseRegExp.hasMatch(value)) {
+                      if (!registrationProvider.licenseRegExp.hasMatch(value)) {
                         return 'Please enter a valid license number in ST-24-7174 format';
                       }
                       return null;
                     },
-                    onChanged: (value) => _checkFormValidity(),
+                    onChanged: (value) =>
+                        registrationProvider.checkDrivingLicenseFormValidity(),
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // Submit button
                 SizedBox(
-                  width: MediaQuery.of(context).size.width *
-                      0.9, // 90% of screen width
-                  height: MediaQuery.of(context).size.height *
-                      0.09, // 9% of screen height
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.09,
                   child: ElevatedButton(
-                    onPressed: _isFormValid
-                        ? () {
-                            // Handle form submission
+                    onPressed: registrationProvider.isFormValidDrivingLicnese &&
+                            !registrationProvider.isLoading
+                        ? () async {
+                            if (_formKey.currentState?.validate() == true) {
+                              registrationProvider.startLoading();
+                              try {
+                                //await registrationProvider.saveUserData();
+                                Navigator.pop(context, true);
+                              } catch (e) {
+                                print("Error while saving data: $e");
+                              } finally {
+                                registrationProvider.stopLoading();
+                              }
+                            }
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
-                          _isFormValid ? Colors.green : Colors.grey,
-                    ), // Disable if form is not valid
-                    child: const Text(
-                      'Done',
-                      style: TextStyle(color: Colors.white),
+                          registrationProvider.isFormValidDrivingLicnese
+                              ? Colors.green
+                              : Colors.grey,
                     ),
+                    child: registrationProvider.isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Done',
+                            style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],

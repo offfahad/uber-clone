@@ -48,7 +48,7 @@ class _CNICScreenState extends State<CNICScreen> {
                     context,
                     'CNIC (Front Side - First Capture Then Crop)',
                     registrationProvider.cnincFrontImage,
-                    () => registrationProvider.pickAndCropImage(true)),
+                    () => registrationProvider.pickAndCropCnincImage(true)),
                 const SizedBox(height: 16),
 
                 // CNIC Back Side Upload
@@ -56,7 +56,7 @@ class _CNICScreenState extends State<CNICScreen> {
                     context,
                     'CNIC (Back Side - First Capture Then Crop)',
                     registrationProvider.cnincBackImage,
-                    () => registrationProvider.pickAndCropImage(false)),
+                    () => registrationProvider.pickAndCropCnincImage(false)),
                 const SizedBox(height: 16),
 
                 // CNIC Number TextField
