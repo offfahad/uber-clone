@@ -158,7 +158,7 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                   child: Column(
                     children: [
                       TextFormField(
-                        controller: registrationProvider.modelController,
+                        controller: registrationProvider.brandController,
                         decoration: const InputDecoration(
                           labelText: 'Brand Name',
                           border: OutlineInputBorder(
@@ -245,19 +245,15 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                   width: MediaQuery.of(context).size.width * 0.9,
                   height: MediaQuery.of(context).size.height * 0.09,
                   child: ElevatedButton(
-                    onPressed: registrationProvider.isVehicleBasicFormValid &&
-                            !registrationProvider.isLoading
+                    onPressed: registrationProvider.isVehicleBasicFormValid
                         ? () async {
                             if (_formKey.currentState?.validate() == true) {
-                              registrationProvider.startLoading();
                               try {
                                 //await registrationProvider.saveUserData();
                                 Navigator.pop(context, true);
                               } catch (e) {
                                 print("Error while saving data: $e");
-                              } finally {
-                                registrationProvider.stopLoading();
-                              }
+                              } finally {}
                             }
                           }
                         : null,
@@ -267,10 +263,8 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                               ? Colors.green
                               : Colors.grey,
                     ),
-                    child: registrationProvider.isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Done',
-                            style: TextStyle(color: Colors.white)),
+                    child: const Text('Done',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],

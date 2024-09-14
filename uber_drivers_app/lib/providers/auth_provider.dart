@@ -250,6 +250,7 @@ class AuthenticationProvider extends ChangeNotifier {
           drivingLicenseFrontImage:
               driverData["drivingLicenseFrontImage"] ?? '',
           drivingLicenseBackImage: driverData["drivingLicenseBackImage"] ?? '',
+          blockStatus: driverData["blockStatus"] ?? '',
           vehicleInfo: VehicleInfo(
             brand: driverData["vehicleInfo"]?["brand"] ?? '',
             color: driverData["vehicleInfo"]?["color"] ?? '',

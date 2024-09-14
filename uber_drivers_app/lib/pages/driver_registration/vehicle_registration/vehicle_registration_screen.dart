@@ -71,19 +71,15 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                                     .vehicleRegistrationFrontImage !=
                                 null &&
                             registrationProvider.vehicleRegistrationBackImage !=
-                                null &&
-                            !registrationProvider.isLoading
+                                null
                         ? () async {
                             if (_formKey.currentState?.validate() == true) {
-                              registrationProvider.startLoading();
                               try {
                                 //await registrationProvider.saveUserData();
                                 Navigator.pop(context, true);
                               } catch (e) {
                                 print("Error while saving data: $e");
-                              } finally {
-                                registrationProvider.stopLoading();
-                              }
+                              } finally {}
                             }
                           }
                         : null,
@@ -97,10 +93,8 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
                               ? Colors.green
                               : Colors.grey,
                     ),
-                    child: registrationProvider.isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Done',
-                            style: TextStyle(color: Colors.white)),
+                    child: const Text('Done',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],

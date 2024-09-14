@@ -399,7 +399,7 @@ class _NewTripPageState extends State<NewTripPage> {
               initialCameraPosition: googlePlexInitialPosition,
               onMapCreated: (GoogleMapController mapController) async {
                 controllerGoogleMap = mapController;
-                themeMethods.updateMapTheme(controllerGoogleMap!);
+                //themeMethods.updateMapTheme(controllerGoogleMap!);
                 googleMapCompleterController.complete(controllerGoogleMap);
 
                 setState(() {

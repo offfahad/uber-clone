@@ -91,7 +91,8 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                             bool? result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const DriverCarImageScreeen(),
+                                builder: (context) =>
+                                    const DriverCarImageScreeen(),
                               ),
                             );
                             if (result != null && result) {
@@ -111,7 +112,8 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                             bool? result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const VehicleRegistrationScreen(),
+                                builder: (context) =>
+                                    const VehicleRegistrationScreen(),
                               ),
                             );
                             if (result != null && result) {
@@ -136,13 +138,17 @@ class _VehicleInfoScreenState extends State<VehicleInfoScreen> {
                 height: MediaQuery.of(context).size.height *
                     0.09, // 9% of screen height
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isAllComplete ? Colors.green : Colors.grey,
+                  ),
                   onPressed: isAllComplete
-                      ? () {
+                      ? () async {
                           // Submit all the data
+                          Navigator.pop(context, true);
                         }
                       : null, // Disable button if not all sections are complete
-                  child: const Text('Done',
-                      style: TextStyle(color: Colors.black87)),
+                  child: Text('Done',
+                      style: TextStyle(color: isAllComplete ? Colors.white : Colors.black)),
                 ),
               ),
             ],

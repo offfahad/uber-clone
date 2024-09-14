@@ -81,7 +81,7 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
         currentIndex: indexSelected,
         //backgroundColor: Colors.grey,
         unselectedItemColor: Colors.grey,
-        selectedItemColor: Colors.pink,
+        selectedItemColor: Colors.black,
         showSelectedLabels: true,
         selectedLabelStyle: const TextStyle(fontSize: 12),
         type: BottomNavigationBarType.fixed,

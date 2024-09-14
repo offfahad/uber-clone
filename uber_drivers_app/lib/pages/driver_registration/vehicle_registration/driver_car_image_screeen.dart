@@ -14,7 +14,6 @@ class DriverCarImageScreeen extends StatefulWidget {
 }
 
 class _DriverCarImageScreeenState extends State<DriverCarImageScreeen> {
-
   @override
   Widget build(BuildContext context) {
     final registrationProvider = Provider.of<RegistrationProvider>(context);
@@ -53,18 +52,14 @@ class _DriverCarImageScreeenState extends State<DriverCarImageScreeen> {
                 width: MediaQuery.of(context).size.width * 0.9,
                 height: MediaQuery.of(context).size.height * 0.09,
                 child: ElevatedButton(
-                  onPressed: registrationProvider.isVehiclePhotoAdded &&
-                          !registrationProvider.isLoading
+                  onPressed: registrationProvider.isVehiclePhotoAdded
                       ? () async {
-                          registrationProvider.startLoading();
                           try {
                             //await registrationProvider.saveUserData();
                             Navigator.pop(context, true);
                           } catch (e) {
                             print("Error while saving data: $e");
-                          } finally {
-                            registrationProvider.stopLoading();
-                          }
+                          } finally {}
                         }
                       : null,
                   style: ElevatedButton.styleFrom(
@@ -72,10 +67,8 @@ class _DriverCarImageScreeenState extends State<DriverCarImageScreeen> {
                         ? Colors.green
                         : Colors.grey,
                   ),
-                  child: registrationProvider.isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Done',
-                          style: TextStyle(color: Colors.white)),
+                  child:
+                      const Text('Done', style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],

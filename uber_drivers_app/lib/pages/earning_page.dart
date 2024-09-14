@@ -23,6 +23,11 @@ class _EarningsPageState extends State<EarningsPage> {
           double earnings = (snap.snapshot.value as Map)["earnings"];
           driverEarnings = earnings.toStringAsFixed(2); // Display 2 digits after decimal
         });
+      }else{
+        setState(() {
+          
+        driverEarnings = "0";
+        });
       }
     });
   }
@@ -36,6 +41,7 @@ class _EarningsPageState extends State<EarningsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.indigo,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

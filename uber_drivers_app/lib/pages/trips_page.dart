@@ -54,6 +54,7 @@ class _TripsPageState extends State<TripsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.indigo,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

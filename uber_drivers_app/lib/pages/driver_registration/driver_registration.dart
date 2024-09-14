@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/methods/common_method.dart';
+import 'package:uber_drivers_app/pages/dashboard.dart';
 import 'package:uber_drivers_app/pages/driver_registration/basic_info_screen.dart';
 import 'package:uber_drivers_app/pages/driver_registration/cninc_screen.dart';
 import 'package:uber_drivers_app/pages/driver_registration/driving_license_screen.dart';
 import 'package:uber_drivers_app/pages/driver_registration/selfie_screen.dart';
+import 'package:uber_drivers_app/providers/registration_provider.dart';
 import 'vehicle_info_screen.dart';
 
 class DriverRegistration extends StatefulWidget {
@@ -14,18 +18,25 @@ class _DriverRegistrationState extends State<DriverRegistration> {
   bool isBasicInfoComplete = false;
   bool isCnicComplete = false;
   bool isSelfieComplete = false;
-  bool isReferralCodeComplete = false;
   bool isVehicleInfoComplete = false;
   bool isDrivingLicenseInfoComplete = false;
 
+  // Function to recalculate 'isAllComplete'
+  void _recalculateAllComplete() {
+    setState(() {
+      isAllComplete = isBasicInfoComplete &&
+          isCnicComplete &&
+          isSelfieComplete &&
+          isVehicleInfoComplete &&
+          isDrivingLicenseInfoComplete;
+    });
+  }
+
+  bool isAllComplete = false;
+
   @override
   Widget build(BuildContext context) {
-    bool isAllComplete = isBasicInfoComplete &&
-        isCnicComplete &&
-        isSelfieComplete &&
-        isReferralCodeComplete &&
-        isVehicleInfoComplete &&
-        isDrivingLicenseInfoComplete;
+    final registrationProvider = Provider.of<RegistrationProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +51,6 @@ class _DriverRegistrationState extends State<DriverRegistration> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Container holding the ListView
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
@@ -52,13 +62,10 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                         blurRadius: 6.0),
                   ],
                 ),
-                width: MediaQuery.of(context).size.width *
-                    0.9, // 90% of screen width
-                // height: MediaQuery.of(context).size.height *
-                //     0.5, // 45% of screen height
+                width: MediaQuery.of(context).size.width * 0.9,
                 child: ListView.separated(
                   shrinkWrap: true,
-                  itemCount: 5, // You have 4 items
+                  itemCount: 5,
                   separatorBuilder: (context, index) => const Divider(
                     color: Colors.grey,
                     thickness: 0.3,
@@ -81,6 +88,7 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                           if (result != null && result) {
                             setState(() {
                               isBasicInfoComplete = true;
+                              _recalculateAllComplete();
                             });
                           }
                         },
@@ -100,6 +108,7 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                           if (result != null && result) {
                             setState(() {
                               isCnicComplete = true;
+                              _recalculateAllComplete();
                             });
                           }
                         },
@@ -119,6 +128,7 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                           if (result != null && result) {
                             setState(() {
                               isSelfieComplete = true;
+                              _recalculateAllComplete();
                             });
                           }
                         },
@@ -139,6 +149,7 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                           if (result != null && result) {
                             setState(() {
                               isDrivingLicenseInfoComplete = true;
+                              _recalculateAllComplete();
                             });
                           }
                         },
@@ -158,6 +169,7 @@ class _DriverRegistrationState extends State<DriverRegistration> {
                           if (result != null && result) {
                             setState(() {
                               isVehicleInfoComplete = true;
+                              _recalculateAllComplete();
                             });
                           }
                         },
@@ -169,18 +181,37 @@ class _DriverRegistrationState extends State<DriverRegistration> {
               const SizedBox(height: 20),
               // Done button
               SizedBox(
-                width: MediaQuery.of(context).size.width *
-                    0.9, // 90% of screen width
-                height: MediaQuery.of(context).size.height *
-                    0.09, // 9% of screen height
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.09,
                 child: ElevatedButton(
-                  onPressed: isAllComplete
-                      ? () {
-                          // Submit all the data
+                  onPressed: isAllComplete && !registrationProvider.isLoading
+                      ? () async {
+                          registrationProvider.startLoading();
+                          try {
+                            await registrationProvider.saveUserData(context);
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (c) => const Dashboard(),
+                              ),
+                            );
+                            CommonMethods commonMethods = CommonMethods();
+                            commonMethods.displaySnackBar(
+                                "Your account created successfully.", context);
+                          } catch (e) {
+                            print("Error while saving data: $e");
+                          } finally {
+                            registrationProvider.stopLoading();
+                          }
                         }
-                      : null, // Disable button if not all sections are complete
-                  child: const Text('Done',
-                      style: TextStyle(color: Colors.black87)),
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isAllComplete ? Colors.green : Colors.grey,
+                  ),
+                  child: registrationProvider.isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Done',
+                          style: TextStyle(color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 5),
@@ -200,11 +231,12 @@ class _DriverRegistrationState extends State<DriverRegistration> {
   }
 
   // Build ListTile method
-  Widget _buildListTile(
-      {required String title,
-      required String subtitle,
-      required bool isCompleted,
-      required Function() onTap}) {
+  Widget _buildListTile({
+    required String title,
+    required String subtitle,
+    required bool isCompleted,
+    required Function() onTap,
+  }) {
     return ListTile(
       title: Text(
         title,

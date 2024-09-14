@@ -6,6 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uber_drivers_app/methods/common_method.dart';
 import 'package:uber_drivers_app/methods/image_picker_service.dart';
 import 'package:uber_drivers_app/models/driver.dart';
 import 'package:uber_drivers_app/models/vehicleInfo.dart';
@@ -45,7 +46,7 @@ class RegistrationProvider extends ChangeNotifier {
   final TextEditingController drivingLicenseController =
       TextEditingController();
 
-  final TextEditingController modelController = TextEditingController();
+  final TextEditingController brandController = TextEditingController();
   final TextEditingController colorController = TextEditingController();
   final TextEditingController numberPlateController = TextEditingController();
   final TextEditingController productionYearController =
@@ -70,6 +71,8 @@ class RegistrationProvider extends ChangeNotifier {
   XFile? get vehicleRegistrationFrontImage => _vehicleRegistrationFrontImage;
   XFile? get vehicleRegistrationBackImage => _vehicleRegistrationBackImage;
   Timer? _debounce;
+
+  CommonMethods commonMethods = CommonMethods();
 
   void startLoading() {
     _isLoading = true;
@@ -133,7 +136,7 @@ class RegistrationProvider extends ChangeNotifier {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
       _isVehicleBasicFormValid = _selectedVehicle != null &&
-          modelController.text.isNotEmpty &&
+          brandController.text.isNotEmpty &&
           colorController.text.isNotEmpty &&
           numberPlateController.text.isNotEmpty &&
           productionYearController.text.isNotEmpty;
@@ -157,7 +160,7 @@ class RegistrationProvider extends ChangeNotifier {
     emailController.dispose();
     phoneController.dispose();
     drivingLicenseController.dispose();
-    modelController.dispose();
+    brandController.dispose();
     colorController.dispose();
     numberPlateController.dispose();
     productionYearController.dispose();
@@ -204,11 +207,11 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
-    Future<void> pickAndCropVehicleRegistrationImages(bool isFrontImage) async {
+  Future<void> pickAndCropVehicleRegistrationImages(bool isFrontImage) async {
     final ImagePickerService imagePickerService = ImagePickerService();
 
     final pickedFile = await imagePickerService.pickCropImage(
-      cropAspectRatio: const CropAspectRatio(ratioX: 20, ratioY: 20),
+      cropAspectRatio: const CropAspectRatio(ratioX: 16, ratioY: 12),
       imageSource: ImageSource.camera,
     );
 
@@ -219,6 +222,7 @@ class RegistrationProvider extends ChangeNotifier {
         _vehicleRegistrationBackImage = pickedFile;
       }
     }
+    notifyListeners();
   }
 
   Future<void> pickAndCropDrivingLicenseImage(bool isFrontImage) async {
@@ -271,14 +275,38 @@ class RegistrationProvider extends ChangeNotifier {
     return downloadUrl;
   }
 
-  Future<void> saveUserData() async {
-    if (!isFormValidBasic) {
-      throw Exception("Form is not valid");
+  Future<void> saveUserData(BuildContext context) async {
+    if (!isFormValidBasic ||
+        !isFormValidCninc ||
+        !isFormValidDrivingLicnese ||
+        !isVehicleBasicFormValid) {
+      commonMethods.displaySnackBar("Fill all the details!", context);
+      return;
     }
     try {
       startLoading();
       final profilePictureUrl =
           await uploadImageToFirebaseStorage(_profilePhoto, "ProfilePicture");
+
+      final frontCnincImageUrl =
+          await uploadImageToFirebaseStorage(_cnicFrontImage, "Cninc");
+      final backCnincImageUrl =
+          await uploadImageToFirebaseStorage(_cnicBackImage, "Cninc");
+      final faceWithCnincImageUrl = await uploadImageToFirebaseStorage(
+          _cnicWithSelfieImage, "SelfieWithCninc");
+      final drivingLicenseFrontImageUrl = await uploadImageToFirebaseStorage(
+          _drivingLicenseFrontImage, "DrivingLicenseImages");
+      final drivingLicenseBackImageUrl = await uploadImageToFirebaseStorage(
+          _drivingLicenseBackImage, "DrivingLicenseImages");
+      final vehicleImageUrl =
+          await uploadImageToFirebaseStorage(_vehicleImage, "VehicleImage");
+      final vehicleRegistrationFrontImageUrl =
+          await uploadImageToFirebaseStorage(
+              _vehicleRegistrationFrontImage, "VehicleRegistrationImages");
+      final vehicleRegistrationBackImageUrl =
+          await uploadImageToFirebaseStorage(
+              _vehicleRegistrationBackImage, "VehicleRegistrationImages");
+
       final driver = Driver(
         id: _auth.currentUser!.uid,
         profilePicture: profilePictureUrl,
@@ -287,22 +315,23 @@ class RegistrationProvider extends ChangeNotifier {
         phoneNumber: phoneController.text,
         dob: dobController.text,
         email: emailController.text,
-        cnicNumber: '', // Add these fields if required
-        cnicFrontImage: '',
-        cnicBackImage: '',
-        driverFaceWithCnic: '',
-        drivingLicenseNumber: '',
-        drivingLicenseFrontImage: '',
-        drivingLicenseBackImage: '',
+        cnicNumber: cnicController.text, // Add these fields if required
+        cnicFrontImage: frontCnincImageUrl,
+        cnicBackImage: backCnincImageUrl,
+        driverFaceWithCnic: faceWithCnincImageUrl,
+        drivingLicenseNumber: drivingLicenseController.text,
+        drivingLicenseFrontImage: drivingLicenseFrontImageUrl,
+        drivingLicenseBackImage: drivingLicenseBackImageUrl,
+        blockStatus: "no",
         vehicleInfo: VehicleInfo(
-          type: '',
-          brand: '',
-          color: '',
-          vehiclePicture: '',
-          productionYear: '',
-          registrationPlateNumber: '',
-          registrationCertificateBackImage: '',
-          registrationCertificateFrontImage: '',
+          type: selectedVehicle.toString(),
+          brand: brandController.text,
+          color: colorController.text,
+          vehiclePicture: vehicleImageUrl,
+          productionYear: productionYearController.text,
+          registrationPlateNumber: numberPlateController.text,
+          registrationCertificateBackImage: vehicleRegistrationFrontImageUrl,
+          registrationCertificateFrontImage: vehicleRegistrationBackImageUrl,
         ), // Initialize properly if needed
       );
 
@@ -316,36 +345,36 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> saveCNICData() async {
-    if (!_isFormValidCninc) {
-      throw Exception("Form is not valid");
-    }
-    try {
-      startLoading();
+  // Future<void> saveCNICData() async {
+  //   if (!_isFormValidCninc) {
+  //     throw Exception("Form is not valid");
+  //   }
+  //   try {
+  //     startLoading();
 
-      // Upload CNIC images
-      final frontImageUrl =
-          await uploadImageToFirebaseStorage(_cnicFrontImage, "Cninc");
-      final backImageUrl =
-          await uploadImageToFirebaseStorage(_cnicBackImage, "Cninc");
+  //     // Upload CNIC images
+  //     final frontImageUrl =
+  //         await uploadImageToFirebaseStorage(_cnicFrontImage, "Cninc");
+  //     final backImageUrl =
+  //         await uploadImageToFirebaseStorage(_cnicBackImage, "Cninc");
 
-      // Create CNIC data
-      final driverData = {
-        'id': _auth.currentUser!.uid,
-        'cnicNumber': cnicController.text,
-        'cnicFrontImage': frontImageUrl,
-        'cnicBackImage': backImageUrl,
-      };
+  //     // Create CNIC data
+  //     final driverData = {
+  //       'id': _auth.currentUser!.uid,
+  //       'cnicNumber': cnicController.text,
+  //       'cnicFrontImage': frontImageUrl,
+  //       'cnicBackImage': backImageUrl,
+  //     };
 
-      // Update driver data in Firebase Realtime Database
-      final userRef =
-          _database.ref().child("drivers").child(_auth.currentUser!.uid);
-      await userRef.update(driverData);
+  //     // Update driver data in Firebase Realtime Database
+  //     final userRef =
+  //         _database.ref().child("drivers").child(_auth.currentUser!.uid);
+  //     await userRef.update(driverData);
 
-      stopLoading();
-    } catch (e) {
-      stopLoading();
-      print("An error occurred while saving CNIC data: $e");
-    }
-  }
+  //     stopLoading();
+  //   } catch (e) {
+  //     stopLoading();
+  //     print("An error occurred while saving CNIC data: $e");
+  //   }
+  // }
 }

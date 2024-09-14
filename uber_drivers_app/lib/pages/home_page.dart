@@ -154,7 +154,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             height: 136,
             width: double.infinity,
-            color: Colors.black54,
+            //color: Colors.black12,
           ),
 
           ///go online offline button
@@ -166,6 +166,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
+                  
                   onPressed: () {
                     showModalBottomSheet(
                         context: context,
@@ -202,7 +203,7 @@ class _HomePageState extends State<HomePage> {
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 22,
-                                      color: Colors.white70,
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -215,7 +216,7 @@ class _HomePageState extends State<HomePage> {
                                         : "You are about to go offline, you will stop receiving new trip requests from users.",
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
-                                      color: Colors.white30,
+                                      color: Colors.white,
                                     ),
                                   ),
                                   const SizedBox(
@@ -228,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: const Text("BACK"),
+                                          child: const Text("BACK", style: TextStyle(color: Colors.black),),
                                         ),
                                       ),
                                       const SizedBox(
@@ -270,7 +271,7 @@ class _HomePageState extends State<HomePage> {
                                                     ? Colors.green
                                                     : Colors.pink,
                                           ),
-                                          child: const Text("CONFIRM"),
+                                          child: const Text("CONFIRM", style: TextStyle(color: Colors.white),),
                                         ),
                                       ),
                                     ],
@@ -283,9 +284,10 @@ class _HomePageState extends State<HomePage> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorToShow,
+
                   ),
                   child: Text(
-                    titleToShow,
+                    titleToShow, style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ],

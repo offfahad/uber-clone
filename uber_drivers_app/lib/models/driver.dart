@@ -15,7 +15,9 @@ class Driver {
   final String drivingLicenseNumber; // Driving license number
   final String drivingLicenseFrontImage; // Driving license front image
   final String drivingLicenseBackImage; // Driving license back image
+  final String blockStatus;
   final VehicleInfo vehicleInfo; // Vehicle information
+  
 
   Driver({
     required this.id,
@@ -32,6 +34,7 @@ class Driver {
     required this.drivingLicenseNumber,
     required this.drivingLicenseFrontImage,
     required this.drivingLicenseBackImage,
+    required this.blockStatus,
     required this.vehicleInfo,
   });
 
@@ -52,6 +55,7 @@ class Driver {
       'drivingLicenseNumber': drivingLicenseNumber,
       'drivingLicenseFrontImage': drivingLicenseFrontImage,
       'drivingLicenseBackImage': drivingLicenseBackImage,
+      'blockStatus': blockStatus,
       'vehicleInfo': vehicleInfo.toMap(), // Nested vehicle info
     };
   }
@@ -73,6 +77,7 @@ class Driver {
       drivingLicenseNumber: map['drivingLicenseNumber'],
       drivingLicenseFrontImage: map['drivingLicenseFrontImage'],
       drivingLicenseBackImage: map['drivingLicenseBackImage'],
+      blockStatus: map['blockStatus'],
       vehicleInfo: VehicleInfo.fromMap(map['vehicleInfo']),
     );
   }

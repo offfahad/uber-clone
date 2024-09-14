@@ -72,8 +72,10 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                       const SizedBox(height: 16),
                       CircleAvatar(
                         radius: 60,
-                        backgroundImage: registrationProvider.profilePhoto != null
-                            ? FileImage(File(registrationProvider.profilePhoto!.path))
+                        backgroundImage: registrationProvider.profilePhoto !=
+                                null
+                            ? FileImage(
+                                File(registrationProvider.profilePhoto!.path))
                             : const AssetImage('assets/auth/user.jpg')
                                 as ImageProvider,
                         backgroundColor: Colors.black,
@@ -226,18 +228,15 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                   width: MediaQuery.of(context).size.width * 0.9,
                   height: MediaQuery.of(context).size.height * 0.09,
                   child: ElevatedButton(
-                    onPressed: registrationProvider.isFormValidBasic && !isLoading
+                    onPressed: registrationProvider.isFormValidBasic
                         ? () async {
                             if (_formKey.currentState?.validate() == true) {
-                              registrationProvider.startLoading();
                               try {
                                 //await registrationProvider.saveUserData();
                                 Navigator.pop(context, true);
                               } catch (e) {
                                 print("Error while saving data: $e");
-                              } finally {
-                                registrationProvider.stopLoading();
-                              }
+                              } finally {}
                             }
                           }
                         : null,
@@ -246,10 +245,8 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                           ? Colors.green
                           : Colors.grey,
                     ),
-                    child: isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text('Done',
-                            style: TextStyle(color: Colors.white)),
+                    child: const Text('Done',
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],
