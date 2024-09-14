@@ -30,6 +30,10 @@ class RegistrationProvider extends ChangeNotifier {
   String? _selectedVehicle;
   bool _isVehicleBasicFormValid = false;
   final RegExp licenseRegExp = RegExp(r'^[A-Z]{2}-\d{2}-\d{4}$');
+  XFile? _vehicleImage;
+  bool _isVehiclePhotoAdded = false;
+  XFile? _vehicleRegistrationFrontImage;
+  XFile? _vehicleRegistrationBackImage;
 
   // TextEditingControllers
   final TextEditingController firstNameController = TextEditingController();
@@ -61,7 +65,10 @@ class RegistrationProvider extends ChangeNotifier {
   XFile? get drivingLicenseBackImage => _drivingLicenseBackImage;
   bool get isVehicleBasicFormValid => _isVehicleBasicFormValid;
   String? get selectedVehicle => _selectedVehicle;
-
+  XFile? get vehicleImage => _vehicleImage;
+  bool get isVehiclePhotoAdded => _isVehiclePhotoAdded;
+  XFile? get vehicleRegistrationFrontImage => _vehicleRegistrationFrontImage;
+  XFile? get vehicleRegistrationBackImage => _vehicleRegistrationBackImage;
   Timer? _debounce;
 
   void startLoading() {
@@ -157,13 +164,24 @@ class RegistrationProvider extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> pickImage() async {
+  Future<void> pickProfileImageFromGallary() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       _profilePhoto = image;
       _isPhotoAdded = true;
+      notifyListeners();
+    }
+  }
+
+  Future<void> pickVehicleImageFromCamera() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.camera);
+
+    if (image != null) {
+      _vehicleImage = image;
+      _isVehiclePhotoAdded = true;
       notifyListeners();
     }
   }
@@ -183,6 +201,23 @@ class RegistrationProvider extends ChangeNotifier {
         _cnicBackImage = pickedFile;
       }
       checkCNICFormValidity();
+    }
+  }
+
+    Future<void> pickAndCropVehicleRegistrationImages(bool isFrontImage) async {
+    final ImagePickerService imagePickerService = ImagePickerService();
+
+    final pickedFile = await imagePickerService.pickCropImage(
+      cropAspectRatio: const CropAspectRatio(ratioX: 20, ratioY: 20),
+      imageSource: ImageSource.camera,
+    );
+
+    if (pickedFile != null) {
+      if (isFrontImage) {
+        _vehicleRegistrationFrontImage = pickedFile;
+      } else {
+        _vehicleRegistrationBackImage = pickedFile;
+      }
     }
   }
 

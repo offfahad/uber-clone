@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/methods/image_picker_service.dart';
+import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 class DriverCarImageScreeen extends StatefulWidget {
   const DriverCarImageScreeen({super.key});
@@ -12,26 +14,11 @@ class DriverCarImageScreeen extends StatefulWidget {
 }
 
 class _DriverCarImageScreeenState extends State<DriverCarImageScreeen> {
-  XFile? _vehicleImage; // Store the image
-  bool _isImageSelected = false; // Check if image is selected
-
-  // Pick and crop image from gallery or camera
-  Future<void> _pickAndCropImage() async {
-    final pickedFile = await ImagePickerService().pickCropImage(
-      cropAspectRatio: const CropAspectRatio(ratioX: 20, ratioY: 20),
-      imageSource: ImageSource.camera,
-    );
-
-    if (pickedFile != null) {
-      setState(() {
-        _vehicleImage = pickedFile;
-        _isImageSelected = true; // Enable button when an image is selected
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    final registrationProvider = Provider.of<RegistrationProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Vehicle Pitcure'),
@@ -55,36 +42,40 @@ class _DriverCarImageScreeenState extends State<DriverCarImageScreeen> {
               _buildImagePicker(
                 context,
                 'Photo of your vehicle',
-                _vehicleImage,
-                _pickAndCropImage,
+                registrationProvider.vehicleImage,
+                registrationProvider.pickVehicleImageFromCamera,
                 // Pick image when button is pressed
               ),
               const SizedBox(height: 16),
 
               // Submit button
               SizedBox(
-                width: MediaQuery.of(context).size.width *
-                    0.9, // 90% of screen width
-                height: MediaQuery.of(context).size.height *
-                    0.09, // 9% of screen height
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.09,
                 child: ElevatedButton(
-                  onPressed: _isImageSelected
-                      ? () {
-                          // Handle the action when the image is selected
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Image uploaded successfully!')),
-                          );
+                  onPressed: registrationProvider.isVehiclePhotoAdded &&
+                          !registrationProvider.isLoading
+                      ? () async {
+                          registrationProvider.startLoading();
+                          try {
+                            //await registrationProvider.saveUserData();
+                            Navigator.pop(context, true);
+                          } catch (e) {
+                            print("Error while saving data: $e");
+                          } finally {
+                            registrationProvider.stopLoading();
+                          }
                         }
-                      : null, // Disable button if no image is selected
+                      : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        _isImageSelected ? Colors.green : Colors.grey,
+                    backgroundColor: registrationProvider.isVehiclePhotoAdded
+                        ? Colors.green
+                        : Colors.grey,
                   ),
-                  child: const Text(
-                    'Done',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: registrationProvider.isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Done',
+                          style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],

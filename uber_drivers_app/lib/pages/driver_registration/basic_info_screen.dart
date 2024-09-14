@@ -86,7 +86,7 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                         ),
                         child: TextButton.icon(
                           onPressed: () {
-                            registrationProvider.pickImage();
+                            registrationProvider.pickProfileImageFromGallary();
                           },
                           label: const Text('Add a profilePhoto*',
                               style: TextStyle(color: Colors.black87)),
