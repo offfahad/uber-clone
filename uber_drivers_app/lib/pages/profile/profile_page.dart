@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
 
-import '../authentication/login_screen.dart';
-import '../global/global.dart';
+import '../../authentication/login_screen.dart';
+import '../../global/global.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -26,8 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       nameTextEditingController.text = driverName;
       phoneTextEditingController.text = driverPhone;
-      emailTextEditingController.text =
-          FirebaseAuth.instance.currentUser!.email.toString();
+      emailTextEditingController.text = driverEmail;
       carTextEditingController.text =
           carNumber + " - " + carColor + " - " + carModel;
     });
@@ -56,14 +55,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 180,
                 height: 180,
                 decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey,
-                    image: DecorationImage(
-                      fit: BoxFit.fitHeight,
-                      image: NetworkImage(
-                        driverPhoto,
-                      ),
-                    )),
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                  image: DecorationImage(
+                    fit: BoxFit.fitHeight,
+                    image: NetworkImage(
+                      driverPhoto,
+                    ),
+                  ),
+                ),
               ),
 
               const SizedBox(
@@ -174,7 +174,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: Colors.red,
+          backgroundColor: Colors.red,
           onPressed: () async {
             await authProvider.signOut(context);
           },

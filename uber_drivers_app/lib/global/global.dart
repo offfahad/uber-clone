@@ -25,6 +25,7 @@ Position? driverCurrentPosition;
 String driverName = "";
 String driverPhone = "";
 String driverPhoto = "";
+String driverEmail = "";
 String carModel = "";
 String carColor = "";
 String carNumber = "";

@@ -6,8 +6,8 @@ import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/authentication/login_screen.dart';
 import 'package:uber_drivers_app/pages/auth/register_screen.dart';
 import 'package:uber_drivers_app/pages/dashboard.dart';
-import 'package:uber_drivers_app/pages/driver_registration/driver_registration.dart';
-import 'package:uber_drivers_app/pages/home_page.dart';
+import 'package:uber_drivers_app/pages/driverRegistration/driver_registration.dart';
+import 'package:uber_drivers_app/pages/home/home_page.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
 
@@ -50,8 +50,9 @@ class MyApp extends StatelessWidget {
         // ThemeData.dark().copyWith(
         //   scaffoldBackgroundColor: Colors.white,
         // ),
-        home: RegisterScreen(),
-        //FirebaseAuth.instance.currentUser == null ? LoginScreen() : Dashboard(),
+        home: FirebaseAuth.instance.currentUser == null
+            ? RegisterScreen()
+            : Dashboard(),
       ),
     );
   }

@@ -19,19 +19,8 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
       appBar: AppBar(
         title: const Text(
           'My Completed Trips',
-          style: TextStyle(
-            color: Colors.white,
-          ),
         ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-        ),
+
       ),
       body: StreamBuilder(
         stream: completedTripRequestsOfCurrentDriver.onValue,
@@ -40,7 +29,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
             return const Center(
               child: Text(
                 "Error Occurred.",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
               ),
             );
           }
@@ -50,7 +39,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
             return const Center(
               child: Text(
                 "No record found.",
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.black),
               ),
             );
           }
@@ -70,11 +59,12 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
                   tripsList[index]["driverId"] ==
                       FirebaseAuth.instance.currentUser!.uid) {
                 return Card(
-                  color: Colors.white12,
-                  elevation: 10,
+                  margin: const EdgeInsets.all(10),
+                  color: Colors.white,
+                  elevation: 6,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 16),
+                        horizontal: 20, vertical: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -95,7 +85,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 12,
-                                  color: Colors.white38,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
@@ -106,7 +96,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
                               "Rs${tripsList[index]["fareAmount"]}",
                               style: const TextStyle(
                                 fontSize: 12,
-                                color: Colors.white,
+                                color: Colors.black,
                               ),
                             ),
                           ],
@@ -131,7 +121,7 @@ class _TripsHistoryPageState extends State<TripsHistoryPage> {
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 12,
-                                  color: Colors.white38,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),

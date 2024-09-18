@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/methods/common_method.dart';
 import 'package:uber_drivers_app/pages/auth/register_screen.dart';
 import 'package:uber_drivers_app/pages/dashboard.dart';
-import 'package:uber_drivers_app/pages/driver_registration/driver_registration.dart';
-import 'package:uber_drivers_app/pages/home_page.dart';
+import 'package:uber_drivers_app/pages/driverRegistration/driver_registration.dart';
+import 'package:uber_drivers_app/pages/home/home_page.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
 
 class OTPScreen extends StatefulWidget {

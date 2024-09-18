@@ -112,6 +112,7 @@ class _HomePageState extends State<HomePage> {
       driverName = (snap.snapshot.value as Map)["firstName"];
       driverPhone = (snap.snapshot.value as Map)["phoneNumber"];
       driverPhoto = (snap.snapshot.value as Map)["profilePicture"];
+      driverEmail = (snap.snapshot.value as Map)["email"];
       carColor = (snap.snapshot.value as Map)["vehicleInfo"]["color"];
       carModel = (snap.snapshot.value as Map)["vehicleInfo"]["brand"];
       carNumber = (snap.snapshot.value as Map)["vehicleInfo"]["registrationPlateNumber"];

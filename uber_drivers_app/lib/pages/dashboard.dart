@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:uber_drivers_app/pages/earning_page.dart';
-import 'package:uber_drivers_app/pages/home_page.dart';
-import 'package:uber_drivers_app/pages/profile_page.dart';
-import 'package:uber_drivers_app/pages/trips_page.dart';
+import 'package:uber_drivers_app/pages/earnings/earning_page.dart';
+import 'package:uber_drivers_app/pages/home/home_page.dart';
+import 'package:uber_drivers_app/pages/profile/profile_page.dart';
+import 'package:uber_drivers_app/pages/trips/trips_page.dart';
 
 
 class Dashboard extends StatefulWidget

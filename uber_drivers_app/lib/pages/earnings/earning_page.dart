@@ -13,25 +13,29 @@ class _EarningsPageState extends State<EarningsPage> {
   String driverEarnings = "";
 
   getTotalEarningsOfCurrentDriver() async {
-    DatabaseReference driversRef = FirebaseDatabase.instance.ref().child("drivers");
+    DatabaseReference driversRef =
+        FirebaseDatabase.instance.ref().child("drivers");
 
-    await driversRef.child(FirebaseAuth.instance.currentUser!.uid)
+    await driversRef
+        .child(FirebaseAuth.instance.currentUser!.uid)
         .once()
         .then((snap) {
-      if ((snap.snapshot.value as Map)["earnings"] != null) {
+      var data = snap.snapshot.value as Map?;
+      if (data != null && data["earnings"] != null) {
         setState(() {
-          double earnings = (snap.snapshot.value as Map)["earnings"];
-          driverEarnings = earnings.toStringAsFixed(2); // Display 2 digits after decimal
-        });
-      }else{
+          // Convert the earnings to double safely
+          double earnings = double.tryParse(data["earnings"].toString()) ?? 0.0;
+          driverEarnings =
+              earnings.toStringAsFixed(2); // Display 2 digits after decimal
+        }); 
+      } else {
         setState(() {
-          
-        driverEarnings = "0";
+          driverEarnings = "0";
         });
       }
     });
   }
-
+  
   @override
   void initState() {
     super.initState();
