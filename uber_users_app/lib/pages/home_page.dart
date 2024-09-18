@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
   makeDriverNearbyCarIcon() {
     if (carIconNearbyDriver == null) {
       ImageConfiguration configuration =
-          createLocalImageConfiguration(context, size: Size(0.5, 0.5));
+          createLocalImageConfiguration(context, size: const Size(0.5, 0.5));
       BitmapDescriptor.fromAssetImage(
               configuration, "assets/images/tracking.png")
           .then((iconImage) {
@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
           FirebaseAuth.instance.signOut();
 
           Navigator.push(
-              context, MaterialPageRoute(builder: (c) => LoginScreen()));
+              context, MaterialPageRoute(builder: (c) => const LoginScreen()));
 
           cMethods.displaySnackBar(
               "You are blocked. Contact admin: gulzarsoft@gmail.com", context);
@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         FirebaseAuth.instance.signOut();
         Navigator.push(
-            context, MaterialPageRoute(builder: (c) => LoginScreen()));
+            context, MaterialPageRoute(builder: (c) => const LoginScreen()));
       }
     });
   }
@@ -156,7 +156,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         searchContainerHeight = 0;
         bottomMapPadding = 240;
-        rideDetailsContainerHeight = 260;
+        rideDetailsContainerHeight = 500;
         isDrawerOpened = false;
       });
     }
@@ -645,13 +645,14 @@ class _HomePageState extends State<HomePage> {
 
   noDriverAvailable() {
     showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => InfoDialog(
-              title: "No Driver Available",
-              description:
-                  "No driver found in the nearby location. Please try again shortly.",
-            ));
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => InfoDialog(
+        title: "No Driver Available",
+        description:
+            "No driver found in the nearby location. Please try again shortly.",
+      ),
+    );
   }
 
   searchDriver() {
@@ -688,7 +689,6 @@ class _HomePageState extends State<HomePage> {
         .child("deviceToken");
 
     tokenOfCurrentDriverRef.once().then((dataSnapshot) {
-
       print("Fetched deviceToken: ${dataSnapshot.snapshot.value}");
       if (dataSnapshot.snapshot.value != null) {
         String deviceToken = dataSnapshot.snapshot.value.toString();
@@ -795,7 +795,7 @@ class _HomePageState extends State<HomePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ProfilePage(),
+                                    builder: (context) => const ProfilePage(),
                                   ),
                                 );
                               },
@@ -826,8 +826,10 @@ class _HomePageState extends State<HomePage> {
                 //body
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (c) => TripsHistoryPage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (c) => const TripsHistoryPage()));
                   },
                   child: ListTile(
                     leading: IconButton(
@@ -847,7 +849,7 @@ class _HomePageState extends State<HomePage> {
                 GestureDetector(
                   onTap: () {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (c) => AboutPage()));
+                        MaterialPageRoute(builder: (c) => const AboutPage()));
                   },
                   child: ListTile(
                     leading: IconButton(
@@ -975,7 +977,8 @@ class _HomePageState extends State<HomePage> {
                         var responseFromSearchPage = await Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (c) => SearchDestinationPlace()));
+                                builder: (c) =>
+                                    const SearchDestinationPlace()));
 
                         if (responseFromSearchPage == "placeSelected") {
                           displayUserRideDetailsContainer();
@@ -1009,7 +1012,7 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TripsHistoryPage(),
+                            builder: (context) => const TripsHistoryPage(),
                           ),
                         );
                       },
@@ -1050,96 +1053,156 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 16),
-                        child: SizedBox(
-                          height: 200,
-                          child: Card(
-                            elevation: 10,
-                            child: Container(
-                              width: MediaQuery.of(context).size.width * .70,
-                              color: Colors.black45,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 8, bottom: 8),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 8, right: 8),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            (tripDirectionDetailsInfo != null)
-                                                ? tripDirectionDetailsInfo!
-                                                    .distanceTextString!
-                                                : "",
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white70,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            (tripDirectionDetailsInfo != null)
-                                                ? tripDirectionDetailsInfo!
-                                                    .durationTextString!
-                                                : "",
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white70,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          stateOfApp = "requesting";
-                                        });
-
-                                        displayRequestContainer();
-
-                                        //get nearest available online drivers
-                                        availableNearbyOnlineDriversList =
-                                            ManageDriversMethods
-                                                .nearbyOnlineDriversList;
-
-                                        //search driver
-                                        searchDriver();
-                                      },
-                                      child: Image.asset(
-                                        "assets/images/uberexec.png",
-                                        height: 122,
-                                        width: 122,
-                                      ),
-                                    ),
-                                    Text(
-                                      (tripDirectionDetailsInfo != null)
-                                          ? "\Rs ${(cMethods.calculateFareAmountInPKR(tripDirectionDetailsInfo!)).toString()}"
-                                          : "",
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        color: Colors.white70,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(15)),
+                            width: 100,
+                            height: 70,
+                            child: FittedBox(
+                              fit: BoxFit.none,
+                              child: Image.asset(
+                                "assets/vehicles/home_car.png",
+                                width: 100,
+                                height: 70,
                               ),
                             ),
                           ),
-                        ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(15)),
+                            width: 100,
+                            height: 70,
+                            child: FittedBox(
+                              fit: BoxFit.none,
+                              child: Image.asset(
+                                "assets/vehicles/auto.png",
+                                height: 50,
+                                width: 60,
+                              ), // Ensures the image stays at its original size
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(15)),
+                            width: 100,
+                            height: 70,
+                            child: FittedBox(
+                              child: Image.asset(
+                                "assets/vehicles/bike.png",
+                                width: 60,
+                                height: 50,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 16, right: 16),
+                      //   child: SizedBox(
+                      //     height: 300,
+                      //     child: Card(
+                      //       elevation: 10,
+                      //       child: Container(
+                      //         width: MediaQuery.of(context).size.width * .70,
+                      //         color: Colors.black45,
+                      //         child: Padding(
+                      //           padding:
+                      //               const EdgeInsets.only(top: 8, bottom: 8),
+                      //           child: Column(
+                      //             mainAxisAlignment: MainAxisAlignment.center,
+                      //             children: [
+                      //               Padding(
+                      //                 padding: const EdgeInsets.only(
+                      //                     left: 8, right: 8),
+                      //                 child: Row(
+                      //                   mainAxisAlignment:
+                      //                       MainAxisAlignment.spaceBetween,
+                      //                   children: [
+                      //                     Text(
+                      //                       (tripDirectionDetailsInfo != null)
+                      //                           ? tripDirectionDetailsInfo!
+                      //                               .distanceTextString!
+                      //                           : "",
+                      //                       style: const TextStyle(
+                      //                         fontSize: 16,
+                      //                         color: Colors.white70,
+                      //                         fontWeight: FontWeight.bold,
+                      //                       ),
+                      //                     ),
+                      //                     Text(
+                      //                       (tripDirectionDetailsInfo != null)
+                      //                           ? tripDirectionDetailsInfo!
+                      //                               .durationTextString!
+                      //                           : "",
+                      //                       style: const TextStyle(
+                      //                         fontSize: 16,
+                      //                         color: Colors.white70,
+                      //                         fontWeight: FontWeight.bold,
+                      //                       ),
+                      //                     ),
+                      //                   ],
+                      //                 ),
+                      //               ),
+                      //               GestureDetector(
+                      //                 onTap: () {
+                      //                   setState(() {
+                      //                     stateOfApp = "requesting";
+                      //                   });
+
+                      //                   displayRequestContainer();
+
+                      //                   //get nearest available online drivers
+                      //                   availableNearbyOnlineDriversList =
+                      //                       ManageDriversMethods
+                      //                           .nearbyOnlineDriversList;
+
+                      //                   //search driver
+                      //                   searchDriver();
+                      //                 },
+                      //                 child: Image.asset(
+                      //                   "assets/images/uberexec.png",
+                      //                   height: 122,
+                      //                   width: 122,
+                      //                 ),
+                      //               ),
+                      //               Text(
+                      //                 (tripDirectionDetailsInfo != null)
+                      //                     ? "\Rs ${(cMethods.calculateFareAmountInPKR(tripDirectionDetailsInfo!)).toString()}"
+                      //                     : "",
+                      //                 style: const TextStyle(
+                      //                   fontSize: 18,
+                      //                   color: Colors.white70,
+                      //                   fontWeight: FontWeight.bold,
+                      //                 ),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../global/global.dart';
 import '../methods/common_method.dart';
 import '../models/trip_details.dart';
-import '../pages/new_trip_page.dart';
+import '../pages/newTrip/new_trip_page.dart';
 import 'loading_dialog.dart';
 
 class NotificationDialog extends StatefulWidget {
@@ -112,12 +112,12 @@ class _NotificationDialogState extends State<NotificationDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      backgroundColor: Colors.black54,
+      backgroundColor: Colors.white54,
       child: Container(
         margin: const EdgeInsets.all(5),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.black54,
+          color: Colors.white54,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Column(
@@ -142,7 +142,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
-                color: Colors.grey,
+                color: Colors.black,
               ),
             ),
 
@@ -152,7 +152,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
 
             const Divider(
               height: 1,
-              color: Colors.white,
+              color: Colors.black,
               thickness: 1,
             ),
 
@@ -183,7 +183,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: const TextStyle(
-                            color: Colors.grey,
+                            color: Colors.black,
                             fontSize: 18,
                           ),
                         ),
@@ -213,7 +213,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: const TextStyle(
-                            color: Colors.grey,
+                            color: Colors.black,
                             fontSize: 18,
                           ),
                         ),
@@ -230,7 +230,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
 
             const Divider(
               height: 1,
-              color: Colors.white,
+              color: Colors.black,
               thickness: 1,
             ),
 

@@ -23,12 +23,12 @@ class _PaymentDialogState extends State<PaymentDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      backgroundColor: Colors.black54,
+      backgroundColor: Colors.white54,
       child: Container(
         margin: const EdgeInsets.all(5.0),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.black87,
+          color: Colors.white54,
           borderRadius: BorderRadius.circular(6),
         ),
         child: Column(
@@ -40,7 +40,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
             const Text(
               "COLLECT CASH",
               style: TextStyle(
-                color: Colors.grey,
+                color: Colors.black,
               ),
             ),
             const SizedBox(
@@ -48,7 +48,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
             ),
             const Divider(
               height: 1.5,
-              color: Colors.white70,
+              color: Colors.black87,
               thickness: 1.0,
             ),
             const SizedBox(
@@ -57,7 +57,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
             Text(
               "\Rs ${widget.fareAmount}",
               style: const TextStyle(
-                color: Colors.grey,
+                color: Colors.black,
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
               ),
@@ -70,7 +70,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
               child: Text(
                 "This is fare amount ( \Rs ${widget.fareAmount} ) to be charged from the user.",
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.grey),
+                style: const TextStyle(color: Colors.black),
               ),
             ),
             const SizedBox(

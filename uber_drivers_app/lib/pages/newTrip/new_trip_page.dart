@@ -15,7 +15,7 @@ import 'package:uber_drivers_app/widgets/loading_dialog.dart';
 import 'package:uber_drivers_app/widgets/payment_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../global/global.dart';
+import '../../global/global.dart';
 
 class NewTripPage extends StatefulWidget {
   TripDetails? newTripDetailsInfo;

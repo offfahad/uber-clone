@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:uber_drivers_app/pages/trip_history_page.dart';
+import 'package:uber_drivers_app/pages/trips/trip_history_page.dart';
 
 class TripsPage extends StatefulWidget {
   const TripsPage({super.key});

@@ -11,8 +11,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uber_drivers_app/global/global.dart';
 
-import '../methods/map_theme_methods.dart';
-import '../pushNotifications/push_notification.dart';
+import '../../methods/map_theme_methods.dart';
+import '../../pushNotifications/push_notification.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
