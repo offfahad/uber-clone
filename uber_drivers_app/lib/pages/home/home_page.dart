@@ -110,6 +110,7 @@ class _HomePageState extends State<HomePage> {
         .once()
         .then((snap) {
       driverName = (snap.snapshot.value as Map)["firstName"];
+      driverSecondName = (snap.snapshot.value as Map)["secondName"];
       driverPhone = (snap.snapshot.value as Map)["phoneNumber"];
       driverPhoto = (snap.snapshot.value as Map)["profilePicture"];
       driverEmail = (snap.snapshot.value as Map)["email"];

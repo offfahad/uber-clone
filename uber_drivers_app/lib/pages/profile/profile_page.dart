@@ -17,171 +17,204 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  TextEditingController nameTextEditingController = TextEditingController();
-  TextEditingController phoneTextEditingController = TextEditingController();
-  TextEditingController emailTextEditingController = TextEditingController();
-  TextEditingController carTextEditingController = TextEditingController();
-
-  setDriverInfo() {
-    setState(() {
-      nameTextEditingController.text = driverName;
-      phoneTextEditingController.text = driverPhone;
-      emailTextEditingController.text = driverEmail;
-      carTextEditingController.text =
-          carNumber + " - " + carColor + " - " + carModel;
-    });
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
-    setDriverInfo();
-  }
-
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthenticationProvider>(context);
 
-    return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              //image
-              Container(
-                width: 180,
-                height: 180,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey,
-                  image: DecorationImage(
-                    fit: BoxFit.fitHeight,
-                    image: NetworkImage(
-                      driverPhoto,
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(
-                height: 16,
-              ),
-
-              //driver name
-              Padding(
-                padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 8),
-                child: TextField(
-                  controller: nameTextEditingController,
-                  textAlign: TextAlign.start,
-                  enabled: false,
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                  decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white24,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.black,
-                        width: 2,
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            //image
+            Center(
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black12),
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.white,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        offset: Offset(0, 2),
+                        blurRadius: 6.0,
                       ),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.person,
-                      color: Colors.black,
-                    ),
+                    ],
                   ),
-                ),
-              ),
-
-              //driver phone
-              Padding(
-                padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 4),
-                child: TextField(
-                  controller: phoneTextEditingController,
-                  textAlign: TextAlign.start,
-                  enabled: false,
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                  decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white24,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.black,
-                        width: 2,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Stack(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                            child: CircleAvatar(
+                              radius: 36.0,
+                              backgroundColor: Colors.transparent,
+                              backgroundImage: NetworkImage(driverPhoto),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.phone_android_outlined,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
-
-              //driver email
-              Padding(
-                padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 4),
-                child: TextField(
-                  controller: emailTextEditingController,
-                  textAlign: TextAlign.start,
-                  enabled: false,
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                  decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white24,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.black,
-                        width: 2,
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                padding: const EdgeInsets.fromLTRB(0, 0, 0, 4),
+                                child: Text(
+                                  "$driverName $driverSecondName",
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  const Icon(
+                                    Icons.phone,
+                                    size: 12.0,
+                                  ),
+                                  Container(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(8, 4, 4, 4),
+                                    child: Text(
+                                      driverPhone,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              if (driverEmail.isNotEmpty)
+                                Row(
+                                  children: <Widget>[
+                                    const Icon(
+                                      Icons.email,
+                                      size: 12.0,
+                                    ),
+                                    Container(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(8, 4, 4, 4),
+                                      child: Text(
+                                        driverEmail,
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.email,
-                      color: Colors.black,
-                    ),
+                    ],
                   ),
                 ),
               ),
-
-              //driver car info
-              Padding(
-                padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 4),
-                child: TextField(
-                  controller: carTextEditingController,
-                  textAlign: TextAlign.start,
-                  enabled: false,
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
-                  decoration: const InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white24,
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.black,
-                        width: 2,
-                      ),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.drive_eta_rounded,
-                      color: Colors.black,
-                    ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black12),
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    offset: Offset(0, 2),
+                    blurRadius: 6.0,
                   ),
+                ],
+              ),
+              child: InkWell(
+                onTap: () {},
+                child: const ListTile(
+                  leading: Icon(Icons.verified_user),
+                  title: Text(
+                    "Your Profile",
+                  ),
+                  trailing: Icon(Icons.arrow_forward),
                 ),
               ),
-            ],
-          ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black12),
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    offset: Offset(0, 2),
+                    blurRadius: 6.0,
+                  ),
+                ],
+              ),
+              child: InkWell(
+                onTap: () {},
+                child: const ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text(
+                    "Setting",
+                  ),
+                  trailing: Icon(Icons.arrow_forward),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              padding: const EdgeInsets.all(10),
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black12),
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    offset: Offset(0, 2),
+                    blurRadius: 6.0,
+                  ),
+                ],
+              ),
+              child: InkWell(
+                onTap: () {},
+                child: const ListTile(
+                  leading: Icon(Icons.help_center),
+                  title: Text(
+                    "Help Center",
+                  ),
+                  trailing: Icon(Icons.arrow_forward),
+                ),
+              ),
+            ),
+          ],
         ),
+        floatingActionButton: FloatingActionButton.extended(
+            backgroundColor: Colors.red,
+            onPressed: () async {
+              await authProvider.signOut(context);
+            },
+            label: const Text(
+              "Logout",
+              style: TextStyle(color: Colors.white),
+            )),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: Colors.red,
-          onPressed: () async {
-            await authProvider.signOut(context);
-          },
-          label: const Text(
-            "Logout",
-            style: TextStyle(color: Colors.white),
-          )),
     );
   }
 }
