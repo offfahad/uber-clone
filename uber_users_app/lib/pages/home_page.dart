@@ -28,6 +28,7 @@ import '../methods/manage_drivers_methods.dart';
 import '../methods/push_notification_service.dart';
 import '../models/direction_details.dart';
 import '../models/online_nearby_drivers.dart';
+import '../widgets/bid_dialog.dart';
 import '../widgets/info_dialog.dart';
 import '../widgets/loading_dialog.dart';
 import '../widgets/payment_dialog.dart';
@@ -66,6 +67,10 @@ class _HomePageState extends State<HomePage> {
   List<OnlineNearbyDrivers>? availableNearbyOnlineDriversList;
   StreamSubscription<DatabaseEvent>? tripStreamSubscription;
   bool requestingDirectionDetailsInfo = false;
+  String selectedPaymentMethod = "Cash"; // Default selection
+  TextEditingController bidController = TextEditingController();
+  double? actualFareAmount; // To store the actual fare amount
+  double? bidAmount; // To store the entered bid amount
 
   makeDriverNearbyCarIcon() {
     if (carIconNearbyDriver == null) {
@@ -738,8 +743,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (tripDirectionDetailsInfo != null) {
+      var fareString = cMethods.calculateFareAmountInPKR(
+        tripDirectionDetailsInfo!,
+      ); // Save the fare amount
+      actualFareAmount = double.tryParse(fareString) ?? 0.0;
+    }
+
     final authProvider =
         Provider.of<AuthenticationProvider>(context, listen: false);
+    final appProvider = Provider.of<AppInfo>(context, listen: false);
     makeDriverNearbyCarIcon();
 
     return SafeArea(
@@ -1056,11 +1069,11 @@ class _HomePageState extends State<HomePage> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Container(
                             decoration: BoxDecoration(
@@ -1114,95 +1127,319 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(left: 16, right: 16),
-                      //   child: SizedBox(
-                      //     height: 300,
-                      //     child: Card(
-                      //       elevation: 10,
-                      //       child: Container(
-                      //         width: MediaQuery.of(context).size.width * .70,
-                      //         color: Colors.black45,
-                      //         child: Padding(
-                      //           padding:
-                      //               const EdgeInsets.only(top: 8, bottom: 8),
-                      //           child: Column(
-                      //             mainAxisAlignment: MainAxisAlignment.center,
-                      //             children: [
-                      //               Padding(
-                      //                 padding: const EdgeInsets.only(
-                      //                     left: 8, right: 8),
-                      //                 child: Row(
-                      //                   mainAxisAlignment:
-                      //                       MainAxisAlignment.spaceBetween,
-                      //                   children: [
-                      //                     Text(
-                      //                       (tripDirectionDetailsInfo != null)
-                      //                           ? tripDirectionDetailsInfo!
-                      //                               .distanceTextString!
-                      //                           : "",
-                      //                       style: const TextStyle(
-                      //                         fontSize: 16,
-                      //                         color: Colors.white70,
-                      //                         fontWeight: FontWeight.bold,
-                      //                       ),
-                      //                     ),
-                      //                     Text(
-                      //                       (tripDirectionDetailsInfo != null)
-                      //                           ? tripDirectionDetailsInfo!
-                      //                               .durationTextString!
-                      //                           : "",
-                      //                       style: const TextStyle(
-                      //                         fontSize: 16,
-                      //                         color: Colors.white70,
-                      //                         fontWeight: FontWeight.bold,
-                      //                       ),
-                      //                     ),
-                      //                   ],
-                      //                 ),
-                      //               ),
-                      //               GestureDetector(
-                      //                 onTap: () {
-                      //                   setState(() {
-                      //                     stateOfApp = "requesting";
-                      //                   });
+                      Row(
+                        children: [
+                          FittedBox(
+                            child: Image.asset(
+                              "assets/images/initial.png",
+                              width: 20,
+                              height: 40,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: Text(
+                              // First check if pickUpLocation is null, then access placeName
+                              (appProvider.pickUpLocation != null &&
+                                      appProvider.pickUpLocation!.placeName !=
+                                          null)
+                                  ? appProvider.pickUpLocation!.placeName
+                                      .toString()
+                                  : "Location not available", // Fallback text if null
+                              style: const TextStyle(color: Colors.white),
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          FittedBox(
+                            child: Image.asset(
+                              "assets/images/final.png",
+                              width: 20,
+                              height: 20,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: Text(
+                              // First check if dropOffLocation and placeName are not null
+                              (appProvider.dropOffLocation != null &&
+                                      appProvider.dropOffLocation!.placeName !=
+                                          null)
+                                  ? appProvider.dropOffLocation!.placeName
+                                      .toString()
+                                  : "Location not available", // Fallback text if null
+                              style: const TextStyle(color: Colors.white),
+                              textAlign: TextAlign.start,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      const Divider(
+                        thickness: 2.0,
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.travel_explore_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Total Distace",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                Text(
+                                  (tripDirectionDetailsInfo != null)
+                                      ? tripDirectionDetailsInfo!
+                                          .distanceTextString!
+                                      : "",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.time_to_leave,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Estimated Time",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                Text(
+                                  (tripDirectionDetailsInfo != null)
+                                      ? tripDirectionDetailsInfo!
+                                          .durationTextString!
+                                      : "",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      const Divider(
+                        thickness: 2.0,
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.money_sharp,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "Fare Fee",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        Text(
+                                          actualFareAmount != null
+                                              ? "Rs ${actualFareAmount!.toString()}"
+                                              : "",
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.payment,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "Payment Method",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        DropdownButton<String>(
+                                          value: selectedPaymentMethod,
+                                          dropdownColor: Colors.grey,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                          icon: const Icon(
+                                            Icons.arrow_drop_down,
+                                            color: Colors.white,
+                                          ),
+                                          onChanged: (String? newValue) {
+                                            setState(() {
+                                              selectedPaymentMethod = newValue!;
+                                            });
+                                          },
+                                          items: <String>[
+                                            'Cash',
+                                            'Credit Card',
+                                            'JazzCash'
+                                          ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(value),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      const Divider(
+                        thickness: 2.0,
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: SizedBox(
+                              height: 50,
+                              child: BidDialogWidget(
+                                initialFareAmount: actualFareAmount ?? 0.0,
+                                onBidAmountChanged: (bidAmount) {
+                                  setState(() {
+                                    bidAmount = bidAmount;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Expanded(
+                            child: SizedBox(
+                              height: 50,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                ),
+                                child: const Text(
+                                  "Find Driver",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    stateOfApp = "requesting";
+                                    displayRequestContainer();
 
-                      //                   displayRequestContainer();
+                                    //get nearest available online drivers
+                                    availableNearbyOnlineDriversList =
+                                        ManageDriversMethods
+                                            .nearbyOnlineDriversList;
 
-                      //                   //get nearest available online drivers
-                      //                   availableNearbyOnlineDriversList =
-                      //                       ManageDriversMethods
-                      //                           .nearbyOnlineDriversList;
-
-                      //                   //search driver
-                      //                   searchDriver();
-                      //                 },
-                      //                 child: Image.asset(
-                      //                   "assets/images/uberexec.png",
-                      //                   height: 122,
-                      //                   width: 122,
-                      //                 ),
-                      //               ),
-                      //               Text(
-                      //                 (tripDirectionDetailsInfo != null)
-                      //                     ? "\Rs ${(cMethods.calculateFareAmountInPKR(tripDirectionDetailsInfo!)).toString()}"
-                      //                     : "",
-                      //                 style: const TextStyle(
-                      //                   fontSize: 18,
-                      //                   color: Colors.white70,
-                      //                   fontWeight: FontWeight.bold,
-                      //                 ),
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
+                                    //search driver
+                                    searchDriver();
+                                  });
+                                },
+                              ),
+                            ),
+                          )
+                        ],
+                      )
                     ],
                   ),
                 ),

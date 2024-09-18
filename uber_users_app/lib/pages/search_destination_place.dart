@@ -73,7 +73,7 @@ class _SearchDestinationPlaceState extends State<SearchDestinationPlace> {
                 elevation: 5,
                 
                 child: Container(
-                  height: mq.height * 0.30,
+                  //height: mq.height * 0.25,
                   decoration: const BoxDecoration(
                     //color: Colors.black12,
                     boxShadow: [
@@ -87,7 +87,7 @@ class _SearchDestinationPlaceState extends State<SearchDestinationPlace> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.only(
-                        left: 24, top: 20, right: 24, bottom: 10),
+                        left: 24, top: 20, right: 24, bottom: 30),
                     child: Column(
                       children: [
                         const SizedBox(
