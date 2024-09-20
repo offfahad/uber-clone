@@ -13,13 +13,12 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:uber_users_app/appInfo/app_info.dart';
 import 'package:uber_users_app/appInfo/auth_provider.dart';
-import 'package:uber_users_app/authentication/register_screen.dart';
 import 'package:uber_users_app/pages/profile_page.dart';
 import 'package:uber_users_app/pages/search_destination_place.dart';
 import 'package:uber_users_app/widgets/sign_out_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../appInfo/app_info.dart';
 import '../authentication/login_screen.dart';
 import '../global/global_var.dart';
 import '../global/trip_var.dart';
@@ -49,7 +48,7 @@ class _HomePageState extends State<HomePage> {
   Position? currentPositionOfUser;
   GlobalKey<ScaffoldState> sKey = GlobalKey<ScaffoldState>();
   CommonMethods cMethods = CommonMethods();
-  double searchContainerHeight = 276;
+  double searchContainerHeight = 230;
   double bottomMapPadding = 0;
   double rideDetailsContainerHeight = 0;
   double requestContainerHeight = 0;
@@ -69,8 +68,12 @@ class _HomePageState extends State<HomePage> {
   bool requestingDirectionDetailsInfo = false;
   String selectedPaymentMethod = "Cash"; // Default selection
   TextEditingController bidController = TextEditingController();
-  double? actualFareAmount; // To store the actual fare amount
+  double actualFareAmountCar = 0.0; // To store the actual fare amount
   double? bidAmount; // To store the entered bid amount
+  String selectedVehicle = "Car";
+  String estimatedTimeCar = "";
+  double actualFareAmount = 0.0;
+  String estimatedTime = "";
 
   makeDriverNearbyCarIcon() {
     if (carIconNearbyDriver == null) {
@@ -104,7 +107,6 @@ class _HomePageState extends State<HomePage> {
     Position positionOfUser = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.bestForNavigation);
     currentPositionOfUser = positionOfUser;
-
     LatLng positionOfUserInLatLng = LatLng(
         currentPositionOfUser!.latitude, currentPositionOfUser!.longitude);
 
@@ -169,9 +171,9 @@ class _HomePageState extends State<HomePage> {
 
   retrieveDirectionDetails() async {
     var pickUpLocation =
-        Provider.of<AppInfo>(context, listen: false).pickUpLocation;
+        Provider.of<AppInfoClass>(context, listen: false).pickUpLocation;
     var dropOffDestinationLocation =
-        Provider.of<AppInfo>(context, listen: false).dropOffLocation;
+        Provider.of<AppInfoClass>(context, listen: false).dropOffLocation;
 
     var pickupGeoGraphicCoOrdinates = LatLng(
         pickUpLocation!.latitudePosition!, pickUpLocation.longitudePosition!);
@@ -325,7 +327,7 @@ class _HomePageState extends State<HomePage> {
       rideDetailsContainerHeight = 0;
       requestContainerHeight = 0;
       tripContainerHeight = 0;
-      searchContainerHeight = 276;
+      searchContainerHeight = 230;
       bottomMapPadding = 300;
       isDrawerOpened = true;
 
@@ -455,9 +457,9 @@ class _HomePageState extends State<HomePage> {
         FirebaseDatabase.instance.ref().child("tripRequest").push();
 
     var pickUpLocation =
-        Provider.of<AppInfo>(context, listen: false).pickUpLocation;
+        Provider.of<AppInfoClass>(context, listen: false).pickUpLocation;
     var dropOffDestinationLocation =
-        Provider.of<AppInfo>(context, listen: false).dropOffLocation;
+        Provider.of<AppInfoClass>(context, listen: false).dropOffLocation;
 
     Map pickUpCoOrdinatesMap = {
       "latitude": pickUpLocation!.latitudePosition.toString(),
@@ -627,7 +629,7 @@ class _HomePageState extends State<HomePage> {
       requestingDirectionDetailsInfo = true;
 
       var dropOffLocation =
-          Provider.of<AppInfo>(context, listen: false).dropOffLocation;
+          Provider.of<AppInfoClass>(context, listen: false).dropOffLocation;
       var userDropOffLocationLatLng = LatLng(dropOffLocation!.latitudePosition!,
           dropOffLocation.longitudePosition!);
 
@@ -741,18 +743,77 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  CommonMethods commonMethods = CommonMethods();
+
   @override
   Widget build(BuildContext context) {
+    String? userAddress = Provider.of<AppInfoClass>(context, listen: false)
+                .pickUpLocation !=
+            null
+        ? (Provider.of<AppInfoClass>(context, listen: false)
+                    .pickUpLocation!
+                    .placeName!
+                    .length >
+                35
+            ? "${Provider.of<AppInfoClass>(context, listen: false).pickUpLocation!.placeName!.substring(0, 35)}..."
+            : Provider.of<AppInfoClass>(context, listen: false)
+                .pickUpLocation!
+                .placeName)
+        : 'Fetching Your Current Location.';
+
     if (tripDirectionDetailsInfo != null) {
       var fareString = cMethods.calculateFareAmountInPKR(
         tripDirectionDetailsInfo!,
       ); // Save the fare amount
-      actualFareAmount = double.tryParse(fareString) ?? 0.0;
+      actualFareAmountCar = double.tryParse(fareString) ?? 0.0;
+      estimatedTimeCar =
+          tripDirectionDetailsInfo!.durationTextString.toString();
+    }
+
+    void calculateFareAndTime() {
+      // Parse the time for the car into total minutes
+      int totalMinutes = 0;
+      if (estimatedTimeCar.contains("hours")) {
+        List<String> timeParts = estimatedTimeCar.split(" ");
+        int hours = int.tryParse(timeParts[0]) ?? 0; // Parse the hours
+        int minutes = int.tryParse(timeParts[2]) ?? 0; // Parse the minutes
+        totalMinutes = (hours * 60) + minutes;
+      } else {
+        // If it's just minutes, like "24 mins"
+        totalMinutes = int.tryParse(estimatedTimeCar.split(" ")[0]) ?? 0;
+      }
+
+      // Adjust fare and time based on selected vehicle
+      if (selectedVehicle == "Car") {
+        setState(() {
+          actualFareAmount = actualFareAmountCar;
+          estimatedTime =
+              estimatedTimeCar; // Show the car's estimated time directly
+        });
+      } else if (selectedVehicle == "Auto") {
+        setState(() {
+          actualFareAmount =
+              actualFareAmountCar * 0.8; // Auto fare is 80% of the car fare
+          int updatedMinutes =
+              (totalMinutes * 1.2).toInt(); // Increase time by 20%
+          estimatedTime = commonMethods
+              .formatTime(updatedMinutes); // Convert back to hours and minutes
+        });
+      } else if (selectedVehicle == "Bike") {
+        setState(() {
+          actualFareAmount =
+              actualFareAmountCar * 0.5; // Bike fare is 50% of car fare
+          int updatedMinutes =
+              (totalMinutes * 0.8).toInt(); // Decrease time by 20%
+          estimatedTime = commonMethods
+              .formatTime(updatedMinutes); // Convert back to hours and minutes
+        });
+      }
     }
 
     final authProvider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-    final appProvider = Provider.of<AppInfo>(context, listen: false);
+    final appProvider = Provider.of<AppInfoClass>(context, listen: false);
     makeDriverNearbyCarIcon();
 
     return SafeArea(
@@ -924,7 +985,7 @@ class _HomePageState extends State<HomePage> {
               markers: markerSet,
               circles: circleSet,
               initialCameraPosition: googlePlexInitialPosition,
-              onMapCreated: (GoogleMapController mapController) {
+              onMapCreated: (GoogleMapController mapController) async {
                 controllerGoogleMap = mapController;
                 //updateMapTheme(controllerGoogleMap!);
 
@@ -934,7 +995,7 @@ class _HomePageState extends State<HomePage> {
                   bottomMapPadding = 300;
                 });
 
-                getCurrentLiveLocationOfUser();
+                await getCurrentLiveLocationOfUser();
               },
             ),
 
@@ -975,71 +1036,138 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            ///search location icon button
             Positioned(
               left: 0,
               right: 0,
-              bottom: -80,
-              child: Container(
-                height: searchContainerHeight,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        var responseFromSearchPage = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (c) =>
-                                    const SearchDestinationPlace()));
+              bottom: 0,
+              child: AnimatedSize(
+                curve: Curves.easeInOut,
+                duration: const Duration(microseconds: 122),
+                child: Container(
+                  height: searchContainerHeight,
+                  decoration: const BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15),
+                        topRight: Radius.circular(15),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white12,
+                          blurRadius: 15.0,
+                          spreadRadius: 0.5,
+                          offset: Offset(.7, .7),
+                        ),
+                      ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.add_location_alt_outlined,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(
+                              width: 13,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "From",
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.white),
+                                ),
+                                Text(
+                                  userAddress!,
+                                  style: const TextStyle(
+                                      fontSize: 14, color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const Divider(),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.add_location_alt_outlined,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(
+                              width: 13,
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                var responseFromSearchPage =
+                                    await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (c) =>
+                                                const SearchDestinationPlace()));
 
-                        if (responseFromSearchPage == "placeSelected") {
-                          displayUserRideDetailsContainer();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: const CircleBorder(),
-                        padding: const EdgeInsets.all(24),
-                      ),
-                      child: const Icon(
-                        Icons.search,
-                        color: Colors.black,
-                        size: 25,
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          shape: const CircleBorder(),
-                          padding: const EdgeInsets.all(24)),
-                      child: const Icon(
-                        Icons.home_outlined,
-                        color: Colors.black,
-                        size: 25,
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const TripsHistoryPage(),
+                                if (responseFromSearchPage == "placeSelected") {
+                                  displayUserRideDetailsContainer();
+                                }
+                              },
+                              child: const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "To",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white),
+                                  ),
+                                  Text(
+                                    "Where would you like to go?",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 3,
+                        ),
+                        const Divider(),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            child: const Text(
+                              "Select Desination",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            onPressed: () async {
+                              var responseFromSearchPage = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (c) =>
+                                          const SearchDestinationPlace()));
+
+                              if (responseFromSearchPage == "placeSelected") {
+                                displayUserRideDetailsContainer();
+                              }
+                            },
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          shape: const CircleBorder(),
-                          padding: const EdgeInsets.all(24)),
-                      child: const Icon(
-                        Icons.history_outlined,
-                        color: Colors.black,
-                        size: 25,
-                      ),
+                        )
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -1075,53 +1203,94 @@ class _HomePageState extends State<HomePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedVehicle = "Car";
+                              });
+                              calculateFareAndTime();
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
                                 color: Colors.grey,
-                                borderRadius: BorderRadius.circular(15)),
-                            width: 100,
-                            height: 70,
-                            child: FittedBox(
-                              fit: BoxFit.none,
-                              child: Image.asset(
-                                "assets/vehicles/home_car.png",
-                                width: 100,
-                                height: 70,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                  color: selectedVehicle == "Car"
+                                      ? Colors.white
+                                      : Colors.transparent,
+                                ),
+                              ),
+                              width: 100,
+                              height: 70,
+                              child: FittedBox(
+                                fit: BoxFit.none,
+                                child: Image.asset(
+                                  "assets/vehicles/home_car.png",
+                                  width: 100,
+                                  height: 70,
+                                ),
                               ),
                             ),
                           ),
                           const SizedBox(
                             width: 20,
                           ),
-                          Container(
-                            decoration: BoxDecoration(
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedVehicle = "Auto";
+                              });
+                              calculateFareAndTime();
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
                                 color: Colors.grey,
-                                borderRadius: BorderRadius.circular(15)),
-                            width: 100,
-                            height: 70,
-                            child: FittedBox(
-                              fit: BoxFit.none,
-                              child: Image.asset(
-                                "assets/vehicles/auto.png",
-                                height: 50,
-                                width: 60,
-                              ), // Ensures the image stays at its original size
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                  color: selectedVehicle == "Auto"
+                                      ? Colors.white
+                                      : Colors.transparent,
+                                ),
+                              ),
+                              width: 100,
+                              height: 70,
+                              child: FittedBox(
+                                fit: BoxFit.none,
+                                child: Image.asset(
+                                  "assets/vehicles/auto.png",
+                                  height: 50,
+                                  width: 60,
+                                ), // Ensures the image stays at its original size
+                              ),
                             ),
                           ),
                           const SizedBox(
                             width: 20,
                           ),
-                          Container(
-                            decoration: BoxDecoration(
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedVehicle = "Bike";
+                              });
+                              calculateFareAndTime();
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
                                 color: Colors.grey,
-                                borderRadius: BorderRadius.circular(15)),
-                            width: 100,
-                            height: 70,
-                            child: FittedBox(
-                              child: Image.asset(
-                                "assets/vehicles/bike.png",
-                                width: 60,
-                                height: 50,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(
+                                    color: selectedVehicle == "Bike"
+                                        ? Colors.white
+                                        : Colors.transparent),
+                              ),
+                              width: 100,
+                              height: 70,
+                              child: FittedBox(
+                                child: Image.asset(
+                                  "assets/vehicles/bike.png",
+                                  width: 60,
+                                  height: 50,
+                                ),
                               ),
                             ),
                           ),
@@ -1252,10 +1421,9 @@ class _HomePageState extends State<HomePage> {
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 Text(
-                                  (tripDirectionDetailsInfo != null)
-                                      ? tripDirectionDetailsInfo!
-                                          .durationTextString!
-                                      : "",
+                                  selectedVehicle == "Car"
+                                      ? estimatedTimeCar
+                                      : estimatedTime, // Fallback if estimatedTime is null
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Colors.white,
@@ -1306,9 +1474,9 @@ class _HomePageState extends State<HomePage> {
                                           style: TextStyle(color: Colors.white),
                                         ),
                                         Text(
-                                          actualFareAmount != null
-                                              ? "Rs ${actualFareAmount!.toString()}"
-                                              : "",
+                                          selectedVehicle == "Car"
+                                              ? "Rs ${actualFareAmountCar.toStringAsFixed(2).toString()}" // Use null-aware operator
+                                              : "Rs ${actualFareAmount.toStringAsFixed(2).toString()}", // Use null-aware operator here as well
                                           style: const TextStyle(
                                             fontSize: 18,
                                             color: Colors.white,
@@ -1359,7 +1527,6 @@ class _HomePageState extends State<HomePage> {
                                           items: <String>[
                                             'Cash',
                                             'Credit Card',
-                                            'JazzCash'
                                           ].map<DropdownMenuItem<String>>(
                                               (String value) {
                                             return DropdownMenuItem<String>(
@@ -1396,7 +1563,7 @@ class _HomePageState extends State<HomePage> {
                             child: SizedBox(
                               height: 50,
                               child: BidDialogWidget(
-                                initialFareAmount: actualFareAmount ?? 0.0,
+                                initialFareAmount: actualFareAmount,
                                 onBidAmountChanged: (bidAmount) {
                                   setState(() {
                                     bidAmount = bidAmount;
@@ -1460,7 +1627,7 @@ class _HomePageState extends State<HomePage> {
                       topRight: Radius.circular(16)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black26,
+                      color: Colors.white12,
                       blurRadius: 15.0,
                       spreadRadius: 0.5,
                       offset: Offset(
@@ -1476,6 +1643,13 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      const Text(
+                        "Searhing For Nearset Drivers..",
+                        style: TextStyle(color: Colors.white),
+                      ),
                       const SizedBox(
                         height: 12,
                       ),
@@ -1524,13 +1698,13 @@ class _HomePageState extends State<HomePage> {
               child: Container(
                 height: tripContainerHeight,
                 decoration: const BoxDecoration(
-                  color: Colors.black87,
+                  color: Colors.black54,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(16),
                       topRight: Radius.circular(16)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white24,
+                      color: Colors.white12,
                       blurRadius: 15.0,
                       spreadRadius: 0.5,
                       offset: Offset(
@@ -1558,7 +1732,7 @@ class _HomePageState extends State<HomePage> {
                             tripStatusDisplay,
                             style: const TextStyle(
                               fontSize: 19,
-                              color: Colors.grey,
+                              color: Colors.white,
                             ),
                           ),
                         ],
@@ -1570,7 +1744,7 @@ class _HomePageState extends State<HomePage> {
 
                       const Divider(
                         height: 1,
-                        color: Colors.white70,
+                        color: Colors.white,
                         thickness: 1,
                       ),
 
@@ -1604,14 +1778,14 @@ class _HomePageState extends State<HomePage> {
                                 nameDriver,
                                 style: const TextStyle(
                                   fontSize: 20,
-                                  color: Colors.grey,
+                                  color: Colors.white,
                                 ),
                               ),
                               Text(
                                 carDetailsDriver,
                                 style: const TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey,
+                                  color: Colors.white,
                                 ),
                               ),
                             ],
@@ -1625,7 +1799,7 @@ class _HomePageState extends State<HomePage> {
 
                       const Divider(
                         height: 1,
-                        color: Colors.white70,
+                        color: Colors.white,
                         thickness: 1,
                       ),
 

@@ -66,7 +66,7 @@ class CommonMethods {
       model.longitudePosition = position.longitude;
       model.latitudePosition = position.latitude;
 
-      Provider.of<AppInfo>(context, listen: false).updatePickUpLocation(model);
+      Provider.of<AppInfoClass>(context, listen: false).updatePickUpLocation(model);
     }
 
     return humanReadableAddress;
@@ -159,5 +159,16 @@ class CommonMethods {
     }
 
     return overAllTotalFareAmountPKR.toStringAsFixed(2);
+  }
+
+  // Utility function to format time from total minutes into "X hours Y mins"
+  String formatTime(int totalMinutes) {
+    int hours = totalMinutes ~/ 60; // Get the number of full hours
+    int minutes = totalMinutes % 60; // Get the remaining minutes
+    if (hours > 0) {
+      return "$hours hours $minutes mins";
+    } else {
+      return "$minutes mins"; // If there are no hours, just show minutes
+    }
   }
 }

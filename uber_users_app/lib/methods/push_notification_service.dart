@@ -57,11 +57,11 @@ class PushNotificationService {
       String deviceToken, BuildContext context, String tripID) async {
         print('device token, ${deviceToken}');
     String dropOffDesitinationAddress =
-        Provider.of<AppInfo>(context, listen: false)
+        Provider.of<AppInfoClass>(context, listen: false)
             .dropOffLocation!
             .placeName
             .toString();
-    String pickUpAddress = Provider.of<AppInfo>(context, listen: false)
+    String pickUpAddress = Provider.of<AppInfoClass>(context, listen: false)
         .pickUpLocation!
         .placeName
         .toString();

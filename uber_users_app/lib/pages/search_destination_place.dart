@@ -55,7 +55,7 @@ class _SearchDestinationPlaceState extends State<SearchDestinationPlace> {
 
   @override
   Widget build(BuildContext context) {
-    String userAddress = Provider.of<AppInfo>(context, listen: false)
+    String userAddress = Provider.of<AppInfoClass>(context, listen: false)
             .pickUpLocation!
             .humanReadableAddress ??
         '';

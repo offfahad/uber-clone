@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
+import 'package:uber_drivers_app/pages/profileUpdation/driver_main_info.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
 
 import '../../authentication/login_screen.dart';
@@ -135,7 +136,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
               child: InkWell(
-                onTap: () {},
+                onTap: () async {
+                  await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DriverMainInfo()));
+                },
                 child: const ListTile(
                   leading: Icon(Icons.verified_user),
                   title: Text(

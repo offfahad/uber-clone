@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:uber_users_app/models/address_models.dart';
 
-class AppInfo extends ChangeNotifier{
+class AppInfoClass extends ChangeNotifier{
   AddressModel? pickUpLocation;
   AddressModel? dropOffLocation;
 

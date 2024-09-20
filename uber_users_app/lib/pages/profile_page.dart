@@ -24,7 +24,6 @@ class _ProfilePageState extends State<ProfilePage> {
       nameTextEditingController.text = userName;
       phoneTextEditingController.text = userPhone;
       emailTextEditingController.text = userEmail;
-          
     });
   }
 

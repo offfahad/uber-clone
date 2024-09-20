@@ -73,7 +73,7 @@ class _PredictionPlaceUIState extends State<PredictionPlaceUI> {
       print("Place ID: ${dropOffLocation.placeID}"); // Debug: Check place ID
 
       // Update the drop-off location in the provider
-      Provider.of<AppInfo>(context, listen: false)
+      Provider.of<AppInfoClass>(context, listen: false)
           .updateDropOffLocation(dropOffLocation);
 
       // Pop the current screen and return "placeSelected"

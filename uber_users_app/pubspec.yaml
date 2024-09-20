@@ -51,6 +51,7 @@ dependencies:
   country_picker:
   rounded_loading_button: '2.1.0'
   google_sign_in:
+  flutter_stripe: ^10.0.0 
 
 
   # The following adds the Cupertino Icons font to your application.
