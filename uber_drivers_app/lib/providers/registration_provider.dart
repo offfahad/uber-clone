@@ -6,11 +6,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uber_drivers_app/methods/common_method.dart';
 import 'package:uber_drivers_app/methods/image_picker_service.dart';
 import 'package:uber_drivers_app/models/driver.dart';
 import 'package:uber_drivers_app/models/vehicleInfo.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
+import 'package:http/http.dart' as http;
 
 class RegistrationProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -18,6 +20,7 @@ class RegistrationProvider extends ChangeNotifier {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
   bool _isLoading = false;
+  bool _isFetchLoading = false;
   XFile? _profilePhoto;
   bool _isPhotoAdded = false;
   bool _isFormValidBasic = false;
@@ -40,6 +43,7 @@ class RegistrationProvider extends ChangeNotifier {
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController cnicController = TextEditingController();
@@ -57,6 +61,7 @@ class RegistrationProvider extends ChangeNotifier {
   bool get isPhotoAdded => _isPhotoAdded;
   bool get isFormValidBasic => _isFormValidBasic;
   bool get isLoading => _isLoading;
+  bool get isFetchLoading => _isFetchLoading;
   XFile? get cnincFrontImage => _cnicFrontImage;
   XFile? get cnincBackImage => _cnicBackImage;
   bool get isFormValidCninc => _isFormValidCninc;
@@ -84,6 +89,16 @@ class RegistrationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void startFetchLoading() {
+    _isFetchLoading = true;
+    notifyListeners();
+  }
+
+  void stopFetchLoading() {
+    _isFetchLoading = false;
+    notifyListeners();
+  }
+
   void initFields(AuthenticationProvider authProvider) {
     if (!authProvider.isGoogleSignedIn) {
       phoneController.text = authProvider.phoneNumber;
@@ -103,6 +118,7 @@ class RegistrationProvider extends ChangeNotifier {
           lastNameController.text.isNotEmpty &&
           emailController.text.isNotEmpty &&
           phoneController.text.isNotEmpty &&
+          addressController.text.isNotEmpty &&
           dobController.text.isNotEmpty &&
           _isPhotoAdded;
       notifyListeners();
@@ -313,6 +329,7 @@ class RegistrationProvider extends ChangeNotifier {
         firstName: firstNameController.text,
         secondName: lastNameController.text,
         phoneNumber: phoneController.text,
+        address: addressController.text,
         dob: dobController.text,
         email: emailController.text,
         cnicNumber: cnicController.text, // Add these fields if required
@@ -323,6 +340,9 @@ class RegistrationProvider extends ChangeNotifier {
         drivingLicenseFrontImage: drivingLicenseFrontImageUrl,
         drivingLicenseBackImage: drivingLicenseBackImageUrl,
         blockStatus: "no",
+        deviceToken: '',
+        earnings: '',
+        driverRattings: '',
         vehicleInfo: VehicleInfo(
           type: selectedVehicle.toString(),
           brand: brandController.text,
@@ -342,6 +362,93 @@ class RegistrationProvider extends ChangeNotifier {
     } catch (e) {
       stopLoading();
       print("An error occurred while saving user data: $e");
+    }
+  }
+
+  Future<void> fetchUserData() async {
+    try {
+      startFetchLoading();
+      // Reference to the user's data in the database
+      final userRef =
+          _database.ref().child("drivers").child(_auth.currentUser!.uid);
+
+      // Fetch the data from Firebase
+      final snapshot = await userRef.get();
+
+      if (snapshot.exists) {
+        final data = snapshot.value as Map<dynamic, dynamic>;
+
+        // Update fields based on the data fetched
+        firstNameController.text = data['firstName'] ?? '';
+        lastNameController.text = data['secondName'] ?? '';
+        phoneController.text = data['phoneNumber'] ?? '';
+        addressController.text = data['address'] ?? '';
+        dobController.text = data['dob'] ?? '';
+        emailController.text = data['email'] ?? '';
+        cnicController.text = data['cnicNumber'] ?? '';
+        drivingLicenseController.text = data['drivingLicenseNumber'] ?? '';
+        _selectedVehicle = data['vehicleInfo']['type'] ?? '';
+        brandController.text = data['vehicleInfo']['brand'] ?? '';
+        colorController.text = data['vehicleInfo']['color'] ?? '';
+        numberPlateController.text =
+            data['vehicleInfo']['registrationPlateNumber'] ?? '';
+        productionYearController.text =
+            data['vehicleInfo']['productionYear'] ?? '';
+
+        // Update XFile instances if URLs exist (assuming download and save locally)
+        _profilePhoto = await _fetchImageFromUrl(data['profilePicture']);
+        _cnicFrontImage = await _fetchImageFromUrl(data['cnicFrontImage']);
+        _cnicBackImage = await _fetchImageFromUrl(data['cnicBackImage']);
+        _cnicWithSelfieImage =
+            await _fetchImageFromUrl(data['driverFaceWithCnic']);
+        _drivingLicenseFrontImage =
+            await _fetchImageFromUrl(data['drivingLicenseFrontImage']);
+        _drivingLicenseBackImage =
+            await _fetchImageFromUrl(data['drivingLicenseBackImage']);
+        _vehicleImage =
+            await _fetchImageFromUrl(data['vehicleInfo']['vehiclePicture']);
+        _vehicleRegistrationFrontImage = await _fetchImageFromUrl(
+            data['vehicleInfo']['registrationCertificateFrontImage']);
+        _vehicleRegistrationBackImage = await _fetchImageFromUrl(
+            data['vehicleInfo']['registrationCertificateBackImage']);
+
+        // Notify listeners to update UI
+        notifyListeners();
+        stopFetchLoading();
+      } else {
+        print("No data available for this user.");
+        stopFetchLoading();
+      }
+    } catch (e) {
+      print("An error occurred while fetching user data: $e");
+      stopFetchLoading();
+    }
+  }
+
+  Future<XFile?> _fetchImageFromUrl(String url) async {
+    try {
+      // Fetch the image from the URL
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        // Get the temporary directory to store the downloaded image
+        final directory = await getTemporaryDirectory();
+        final filePath =
+            '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+        // Write the image to the file
+        final file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+
+        // Return the XFile
+        return XFile(file.path);
+      } else {
+        print('Failed to download image: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      return null;
     }
   }
 

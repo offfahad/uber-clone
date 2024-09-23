@@ -59,7 +59,7 @@ dependencies:
   provider:
   pinput: ^5.0.0
   image_cropper: 
-
+  path_provider:
 dev_dependencies:
   flutter_test:
     sdk: flutter

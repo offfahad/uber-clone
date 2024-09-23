@@ -6,6 +6,7 @@ class Driver {
   final String firstName; // First name
   final String secondName; // Second name
   final String phoneNumber;
+  final String address; // Address
   final String dob; // Date of birth
   final String email; // Email address
   final String cnicNumber; // CNIC number
@@ -16,8 +17,10 @@ class Driver {
   final String drivingLicenseFrontImage; // Driving license front image
   final String drivingLicenseBackImage; // Driving license back image
   final String blockStatus;
+  final String deviceToken;
+  final String earnings; // Total
+  final String driverRattings; //
   final VehicleInfo vehicleInfo; // Vehicle information
-  
 
   Driver({
     required this.id,
@@ -25,6 +28,7 @@ class Driver {
     required this.firstName,
     required this.secondName,
     required this.phoneNumber,
+    required this.address,
     required this.dob,
     required this.email,
     required this.cnicNumber,
@@ -35,6 +39,9 @@ class Driver {
     required this.drivingLicenseFrontImage,
     required this.drivingLicenseBackImage,
     required this.blockStatus,
+    required this.deviceToken,
+    required this.earnings,
+    required this.driverRattings,
     required this.vehicleInfo,
   });
 
@@ -46,6 +53,7 @@ class Driver {
       'firstName': firstName,
       'secondName': secondName,
       'phoneNumber': phoneNumber,
+      'address': address,
       'dob': dob,
       'email': email,
       'cnicNumber': cnicNumber,
@@ -56,6 +64,9 @@ class Driver {
       'drivingLicenseFrontImage': drivingLicenseFrontImage,
       'drivingLicenseBackImage': drivingLicenseBackImage,
       'blockStatus': blockStatus,
+      'deviceToken': deviceToken,
+      'earnings': earnings,
+      'driverRattings': driverRattings, // Driver's rating as a string (to handle decimal values)
       'vehicleInfo': vehicleInfo.toMap(), // Nested vehicle info
     };
   }
@@ -68,6 +79,7 @@ class Driver {
       firstName: map['firstName'],
       secondName: map['secondName'],
       phoneNumber: map['phoneNumber'],
+      address: map['address'],
       dob: map['dob'],
       email: map['email'],
       cnicNumber: map['cnicNumber'],
@@ -78,6 +90,9 @@ class Driver {
       drivingLicenseFrontImage: map['drivingLicenseFrontImage'],
       drivingLicenseBackImage: map['drivingLicenseBackImage'],
       blockStatus: map['blockStatus'],
+      deviceToken: map['deviceToken'],
+      earnings: map['earnings'],
+      driverRattings: map['driverRattings'], // Convert driverRattings back to double
       vehicleInfo: VehicleInfo.fromMap(map['vehicleInfo']),
     );
   }

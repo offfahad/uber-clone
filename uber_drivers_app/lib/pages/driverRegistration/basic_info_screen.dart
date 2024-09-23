@@ -26,8 +26,6 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // final registrationProvider = Provider.of<RegistrationProvider>(context);
-    // final bool isLoading = registrationProvider.isLoading;
 
     return Consumer<RegistrationProvider>(
       builder: (context, registrationProvider, child) => Scaffold(
@@ -172,6 +170,27 @@ class _BasicInfoScreenState extends State<BasicInfoScreen> {
                                   value.isEmpty ||
                                   !value.contains('@gmail.com')) {
                                 return 'Valid email address is required';
+                              }
+                              return null;
+                            },
+                            onChanged: (_) =>
+                                registrationProvider.checkBasicFormValidity(),
+                          ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            controller: registrationProvider.addressController,
+                            decoration: const InputDecoration(
+                              labelText: 'Address',
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null ||
+                                  value.isEmpty ||
+                                  value.length < 10) {
+                                return 'Valid address address is required';
                               }
                               return null;
                             },

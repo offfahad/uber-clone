@@ -239,6 +239,7 @@ class AuthenticationProvider extends ChangeNotifier {
           firstName: driverData["firstName"] ?? '',
           secondName: driverData["secondName"] ?? '',
           phoneNumber: driverData["phoneNumber"] ?? '',
+          address: driverData["address"] ?? '',
           profilePicture: driverData["profilePicture"] ?? '',
           dob: driverData["dob"] ?? '',
           email: driverData["email"] ?? '',
@@ -251,6 +252,9 @@ class AuthenticationProvider extends ChangeNotifier {
               driverData["drivingLicenseFrontImage"] ?? '',
           drivingLicenseBackImage: driverData["drivingLicenseBackImage"] ?? '',
           blockStatus: driverData["blockStatus"] ?? '',
+          deviceToken: driverData["deviceToken"] ?? '',
+          driverRattings: driverData["driverRattings"] ?? '',
+          earnings: driverData["earnings"] ?? '',
           vehicleInfo: VehicleInfo(
             brand: driverData["vehicleInfo"]?["brand"] ?? '',
             color: driverData["vehicleInfo"]?["color"] ?? '',
