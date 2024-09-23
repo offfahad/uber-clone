@@ -40,9 +40,6 @@ class _DriverMainInfoState extends State<DriverMainInfo> {
   @override
   Widget build(BuildContext context) {
     return Consumer<RegistrationProvider>(builder: (context, provider, child) {
-      // if (provider.isFetchLoading) {
-      //   return const Center(child: CircularProgressIndicator());
-      // }
 
       return Scaffold(
         appBar: AppBar(

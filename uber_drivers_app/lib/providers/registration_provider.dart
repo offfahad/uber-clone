@@ -38,6 +38,8 @@ class RegistrationProvider extends ChangeNotifier {
   bool _isVehiclePhotoAdded = false;
   XFile? _vehicleRegistrationFrontImage;
   XFile? _vehicleRegistrationBackImage;
+  bool _isDataFetched = false;
+  bool get isDataFetched => _isDataFetched;
 
   // TextEditingControllers
   final TextEditingController firstNameController = TextEditingController();
@@ -366,6 +368,10 @@ class RegistrationProvider extends ChangeNotifier {
   }
 
   Future<void> fetchUserData() async {
+    if (_isDataFetched) {
+      print("Data already fetched, skipping...");
+      return; // Data already fetched, so skip further fetching
+    }
     try {
       startFetchLoading();
       // Reference to the user's data in the database
@@ -411,10 +417,10 @@ class RegistrationProvider extends ChangeNotifier {
             data['vehicleInfo']['registrationCertificateFrontImage']);
         _vehicleRegistrationBackImage = await _fetchImageFromUrl(
             data['vehicleInfo']['registrationCertificateBackImage']);
-
+        _isDataFetched = true;
         // Notify listeners to update UI
-        notifyListeners();
         stopFetchLoading();
+        notifyListeners();
       } else {
         print("No data available for this user.");
         stopFetchLoading();
