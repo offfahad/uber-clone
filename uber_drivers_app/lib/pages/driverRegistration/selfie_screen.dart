@@ -16,62 +16,63 @@ class SelfieScreen extends StatefulWidget {
 class _SelfieScreenState extends State<SelfieScreen> {
   @override
   Widget build(BuildContext context) {
-    final registrationProvider = Provider.of<RegistrationProvider>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Selfie With CNIC'),
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Close', style: TextStyle(color: Colors.black)),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // CNIC Front Side Upload
-              _buildImagePicker(
-                  context,
-                  'ID Confirmation',
-                  registrationProvider.cnicWithSelfieImage,
-                  registrationProvider.pickCnincImageWithSelfie,
-                  'Bring your CNIC in front of you and take a photo as an example. The photo should clerly show face and ID card. The photo must be taken in good light and good quality.' // Pick image when button is pressed
-                  ),
-              const SizedBox(height: 16),
+    return Consumer<RegistrationProvider>(
+      builder: (context, registrationProvider, child) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Selfie With CNIC'),
+          centerTitle: true,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Close', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // CNIC Front Side Upload
+                _buildImagePicker(
+                    context,
+                    'ID Confirmation',
+                    registrationProvider.cnicWithSelfieImage,
+                    registrationProvider.pickCnincImageWithSelfie,
+                    'Bring your CNIC in front of you and take a photo as an example. The photo should clerly show face and ID card. The photo must be taken in good light and good quality.' // Pick image when button is pressed
+                    ),
+                const SizedBox(height: 16),
 
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.9,
-                height: MediaQuery.of(context).size.height * 0.09,
-                child: ElevatedButton(
-                  onPressed: registrationProvider.cnicWithSelfieImage != null
-                      ? () async {
-                          try {
-                            //await registrationProvider.saveUserData();
-                            Navigator.pop(context, true);
-                          } catch (e) {
-                            print("Error while saving data: $e");
-                          } finally {}
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        registrationProvider.cnicWithSelfieImage != null
-                            ? Colors.green
-                            : Colors.grey,
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.09,
+                  child: ElevatedButton(
+                    onPressed: registrationProvider.cnicWithSelfieImage != null
+                        ? () async {
+                            try {
+                              //await registrationProvider.saveUserData();
+                              Navigator.pop(context, true);
+                            } catch (e) {
+                              print("Error while saving data: $e");
+                            } finally {}
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          registrationProvider.cnicWithSelfieImage != null
+                              ? Colors.green
+                              : Colors.grey,
+                    ),
+                    child: const Text('Done',
+                        style: TextStyle(color: Colors.white)),
                   ),
-                  child:
-                      const Text('Done', style: TextStyle(color: Colors.white)),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

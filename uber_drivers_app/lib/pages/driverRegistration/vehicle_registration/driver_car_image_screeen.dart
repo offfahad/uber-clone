@@ -16,62 +16,63 @@ class DriverCarImageScreeen extends StatefulWidget {
 class _DriverCarImageScreeenState extends State<DriverCarImageScreeen> {
   @override
   Widget build(BuildContext context) {
-    final registrationProvider = Provider.of<RegistrationProvider>(context);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Vehicle Pitcure'),
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Close', style: TextStyle(color: Colors.black)),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // CNIC Front Side Upload
-              _buildImagePicker(
-                context,
-                'Photo of your vehicle',
-                registrationProvider.vehicleImage,
-                registrationProvider.pickVehicleImageFromCamera,
-                // Pick image when button is pressed
-              ),
-              const SizedBox(height: 16),
-
-              // Submit button
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.9,
-                height: MediaQuery.of(context).size.height * 0.09,
-                child: ElevatedButton(
-                  onPressed: registrationProvider.isVehiclePhotoAdded
-                      ? () async {
-                          try {
-                            //await registrationProvider.saveUserData();
-                            Navigator.pop(context, true);
-                          } catch (e) {
-                            print("Error while saving data: $e");
-                          } finally {}
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: registrationProvider.isVehiclePhotoAdded
-                        ? Colors.green
-                        : Colors.grey,
-                  ),
-                  child:
-                      const Text('Done', style: TextStyle(color: Colors.white)),
+    
+    return Consumer<RegistrationProvider>(
+      builder: (context, registrationProvider, child) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Vehicle Pitcure'),
+          centerTitle: true,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Close', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // CNIC Front Side Upload
+                _buildImagePicker(
+                  context,
+                  'Photo of your vehicle',
+                  registrationProvider.vehicleImage,
+                  registrationProvider.pickVehicleImageFromCamera,
+                  // Pick image when button is pressed
                 ),
-              ),
-            ],
+                const SizedBox(height: 16),
+
+                // Submit button
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  height: MediaQuery.of(context).size.height * 0.09,
+                  child: ElevatedButton(
+                    onPressed: registrationProvider.isVehiclePhotoAdded
+                        ? () async {
+                            try {
+                              //await registrationProvider.saveUserData();
+                              Navigator.pop(context, true);
+                            } catch (e) {
+                              print("Error while saving data: $e");
+                            } finally {}
+                          }
+                        : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: registrationProvider.isVehiclePhotoAdded
+                          ? Colors.green
+                          : Colors.grey,
+                    ),
+                    child: const Text('Done',
+                        style: TextStyle(color: Colors.white)),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

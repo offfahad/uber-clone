@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:provider/provider.dart';
-import 'package:uber_drivers_app/methods/image_picker_service.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 class VehicleRegistrationScreen extends StatefulWidget {
@@ -19,85 +17,87 @@ class _VehicleRegistrationScreenState extends State<VehicleRegistrationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final registrationProvider = Provider.of<RegistrationProvider>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Vehicle Registration Certificate',
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-        ),
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Close', style: TextStyle(color: Colors.black)),
+    return Consumer<RegistrationProvider>(
+      builder: (context, registrationProvider, child) => Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Vehicle Registration Certificate',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // CNIC Front Side Upload
-                _buildImagePickerFront(
-                    context,
-                    'Vehicle Certificate (Front Side)',
-                    registrationProvider.vehicleRegistrationFrontImage,
-                    () => registrationProvider
-                        .pickAndCropVehicleRegistrationImages(true)),
-                const SizedBox(height: 16),
+          centerTitle: true,
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Close', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // CNIC Front Side Upload
+                  _buildImagePickerFront(
+                      context,
+                      'Vehicle Certificate (Front Side)',
+                      registrationProvider.vehicleRegistrationFrontImage,
+                      () => registrationProvider
+                          .pickAndCropVehicleRegistrationImages(true)),
+                  const SizedBox(height: 16),
 
-                // CNIC Back Side Upload
-                _buildImagePickerBack(
-                    context,
-                    'Vehicle Certificate (Back Side)',
-                    registrationProvider.vehicleRegistrationBackImage,
-                    () => registrationProvider
-                        .pickAndCropVehicleRegistrationImages(false)),
-                const SizedBox(height: 16),
+                  // CNIC Back Side Upload
+                  _buildImagePickerBack(
+                      context,
+                      'Vehicle Certificate (Back Side)',
+                      registrationProvider.vehicleRegistrationBackImage,
+                      () => registrationProvider
+                          .pickAndCropVehicleRegistrationImages(false)),
+                  const SizedBox(height: 16),
 
-                // Submit button
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  height: MediaQuery.of(context).size.height * 0.09,
-                  child: ElevatedButton(
-                    onPressed: registrationProvider
-                                    .vehicleRegistrationFrontImage !=
-                                null &&
-                            registrationProvider.vehicleRegistrationBackImage !=
-                                null
-                        ? () async {
-                            if (_formKey.currentState?.validate() == true) {
-                              try {
-                                //await registrationProvider.saveUserData();
-                                Navigator.pop(context, true);
-                              } catch (e) {
-                                print("Error while saving data: $e");
-                              } finally {}
+                  // Submit button
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    height: MediaQuery.of(context).size.height * 0.09,
+                    child: ElevatedButton(
+                      onPressed: registrationProvider
+                                      .vehicleRegistrationFrontImage !=
+                                  null &&
+                              registrationProvider
+                                      .vehicleRegistrationBackImage !=
+                                  null
+                          ? () async {
+                              if (_formKey.currentState?.validate() == true) {
+                                try {
+                                  //await registrationProvider.saveUserData();
+                                  Navigator.pop(context, true);
+                                } catch (e) {
+                                  print("Error while saving data: $e");
+                                } finally {}
+                              }
                             }
-                          }
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          registrationProvider.vehicleRegistrationFrontImage !=
-                                      null &&
-                                  registrationProvider
-                                          .vehicleRegistrationBackImage !=
-                                      null
-                              ? Colors.green
-                              : Colors.grey,
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: registrationProvider
+                                        .vehicleRegistrationFrontImage !=
+                                    null &&
+                                registrationProvider
+                                        .vehicleRegistrationBackImage !=
+                                    null
+                            ? Colors.green
+                            : Colors.grey,
+                      ),
+                      child: const Text('Done',
+                          style: TextStyle(color: Colors.white)),
                     ),
-                    child: const Text('Done',
-                        style: TextStyle(color: Colors.white)),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
