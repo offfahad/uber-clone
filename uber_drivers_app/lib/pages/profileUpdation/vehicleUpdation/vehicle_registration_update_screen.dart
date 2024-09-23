@@ -1,29 +1,31 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../../providers/registration_provider.dart';
+import '../../../providers/registration_provider.dart';
 
-class DrivingLicenseUpdateScreen extends StatefulWidget {
-  const DrivingLicenseUpdateScreen({super.key});
+class VehicleRegistrationUpdateScreen extends StatefulWidget {
+  const VehicleRegistrationUpdateScreen({super.key});
 
   @override
-  State<DrivingLicenseUpdateScreen> createState() =>
-      _DrivingLicenseUpdateScreenState();
+  State<VehicleRegistrationUpdateScreen> createState() =>
+      _VehicleRegistrationUpdateScreenState();
 }
 
-class _DrivingLicenseUpdateScreenState
-    extends State<DrivingLicenseUpdateScreen> {
+class _VehicleRegistrationUpdateScreenState
+    extends State<VehicleRegistrationUpdateScreen> {
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
     return Consumer<RegistrationProvider>(
       builder: (context, registrationProvider, child) => Scaffold(
         appBar: AppBar(
-          title: const Text('Driving License'),
+          title: const Text(
+            'Vehicle Registration Certificate',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+          ),
           centerTitle: true,
           actions: [
             TextButton(
@@ -45,69 +47,32 @@ class _DrivingLicenseUpdateScreenState
                   // CNIC Front Side Upload
                   _buildImagePickerFront(
                       context,
-                      'License (Front Side - First Capture Then Crop)',
-                      registrationProvider.drivingLicenseFrontImage,
+                      'Vehicle Certificate (Front Side)',
+                      registrationProvider.vehicleRegistrationFrontImage,
                       () => registrationProvider
-                          .pickAndCropDrivingLicenseImage(true)),
+                          .pickAndCropVehicleRegistrationImages(true)),
                   const SizedBox(height: 16),
 
                   // CNIC Back Side Upload
                   _buildImagePickerBack(
                       context,
-                      'License (Back Side - First Capture Then Crop)',
-                      registrationProvider.drivingLicenseBackImage,
+                      'Vehicle Certificate (Back Side)',
+                      registrationProvider.vehicleRegistrationBackImage,
                       () => registrationProvider
-                          .pickAndCropDrivingLicenseImage(false)),
+                          .pickAndCropVehicleRegistrationImages(false)),
                   const SizedBox(height: 16),
 
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black12),
-                      borderRadius: BorderRadius.circular(15),
-                      color: Colors.white,
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black12,
-                          offset: Offset(0, 2),
-                          blurRadius: 6.0,
-                        ),
-                      ],
-                    ),
-                    child: TextFormField(
-                      controller: registrationProvider.drivingLicenseController,
-                      decoration: const InputDecoration(
-                        labelText: 'License Number',
-                        helperText: 'Format: ST-24-7174',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                          borderSide: BorderSide(),
-                        ),
-                      ),
-                      keyboardType: TextInputType.text,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'License Number is required';
-                        }
-                        if (!registrationProvider.licenseRegExp
-                            .hasMatch(value)) {
-                          return 'Please enter a valid license number in ST-24-7174 format';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) => registrationProvider
-                          .checkDrivingLicenseFormValidity(),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
+                  // Submit button
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.9,
                     height: MediaQuery.of(context).size.height * 0.09,
                     child: ElevatedButton(
-                      onPressed: registrationProvider.isFormValidDrivingLicnese
+                      onPressed: registrationProvider
+                                      .vehicleRegistrationFrontImage !=
+                                  null &&
+                              registrationProvider
+                                      .vehicleRegistrationBackImage !=
+                                  null
                           ? () async {
                               if (_formKey.currentState?.validate() == true) {
                                 try {
@@ -120,10 +85,14 @@ class _DrivingLicenseUpdateScreenState
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            registrationProvider.isFormValidDrivingLicnese
-                                ? Colors.green
-                                : Colors.grey,
+                        backgroundColor: registrationProvider
+                                        .vehicleRegistrationFrontImage !=
+                                    null &&
+                                registrationProvider
+                                        .vehicleRegistrationBackImage !=
+                                    null
+                            ? Colors.green
+                            : Colors.grey,
                       ),
                       child: const Text('Done',
                           style: TextStyle(color: Colors.white)),
@@ -162,14 +131,15 @@ Widget _buildImagePickerFront(BuildContext context, String label,
         const SizedBox(height: 16),
         imageFile != null
             ? Image.file(File(imageFile.path), height: 150)
-            : Image.asset('assets/auth/license-front.png', height: 150),
+            : Image.asset('assets/auth/cnic-front.png', height: 150),
         const SizedBox(height: 16),
         Container(
           width: 200,
           height: 40,
           decoration: BoxDecoration(
-              border: Border.all(color: Colors.black54),
-              borderRadius: BorderRadius.circular(12)),
+            border: Border.all(color: Colors.black54),
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: TextButton.icon(
             onPressed: onPressed,
             icon: const Icon(
@@ -210,7 +180,7 @@ Widget _buildImagePickerBack(BuildContext context, String label,
         ),
         imageFile != null
             ? Image.file(File(imageFile.path), height: 150)
-            : Image.asset('assets/auth/license-back.png', height: 150),
+            : Image.asset('assets/auth/cnic-back.png', height: 150),
         const SizedBox(height: 16),
         Container(
           width: 200,
