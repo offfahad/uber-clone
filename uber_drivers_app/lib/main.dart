@@ -10,6 +10,7 @@ import 'package:uber_drivers_app/pages/driverRegistration/driver_registration.da
 import 'package:uber_drivers_app/pages/home/home_page.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
+import 'package:uber_drivers_app/widgets/blocked_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
@@ -50,10 +51,78 @@ class MyApp extends StatelessWidget {
         // ThemeData.dark().copyWith(
         //   scaffoldBackgroundColor: Colors.white,
         // ),
-        home: FirebaseAuth.instance.currentUser == null
-            ? RegisterScreen()
-            : Dashboard(),
+        home: const AuthCheck(),
       ),
+    );
+  }
+}
+
+class AuthCheck extends StatelessWidget {
+  const AuthCheck({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Access the AuthenticationProvider via Provider
+    final authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
+
+    return FutureBuilder<User?>(
+      future: FirebaseAuth.instance
+          .authStateChanges()
+          .first, // Check if Firebase user exists
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ); // Show loading indicator
+        }
+
+        // If user is not logged in, navigate to RegisterScreen
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const RegisterScreen();
+        }
+
+        // If user is logged in, first check if the driver is blocked
+        return FutureBuilder<bool>(
+          future: authProvider
+              .checkIfDriverIsBlocked(), // Check if the driver is blocked
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+
+            if (snapshot.hasData && snapshot.data == true) {
+              // If the driver is blocked, show an appropriate message
+              return const BlockedScreen();
+            }
+            // If the driver is not blocked, check for profile completeness
+            return FutureBuilder<bool>(
+              future: authProvider
+                  .checkDriverFieldsFilled(), // Check if the profile fields are filled
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()));
+                }
+
+                if (snapshot.hasData && snapshot.data == true) {
+                  // If profile is complete, navigate to the dashboard
+                  return const Dashboard();
+                } else {
+                  // If profile is incomplete, navigate to the registration screen
+                  return const RegisterScreen();
+                }
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

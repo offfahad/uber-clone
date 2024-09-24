@@ -103,15 +103,6 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-// Helper method to check if the phone number exists in Firebase Realtime Database
-  Future<bool> _checkPhoneNumberExists(String phoneNumber) async {
-    DatabaseReference usersRef = FirebaseDatabase.instance.ref().child("users");
-    DatabaseEvent snapshot =
-        await usersRef.orderByChild("phone").equalTo(phoneNumber).once();
-
-    return snapshot.snapshot.exists;
-  }
-
   void verifyOTP({
     required BuildContext context,
     required String verificationId,
@@ -180,23 +171,6 @@ class AuthenticationProvider extends ChangeNotifier {
     DatabaseReference usersRef = firebaseDatabase.ref().child("drivers");
     DatabaseEvent snapshot =
         await usersRef.orderByChild("email").equalTo(email).once();
-
-    if (snapshot.snapshot.exists) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  
-
-  // Method to check if user exists in Firebase Realtime Database by phone number
-  Future<bool> checkUserExistByPhone(String phoneNumber) async {
-    DatabaseReference usersRef = firebaseDatabase.ref().child("drivers");
-    DatabaseEvent snapshot = await usersRef
-        .orderByChild("phone")
-        .equalTo(phoneNumber.toString().trim())
-        .once();
 
     if (snapshot.snapshot.exists) {
       return true;
@@ -402,6 +376,47 @@ class AuthenticationProvider extends ChangeNotifier {
       stopGoogleLoading();
       commonMethods.displaySnackBar(
           e.message ?? "Failed to sign in with Google", context);
+    }
+  }
+
+  Future<bool> checkIfDriverIsBlocked() async {
+    try {
+      // Get a reference to the user's data in the Realtime Database
+      DatabaseReference driverRef = firebaseDatabase
+          .ref()
+          .child("drivers")
+          .child(firebaseAuth.currentUser!.uid);
+
+      // Fetch user data from the database
+      DataSnapshot snapshot = await driverRef.get();
+
+      if (snapshot.exists && snapshot.value != null) {
+        // Cast the snapshot value to a Map
+        Map driverData = snapshot.value as Map;
+
+        // Check the block status
+        String blockStatus = driverData["blockStatus"] ?? 'no';
+
+        // If blockStatus is 'yes', return true (blocked)
+        if (blockStatus == 'yes') {
+          await firebaseAuth.signOut();
+          await googleSignIn.signOut();
+
+          _uid = null;
+          _isGoogleSignedIn = false;
+          notifyListeners();
+          return true;
+        } else {
+          // If blockStatus is 'no', return false (not blocked)
+          return false;
+        }
+      } else {
+        print("Driver data not found or not in the expected format.");
+        return false; // Default to not blocked if data isn't found
+      }
+    } catch (e) {
+      print("An error occurred while checking block status: $e");
+      return false; // Default to not blocked in case of an error
     }
   }
 

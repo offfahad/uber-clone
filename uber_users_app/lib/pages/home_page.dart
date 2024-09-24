@@ -15,11 +15,11 @@ import 'package:provider/provider.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:uber_users_app/appInfo/app_info.dart';
 import 'package:uber_users_app/appInfo/auth_provider.dart';
+import 'package:uber_users_app/authentication/register_screen.dart';
 import 'package:uber_users_app/pages/profile_page.dart';
 import 'package:uber_users_app/pages/search_destination_place.dart';
 import 'package:uber_users_app/widgets/sign_out_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../authentication/login_screen.dart';
 import '../global/global_var.dart';
 import '../global/trip_var.dart';
 import '../methods/common_methods.dart';
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
           FirebaseAuth.instance.signOut();
 
           Navigator.push(
-              context, MaterialPageRoute(builder: (c) => const LoginScreen()));
+              context, MaterialPageRoute(builder: (c) => const RegisterScreen()));
 
           cMethods.displaySnackBar(
               "You are blocked. Contact admin: gulzarsoft@gmail.com", context);
@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> {
       } else {
         FirebaseAuth.instance.signOut();
         Navigator.push(
-            context, MaterialPageRoute(builder: (c) => const LoginScreen()));
+            context, MaterialPageRoute(builder: (c) => const RegisterScreen()));
       }
     });
   }

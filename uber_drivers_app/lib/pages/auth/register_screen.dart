@@ -8,6 +8,7 @@ import 'package:uber_drivers_app/methods/common_method.dart';
 import 'package:uber_drivers_app/pages/dashboard.dart';
 import 'package:uber_drivers_app/pages/driverRegistration/driver_registration.dart';
 import 'package:uber_drivers_app/pages/home/home_page.dart';
+import 'package:uber_drivers_app/widgets/blocked_screen.dart';
 
 import '../../providers/auth_provider.dart';
 
@@ -206,36 +207,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               await authProvider.signInWithGoogle(
                                 context,
                                 () async {
-                                  bool userExits =
+                                  bool userExists =
                                       await authProvider.checkUserExistById();
-                                  bool userExistInDatabse =
+                                  bool userExistsInDatabase =
                                       await authProvider.checkUserExistByEmail(
                                     authProvider
                                         .firebaseAuth.currentUser!.email!
                                         .toString(),
                                   );
-                                  if (userExits) {
-                                    // 2. get user data from database
-                                    if (userExistInDatabse) {
-                                      await authProvider
-                                          .getUserDataFromFirebaseDatabase();
+                                  print("User Exists: $userExists");
+                                  print(
+                                      "User Exist in datbase response $userExistsInDatabase");
 
-                                      bool isDriverComplete = await authProvider
-                                          .checkDriverFieldsFilled();
-                                      if (isDriverComplete) {
-                                        navigate(isSingedIn: true);
+                                  if (userExists) {
+                                    if (userExistsInDatabase) {
+                                      // Check if the driver is blocked
+                                      bool isBlocked = await authProvider
+                                          .checkIfDriverIsBlocked();
+
+                                      if (isBlocked) {
+                                        // Navigate to Block Screen if blocked
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const BlockedScreen()), // Replace with your actual Block Screen
+                                        );
                                       } else {
-                                        navigate(isSingedIn: false);
-                                        commonMethods.displaySnackBar(
-                                            "Fill your missing information!",
-                                            context);
+                                        // Get user data from database if not blocked
+                                        await authProvider
+                                            .getUserDataFromFirebaseDatabase();
+
+                                        // Check if driver's profile is complete
+                                        bool isDriverComplete =
+                                            await authProvider
+                                                .checkDriverFieldsFilled();
+
+                                        if (isDriverComplete) {
+                                          navigate(isSingedIn: true);
+                                        } else {
+                                          navigate(isSingedIn: false);
+                                          commonMethods.displaySnackBar(
+                                              "Fill your missing information!",
+                                              context);
+                                        }
                                       }
                                     } else {
-                                      // 5. navigate to Home
+                                      // Navigate to user registration if user doesn't exist in database
                                       navigate(isSingedIn: false);
                                     }
                                   } else {
-                                    // navigate to user information screen
+                                    // Navigate to user information screen if user doesn't exist
                                     navigate(isSingedIn: false);
                                   }
                                 },
