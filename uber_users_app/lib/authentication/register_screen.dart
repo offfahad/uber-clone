@@ -248,12 +248,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         : const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.airplanemode_active,
                                 color: Colors.black,
                               ),
-                              const SizedBox(width: 5),
-                              const Text(
+                              SizedBox(width: 5),
+                              Text(
                                 "Continue with Google",
                                 style: TextStyle(
                                   color: Colors.black,

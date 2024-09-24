@@ -132,9 +132,7 @@ class _OTPScreenState extends State<OTPScreen> {
                             BorderRadius.circular(10), // Rounded corners
                       ),
                     ),
-                    onPressed: () {
-                      
-                    },
+                    onPressed: () {},
                     child: const Text(
                       "Resend",
                       style: TextStyle(

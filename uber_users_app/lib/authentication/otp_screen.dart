@@ -3,6 +3,8 @@ import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_users_app/appInfo/auth_provider.dart';
 import 'package:uber_users_app/authentication/user_information_screen.dart';
+import 'package:uber_users_app/methods/common_methods.dart';
+import 'package:uber_users_app/pages/blocked_screen.dart';
 import 'package:uber_users_app/pages/home_page.dart';
 
 class OTPScreen extends StatefulWidget {
@@ -12,6 +14,8 @@ class OTPScreen extends StatefulWidget {
   @override
   State<OTPScreen> createState() => _OTPScreenState();
 }
+
+CommonMethods commonMethods = CommonMethods();
 
 class _OTPScreenState extends State<OTPScreen> {
   String? smsCode;
@@ -26,20 +30,6 @@ class _OTPScreenState extends State<OTPScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                //const SizedBox(height: 50,),
-
-                // Container(
-                //   decoration: BoxDecoration(
-                //       border: Border.all(color: Colors.black, width: 2),
-                //       borderRadius: BorderRadius.circular(90)),
-                //   child: CircleAvatar(
-                //     radius: 80,
-                //     backgroundImage: AssetImage(AssetsManager.openAILogo),
-                //   ),
-                // ),
-                // const SizedBox(
-                //   height: 20,
-                // ),
                 const Text(
                   'Verification',
                   style: TextStyle(
@@ -132,9 +122,10 @@ class _OTPScreenState extends State<OTPScreen> {
                 const Text(
                   'Resend New Code',
                   style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
               ],
             ),
@@ -155,17 +146,35 @@ class _OTPScreenState extends State<OTPScreen> {
         // 1. check database if the current user exist
         bool userExits = await authProvider.checkUserExistById();
         if (userExits) {
+          // 2. Check if the driver is blocked
+          bool isBlocked = await authProvider.checkIfUserIsBlocked();
           // 2. get user data from database
-          await authProvider.getUserDataFromFirebaseDatabase();
 
-          // 3. save user data to shared preferences
-          //await authProvider.saveUserDataToSharedPref();
+          if (isBlocked) {
+            // Navigate to Block Screen if blocked
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const BlockedScreen(),
+              ), 
+            );
+          } else {
+            await authProvider.getUserDataFromFirebaseDatabase();
+            // 4. Check if driver fields are filled
+            bool isUserComplete = await authProvider.checkUserFieldsFilled();
 
-          // 4. save this user as signed in
-          //await authProvider.setSignedIn();
-
-          // 5. navigate to Home
-          navigate(isSingedIn: true);
+            if (isUserComplete) {
+              // Navigate to dashboard if profile is complete
+              navigate(isSingedIn: true);
+            } else {
+              // Navigate to driver registration if profile is incomplete
+              navigate(isSingedIn: false);
+              commonMethods.displaySnackBar(
+                "Fill your missing information!",
+                context,
+              );
+            }
+          }
         } else {
           // navigate to user information screen
           navigate(isSingedIn: false);

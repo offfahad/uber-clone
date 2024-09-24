@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -58,7 +59,7 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-    void stopGoogleLoading() {
+  void stopGoogleLoading() {
     _isGoogleSignInLoading = false;
     notifyListeners();
   }
@@ -254,6 +255,84 @@ class AuthenticationProvider extends ChangeNotifier {
       }
     } catch (e) {
       print("An error occurred while fetching user data: $e");
+    }
+  }
+
+  Future<bool> checkIfUserIsBlocked() async {
+    try {
+      // Get a reference to the user's data in the Realtime Database
+      DatabaseReference driverRef = firebaseDatabase
+          .ref()
+          .child("users")
+          .child(firebaseAuth.currentUser!.uid);
+
+      // Fetch user data from the database
+      DataSnapshot snapshot = await driverRef.get();
+
+      if (snapshot.exists && snapshot.value != null) {
+        // Cast the snapshot value to a Map
+        Map driverData = snapshot.value as Map;
+
+        // Check the block status
+        String blockStatus = driverData["blockStatus"] ?? 'no';
+
+        // If blockStatus is 'yes', return true (blocked)
+        if (blockStatus == 'yes') {
+          await firebaseAuth.signOut();
+          await googleSignIn.signOut();
+
+          _uid = null;
+          _isGoogleSignedIn = false;
+          notifyListeners();
+          return true;
+        } else {
+          // If blockStatus is 'no', return false (not blocked)
+          return false;
+        }
+      } else {
+        print("User data not found or not in the expected format.");
+        return false; // Default to not blocked if data isn't found
+      }
+    } catch (e) {
+      print("An error occurred while checking block status: $e");
+      return false; // Default to not blocked in case of an error
+    }
+  }
+
+  Future<bool> checkUserFieldsFilled() async {
+    try {
+      // Get a reference to the driver's data in the Realtime Database
+      DatabaseReference driverRef = firebaseDatabase
+          .ref()
+          .child("users")
+          .child(firebaseAuth.currentUser!.uid);
+
+      // Fetch user data from the database
+      DataSnapshot snapshot = await driverRef.get();
+
+      if (snapshot.exists && snapshot.value != null) {
+        // Cast the snapshot value to a Map
+        Map userData = snapshot.value as Map;
+
+        // Retrieve individual fields and perform null checks
+        String id = userData["id"] ?? '';
+        String name = userData["name"] ?? '';
+        String email = userData["email"] ?? '';
+        String phone = userData["phone"] ?? '';
+
+        // Check if any of the required fields are missing or empty
+        if (id.isEmpty || name.isEmpty || email.isEmpty || phone.isEmpty) {
+          return false; // Some fields are missing or empty
+        } else {
+          return true; // All fields are filled
+        }
+      } else {
+        print("User data not found or not in the expected format.");
+        return false;
+      }
+    } catch (e) {
+      print("An error occurred while checking user fields: $e");
+      return false;
     }
   }
 

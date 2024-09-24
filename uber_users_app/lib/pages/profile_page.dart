@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:restart_app/restart_app.dart';
 import 'package:uber_users_app/global/global_var.dart';
-
-import '../authentication/login_screen.dart';
-
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
