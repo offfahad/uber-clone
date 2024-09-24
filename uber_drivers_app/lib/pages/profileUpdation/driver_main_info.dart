@@ -45,7 +45,7 @@ class _DriverMainInfoState extends State<DriverMainInfo> {
         appBar: AppBar(
           title: const Text(
             'Profile Updation',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600, fontSize: 16),
           ),
           centerTitle: true,
         ),

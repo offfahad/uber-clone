@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
@@ -206,26 +208,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 () async {
                                   bool userExits =
                                       await authProvider.checkUserExistById();
-                                  bool userExistInDatabse = await authProvider
-                                      .checkUserExistByEmail(authProvider
-                                          .firebaseAuth.currentUser!.email!
-                                          .toString());
+                                  bool userExistInDatabse =
+                                      await authProvider.checkUserExistByEmail(
+                                    authProvider
+                                        .firebaseAuth.currentUser!.email!
+                                        .toString(),
+                                  );
                                   if (userExits) {
                                     // 2. get user data from database
                                     if (userExistInDatabse) {
                                       await authProvider
                                           .getUserDataFromFirebaseDatabase();
-                                      navigate(isSingedIn: true);
+
+                                      bool isDriverComplete = await authProvider
+                                          .checkDriverFieldsFilled();
+                                      if (isDriverComplete) {
+                                        navigate(isSingedIn: true);
+                                      } else {
+                                        navigate(isSingedIn: false);
+                                        commonMethods.displaySnackBar(
+                                            "Fill your missing information!",
+                                            context);
+                                      }
+                                    } else {
+                                      // 5. navigate to Home
+                                      navigate(isSingedIn: false);
                                     }
-
-                                    // 3. save user data to shared preferences
-                                    //await authProvider.saveUserDataToSharedPref();
-
-                                    // 4. save this user as signed in
-                                    //await authProvider.setSignedIn();
-
-                                    // 5. navigate to Home
-                                    //navigate(isSingedIn: false);
                                   } else {
                                     // navigate to user information screen
                                     navigate(isSingedIn: false);
@@ -296,33 +304,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 const SizedBox(
                   height: 15,
                 ),
-                // SizedBox(
-                //   width: MediaQuery.of(context).size.width * 0.9,
-                //   height: MediaQuery.of(context).size.height * 0.07,
-                //   child: ElevatedButton.icon(
-                //     onPressed: () {},
-                //     style: ElevatedButton.styleFrom(
-                //       backgroundColor: Colors.grey.shade400,
-                //       shape: RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(5),
-                //       ),
-                //     ),
-                //     label: const Text(
-                //       "Continue with Facebook",
-                //       style: TextStyle(
-                //         color: Colors.black,
-                //         fontSize: 14,
-                //       ),
-                //     ),
-                //     icon: const Icon(
-                //       Icons.facebook,
-                //       color: Colors.black,
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(
-                //   height: 25,
-                // ),
                 const Text(
                   "By proceeding, you consent to get calls, whatsApp or SMS messages,including by automated means, from Uber and its affiliates to the number provided.",
                   textAlign: TextAlign.center,
@@ -372,10 +353,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           MaterialPageRoute(builder: (context) => const Dashboard()),
           (route) => false);
     } else {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => DriverRegistration()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => DriverRegistration()));
     }
   }
 }

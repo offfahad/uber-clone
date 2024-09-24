@@ -9,6 +9,7 @@ import 'package:uber_drivers_app/providers/auth_provider.dart';
 
 import '../../authentication/login_screen.dart';
 import '../../global/global.dart';
+import '../../widgets/ratting_stars.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -111,6 +112,25 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                   ],
                                 ),
+                              if (address.isNotEmpty)
+                                Row(
+                                  children: <Widget>[
+                                    const Icon(
+                                      Icons.location_city,
+                                      size: 12.0,
+                                    ),
+                                    Container(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(8, 4, 4, 4),
+                                      child: Text(
+                                        address,
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5,),
+                              RatingStars(ratting: ratting),
                             ],
                           ),
                         ),

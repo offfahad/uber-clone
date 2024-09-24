@@ -9,7 +9,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/global/global.dart';
+import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 import '../../methods/map_theme_methods.dart';
 import '../../pushNotifications/push_notification.dart';
@@ -102,32 +104,13 @@ class _HomePageState extends State<HomePage> {
     notificationSystem.startListeningForNewNotification(context);
   }
 
-  retrieveCurrentDriverInfo() async {
-    await FirebaseDatabase.instance
-        .ref()
-        .child("drivers")
-        .child(FirebaseAuth.instance.currentUser!.uid)
-        .once()
-        .then((snap) {
-      driverName = (snap.snapshot.value as Map)["firstName"];
-      driverSecondName = (snap.snapshot.value as Map)["secondName"];
-      driverPhone = (snap.snapshot.value as Map)["phoneNumber"];
-      driverPhoto = (snap.snapshot.value as Map)["profilePicture"];
-      driverEmail = (snap.snapshot.value as Map)["email"];
-      carColor = (snap.snapshot.value as Map)["vehicleInfo"]["color"];
-      carModel = (snap.snapshot.value as Map)["vehicleInfo"]["brand"];
-      carNumber = (snap.snapshot.value as Map)["vehicleInfo"]["registrationPlateNumber"];
-    });
-
-    initializePushNotificationSystem();
-  }
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    retrieveCurrentDriverInfo();
+    initializePushNotificationSystem();
+    Provider.of<RegistrationProvider>(context, listen: false)
+        .retrieveCurrentDriverInfo();
   }
 
   @override
@@ -168,7 +151,6 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  
                   onPressed: () {
                     showModalBottomSheet(
                         context: context,
@@ -231,7 +213,11 @@ class _HomePageState extends State<HomePage> {
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: const Text("BACK", style: TextStyle(color: Colors.black),),
+                                          child: const Text(
+                                            "BACK",
+                                            style:
+                                                TextStyle(color: Colors.black),
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(
@@ -273,7 +259,11 @@ class _HomePageState extends State<HomePage> {
                                                     ? Colors.green
                                                     : Colors.pink,
                                           ),
-                                          child: const Text("CONFIRM", style: TextStyle(color: Colors.white),),
+                                          child: const Text(
+                                            "CONFIRM",
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -286,10 +276,10 @@ class _HomePageState extends State<HomePage> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorToShow,
-
                   ),
                   child: Text(
-                    titleToShow, style: const TextStyle(color: Colors.white),
+                    titleToShow,
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ],

@@ -1,15 +1,11 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:uber_drivers_app/models/driver.dart';
 import 'package:uber_drivers_app/pages/auth/register_screen.dart';
-import 'package:rounded_loading_button/rounded_loading_button.dart';
 import '../methods/common_method.dart';
 import '../models/vehicleInfo.dart';
 import '../pages/auth/otp_screen.dart';
@@ -181,7 +177,7 @@ class AuthenticationProvider extends ChangeNotifier {
 
   // Method to check if user exists in Firebase Realtime Database
   Future<bool> checkUserExistByEmail(String email) async {
-    DatabaseReference usersRef = firebaseDatabase.ref().child("users");
+    DatabaseReference usersRef = firebaseDatabase.ref().child("drivers");
     DatabaseEvent snapshot =
         await usersRef.orderByChild("email").equalTo(email).once();
 
@@ -192,9 +188,11 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
+  
+
   // Method to check if user exists in Firebase Realtime Database by phone number
   Future<bool> checkUserExistByPhone(String phoneNumber) async {
-    DatabaseReference usersRef = firebaseDatabase.ref().child("users");
+    DatabaseReference usersRef = firebaseDatabase.ref().child("drivers");
     DatabaseEvent snapshot = await usersRef
         .orderByChild("phone")
         .equalTo(phoneNumber.toString().trim())

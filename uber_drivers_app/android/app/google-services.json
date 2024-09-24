@@ -8,12 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:311663641676:android:67cf62e30a9fa0e8b8a0e9",
+        "mobilesdk_app_id": "1:311663641676:android:e050637aae25e7aab8a0e9",
         "android_client_info": {
-          "package_name": "com.example.uber_drivers_app"
+          "package_name": "com.example.uber_admin_panel"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAMTI-xVId1DTz9DS0-LEJZhF-eAFv352c"
@@ -21,7 +26,55 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "311663641676-0lpkqjav4i2c43ja6a5jdi94f40do23f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.uberUsersApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311663641676:android:86467490eaf82fe4b8a0e9",
+        "android_client_info": {
+          "package_name": "com.example.uber_drivers_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMTI-xVId1DTz9DS0-LEJZhF-eAFv352c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "311663641676-0lpkqjav4i2c43ja6a5jdi94f40do23f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.uberUsersApp"
+              }
+            }
+          ]
         }
       }
     },
@@ -32,7 +85,20 @@
           "package_name": "com.example.uber_users_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "311663641676-bcq9gmrodsguv4gfrs38rto1lsb0v7vg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.uber_users_app",
+            "certificate_hash": "2865601fc86f6a350764e13ab68ccf25babcf173"
+          }
+        },
+        {
+          "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAMTI-xVId1DTz9DS0-LEJZhF-eAFv352c"
@@ -40,18 +106,35 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "311663641676-0lpkqjav4i2c43ja6a5jdi94f40do23f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.uberUsersApp"
+              }
+            }
+          ]
         }
       }
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:311663641676:android:798b3f081832aeaeb8a0e9",
+        "mobilesdk_app_id": "1:311663641676:android:72bd9a32d91ad953b8a0e9",
         "android_client_info": {
-          "package_name": "com.fahad.uberD"
+          "package_name": "com.fahad.uberAdmin"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAMTI-xVId1DTz9DS0-LEJZhF-eAFv352c"
@@ -59,7 +142,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "311663641676-0lpkqjav4i2c43ja6a5jdi94f40do23f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.uberUsersApp"
+              }
+            }
+          ]
         }
       }
     },
@@ -70,7 +165,20 @@
           "package_name": "com.fahad.uberU"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "311663641676-2r3skl9sjft3vpbhgqbso5pimoi1gquj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fahad.uberU",
+            "certificate_hash": "2865601fc86f6a350764e13ab68ccf25babcf173"
+          }
+        },
+        {
+          "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAMTI-xVId1DTz9DS0-LEJZhF-eAFv352c"
@@ -78,7 +186,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311663641676-o68cf3muicndon4uu03f2ff7m1kj9m9s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "311663641676-0lpkqjav4i2c43ja6a5jdi94f40do23f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.uberUsersApp"
+              }
+            }
+          ]
         }
       }
     }

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uber_drivers_app/global/global.dart';
 import 'package:uber_drivers_app/methods/common_method.dart';
 import 'package:uber_drivers_app/methods/image_picker_service.dart';
 import 'package:uber_drivers_app/models/driver.dart';
@@ -40,6 +41,12 @@ class RegistrationProvider extends ChangeNotifier {
   XFile? _vehicleRegistrationBackImage;
   bool _isDataFetched = false;
   bool get isDataFetched => _isDataFetched;
+  bool _isEarningFetched = false;
+  bool _currentDriverInfo = false;
+
+  double _driverEarnings = 0.0;
+
+  get driverEarnings => _driverEarnings;
 
   // TextEditingControllers
   final TextEditingController firstNameController = TextEditingController();
@@ -458,6 +465,68 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
+  // Fetch the driver's earnings from Firebase Database
+  Future<void> fetchDriverEarnings() async {
+    if (_isEarningFetched) {
+      return;
+    }
+    try {
+      final userId = _auth.currentUser!.uid;
+      DatabaseReference driverRef =
+          _database.ref().child("drivers").child(userId);
+
+      final snapshot = await driverRef.child("earnings").get();
+      if (snapshot.exists) {
+        double earnings = double.tryParse(snapshot.value.toString()) ?? 0.0;
+        _driverEarnings = earnings;
+        _isEarningFetched = true;
+        notifyListeners(); // Notify listeners to update the UI
+      } else {
+        _driverEarnings = 0.0;
+        notifyListeners();
+      }
+    } catch (e) {
+      print("Error fetching driver's earnings: $e");
+    }
+  }
+
+  Future<void> retrieveCurrentDriverInfo() async {
+    if (_currentDriverInfo) {
+      return;
+    }
+    try {
+      final driverId = _auth.currentUser!.uid;
+      DatabaseReference driverRef =
+          _database.ref().child("drivers").child(driverId);
+      // Fetch the data from Firebase
+      final snapshot = await driverRef.get();
+
+      if (snapshot.exists) {
+        final data = snapshot.value as Map<dynamic, dynamic>;
+
+        // Update fields based on the data fetched
+        driverName = data['firstName'] ?? '';
+        driverSecondName = data['secondName'] ?? '';
+        driverPhone = data['phoneNumber'] ?? '';
+        driverEmail = data['email'] ?? '';
+        address = data['address'] ?? '';
+        ratting = data['driverRattings'] ?? '';
+        driverPhoto = data['profilePicture'] ?? '';
+
+        _currentDriverInfo = true;
+        // Notify listeners to update UI
+        stopFetchLoading();
+        notifyListeners();
+      } else {
+        print("No data available for this user.");
+        stopFetchLoading();
+      }
+    } catch (e) {
+      print("An error occurred while fetching user data: $e");
+      stopFetchLoading();
+    }
+  }
+}
   // Future<void> saveCNICData() async {
   //   if (!_isFormValidCninc) {
   //     throw Exception("Form is not valid");
@@ -490,4 +559,3 @@ class RegistrationProvider extends ChangeNotifier {
   //     print("An error occurred while saving CNIC data: $e");
   //   }
   // }
-}

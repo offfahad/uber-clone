@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/registration_provider.dart';
 
 class EarningsPage extends StatefulWidget {
   const EarningsPage({super.key});
@@ -10,36 +11,11 @@ class EarningsPage extends StatefulWidget {
 }
 
 class _EarningsPageState extends State<EarningsPage> {
-  String driverEarnings = "";
-
-  getTotalEarningsOfCurrentDriver() async {
-    DatabaseReference driversRef =
-        FirebaseDatabase.instance.ref().child("drivers");
-
-    await driversRef
-        .child(FirebaseAuth.instance.currentUser!.uid)
-        .once()
-        .then((snap) {
-      var data = snap.snapshot.value as Map?;
-      if (data != null && data["earnings"] != null) {
-        setState(() {
-          // Convert the earnings to double safely
-          double earnings = double.tryParse(data["earnings"].toString()) ?? 0.0;
-          driverEarnings =
-              earnings.toStringAsFixed(2); // Display 2 digits after decimal
-        }); 
-      } else {
-        setState(() {
-          driverEarnings = "0";
-        });
-      }
-    });
-  }
-  
   @override
   void initState() {
     super.initState();
-    getTotalEarningsOfCurrentDriver();
+    Provider.of<RegistrationProvider>(context, listen: false)
+        .fetchDriverEarnings();
   }
 
   @override
@@ -70,12 +46,14 @@ class _EarningsPageState extends State<EarningsPage> {
                         color: Colors.white,
                       ),
                     ),
-                    Text(
-                      "Rs $driverEarnings",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
+                    Consumer<RegistrationProvider>(
+                      builder: (context, provider, child) => Text(
+                        "Rs ${provider.driverEarnings}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],

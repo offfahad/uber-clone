@@ -30,3 +30,5 @@ String carModel = "";
 String carColor = "";
 String carNumber = "";
 String driverSecondName = "";
+String address = "";
+String ratting = "";
