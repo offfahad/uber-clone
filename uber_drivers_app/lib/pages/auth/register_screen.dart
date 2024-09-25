@@ -143,7 +143,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: ElevatedButton(
                     onPressed:
                         sendPhoneNumber, // Correctly call the sendPhoneNumber function
-
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       shape: RoundedRectangleBorder(

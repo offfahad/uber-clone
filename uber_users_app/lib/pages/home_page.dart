@@ -18,6 +18,7 @@ import 'package:uber_users_app/appInfo/auth_provider.dart';
 import 'package:uber_users_app/authentication/register_screen.dart';
 import 'package:uber_users_app/pages/profile_page.dart';
 import 'package:uber_users_app/pages/search_destination_place.dart';
+import 'package:uber_users_app/widgets/custome_drawer.dart';
 import 'package:uber_users_app/widgets/sign_out_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../global/global_var.dart';
@@ -142,8 +143,8 @@ class _HomePageState extends State<HomePage> {
         } else {
           FirebaseAuth.instance.signOut();
 
-          Navigator.push(
-              context, MaterialPageRoute(builder: (c) => const RegisterScreen()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (c) => const RegisterScreen()));
 
           cMethods.displaySnackBar(
               "You are blocked. Contact admin: gulzarsoft@gmail.com", context);
@@ -397,55 +398,56 @@ class _HomePageState extends State<HomePage> {
 
   initializeGeoFireListener() {
     Geofire.initialize("onlineDrivers");
-    Geofire.queryAtLocation(currentPositionOfUser!.latitude,
-            currentPositionOfUser!.longitude, 22)!
-        .listen((driverEvent) {
+
+    // Guard against no drivers collection
+    Geofire.queryAtLocation(currentPositionOfUser?.latitude ?? 0.0,
+            currentPositionOfUser?.longitude ?? 0.0, 22)
+        ?.listen((driverEvent) {
       if (driverEvent != null) {
         var onlineDriverChild = driverEvent["callBack"];
 
         switch (onlineDriverChild) {
           case Geofire.onKeyEntered:
-            OnlineNearbyDrivers onlineNearbyDrivers = OnlineNearbyDrivers();
-            onlineNearbyDrivers.uidDriver = driverEvent["key"];
-            onlineNearbyDrivers.latDriver = driverEvent["latitude"];
-            onlineNearbyDrivers.lngDriver = driverEvent["longitude"];
-            ManageDriversMethods.nearbyOnlineDriversList
-                .add(onlineNearbyDrivers);
+            if (driverEvent["key"] != null &&
+                driverEvent["latitude"] != null &&
+                driverEvent["longitude"] != null) {
+              OnlineNearbyDrivers onlineNearbyDrivers = OnlineNearbyDrivers();
+              onlineNearbyDrivers.uidDriver = driverEvent["key"];
+              onlineNearbyDrivers.latDriver = driverEvent["latitude"];
+              onlineNearbyDrivers.lngDriver = driverEvent["longitude"];
+              ManageDriversMethods.nearbyOnlineDriversList
+                  .add(onlineNearbyDrivers);
 
-            if (nearbyOnlineDriversKeysLoaded == true) {
-              //update drivers on google map
-              updateAvailableNearbyOnlineDriversOnMap();
+              if (nearbyOnlineDriversKeysLoaded == true) {
+                updateAvailableNearbyOnlineDriversOnMap();
+              }
             }
-
             break;
 
           case Geofire.onKeyExited:
-            ManageDriversMethods.removeDriverFromList(driverEvent["key"]);
-
-            //update drivers on google map
-            updateAvailableNearbyOnlineDriversOnMap();
-
+            if (driverEvent["key"] != null) {
+              ManageDriversMethods.removeDriverFromList(driverEvent["key"]);
+              updateAvailableNearbyOnlineDriversOnMap();
+            }
             break;
 
           case Geofire.onKeyMoved:
-            OnlineNearbyDrivers onlineNearbyDrivers = OnlineNearbyDrivers();
-            onlineNearbyDrivers.uidDriver = driverEvent["key"];
-            onlineNearbyDrivers.latDriver = driverEvent["latitude"];
-            onlineNearbyDrivers.lngDriver = driverEvent["longitude"];
-            ManageDriversMethods.updateOnlineNearbyDriversLocation(
-                onlineNearbyDrivers);
-
-            //update drivers on google map
-            updateAvailableNearbyOnlineDriversOnMap();
-
+            if (driverEvent["key"] != null &&
+                driverEvent["latitude"] != null &&
+                driverEvent["longitude"] != null) {
+              OnlineNearbyDrivers onlineNearbyDrivers = OnlineNearbyDrivers();
+              onlineNearbyDrivers.uidDriver = driverEvent["key"];
+              onlineNearbyDrivers.latDriver = driverEvent["latitude"];
+              onlineNearbyDrivers.lngDriver = driverEvent["longitude"];
+              ManageDriversMethods.updateOnlineNearbyDriversLocation(
+                  onlineNearbyDrivers);
+              updateAvailableNearbyOnlineDriversOnMap();
+            }
             break;
 
           case Geofire.onGeoQueryReady:
             nearbyOnlineDriversKeysLoaded = true;
-
-            //update drivers on google map
             updateAvailableNearbyOnlineDriversOnMap();
-
             break;
         }
       }
@@ -461,23 +463,29 @@ class _HomePageState extends State<HomePage> {
     var dropOffDestinationLocation =
         Provider.of<AppInfoClass>(context, listen: false).dropOffLocation;
 
-    Map pickUpCoOrdinatesMap = {
-      "latitude": pickUpLocation!.latitudePosition.toString(),
+    // Guard against null locations
+    if (pickUpLocation == null || dropOffDestinationLocation == null) {
+      print('Error: Pickup or Drop-off location is null.');
+      return;
+    }
+
+    Map<String, String> pickUpCoOrdinatesMap = {
+      "latitude": pickUpLocation.latitudePosition.toString(),
       "longitude": pickUpLocation.longitudePosition.toString(),
     };
 
-    Map dropOffDestinationCoOrdinatesMap = {
-      "latitude": dropOffDestinationLocation!.latitudePosition.toString(),
+    Map<String, String> dropOffDestinationCoOrdinatesMap = {
+      "latitude": dropOffDestinationLocation.latitudePosition.toString(),
       "longitude": dropOffDestinationLocation.longitudePosition.toString(),
     };
 
-    Map driverCoOrdinates = {
+    Map<String, String> driverCoOrdinates = {
       "latitude": "",
       "longitude": "",
     };
 
-    Map dataMap = {
-      "tripID": tripRequestRef!.key,
+    Map<String, dynamic> dataMap = {
+      "tripID": tripRequestRef?.key ?? "",
       "publishDateTime": DateTime.now().toString(),
       "userName": userName,
       "userPhone": userPhone,
@@ -496,57 +504,34 @@ class _HomePageState extends State<HomePage> {
       "status": "new",
     };
 
-    tripRequestRef!.set(dataMap);
+    tripRequestRef?.set(dataMap);
 
     tripStreamSubscription =
-        tripRequestRef!.onValue.listen((eventSnapshot) async {
-      if (eventSnapshot.snapshot.value == null) {
-        return;
-      }
+        tripRequestRef?.onValue.listen((eventSnapshot) async {
+      var data = eventSnapshot.snapshot.value as Map?;
+      if (data == null) return;
 
-      if ((eventSnapshot.snapshot.value as Map)["driverName"] != null) {
-        nameDriver = (eventSnapshot.snapshot.value as Map)["driverName"];
-      }
+      nameDriver = data["driverName"] ?? nameDriver;
+      phoneNumberDriver = data["driverPhone"] ?? phoneNumberDriver;
+      photoDriver = data["driverPhoto"] ?? photoDriver;
+      carDetailsDriver = data["carDetails"] ?? carDetailsDriver;
+      status = data["status"] ?? status;
 
-      if ((eventSnapshot.snapshot.value as Map)["driverPhone"] != null) {
-        phoneNumberDriver =
-            (eventSnapshot.snapshot.value as Map)["driverPhone"];
-      }
-
-      if ((eventSnapshot.snapshot.value as Map)["driverPhoto"] != null) {
-        photoDriver = (eventSnapshot.snapshot.value as Map)["driverPhoto"];
-      }
-
-      if ((eventSnapshot.snapshot.value as Map)["carDetails"] != null) {
-        carDetailsDriver = (eventSnapshot.snapshot.value as Map)["carDetails"];
-      }
-
-      if ((eventSnapshot.snapshot.value as Map)["status"] != null) {
-        status = (eventSnapshot.snapshot.value as Map)["status"];
-      }
-
-      if ((eventSnapshot.snapshot.value as Map)["driverLocation"] != null) {
-        double driverLatitude = double.parse(
-            (eventSnapshot.snapshot.value as Map)["driverLocation"]["latitude"]
-                .toString());
-        double driverLongitude = double.parse(
-            (eventSnapshot.snapshot.value as Map)["driverLocation"]["longitude"]
-                .toString());
+      if (data["driverLocation"] != null) {
+        double driverLatitude =
+            double.parse(data["driverLocation"]["latitude"].toString());
+        double driverLongitude =
+            double.parse(data["driverLocation"]["longitude"].toString());
         LatLng driverCurrentLocationLatLng =
             LatLng(driverLatitude, driverLongitude);
 
         if (status == "accepted") {
-          //update info for pickup to user on UI
-          //info from driver current location to user pickup location
           updateFromDriverCurrentLocationToPickUp(driverCurrentLocationLatLng);
         } else if (status == "arrived") {
-          //update info for arrived - when driver reach at the pickup point of user
           setState(() {
             tripStatusDisplay = 'Driver has Arrived';
           });
         } else if (status == "ontrip") {
-          //update info for dropoff to user on UI
-          //info from driver current location to user dropoff location
           updateFromDriverCurrentLocationToDropOffDestination(
               driverCurrentLocationLatLng);
         }
@@ -554,10 +539,8 @@ class _HomePageState extends State<HomePage> {
 
       if (status == "accepted") {
         displayTripDetailsContainer();
-
         Geofire.stopListener();
 
-        //remove drivers markers
         setState(() {
           markerSet.removeWhere(
               (element) => element.markerId.value.contains("driver"));
@@ -565,27 +548,22 @@ class _HomePageState extends State<HomePage> {
       }
 
       if (status == "ended") {
-        if ((eventSnapshot.snapshot.value as Map)["fareAmount"] != null) {
-          double fareAmount = double.parse(
-              (eventSnapshot.snapshot.value as Map)["fareAmount"].toString());
+        double fareAmount = double.parse(data["fareAmount"].toString());
+        var responseFromPaymentDialog = await showDialog(
+          context: context,
+          builder: (BuildContext context) =>
+              PaymentDialog(fareAmount: fareAmount.toString()),
+        );
 
-          var responseFromPaymentDialog = await showDialog(
-            context: context,
-            builder: (BuildContext context) =>
-                PaymentDialog(fareAmount: fareAmount.toString()),
-          );
+        if (responseFromPaymentDialog == "paid") {
+          tripRequestRef?.onDisconnect();
+          tripRequestRef = null;
 
-          if (responseFromPaymentDialog == "paid") {
-            tripRequestRef!.onDisconnect();
-            tripRequestRef = null;
+          tripStreamSubscription?.cancel();
+          tripStreamSubscription = null;
 
-            tripStreamSubscription!.cancel();
-            tripStreamSubscription = null;
-
-            resetAppNow();
-
-            Restart.restartApp();
-          }
+          resetAppNow();
+          Restart.restartApp();
         }
       }
     });
@@ -603,14 +581,24 @@ class _HomePageState extends State<HomePage> {
     if (!requestingDirectionDetailsInfo) {
       requestingDirectionDetailsInfo = true;
 
+      // Check if currentPositionOfUser is null
+      if (currentPositionOfUser == null) {
+        requestingDirectionDetailsInfo = false;
+        return; // Early return to avoid further execution
+      }
+
       var userPickUpLocationLatLng = LatLng(
-          currentPositionOfUser!.latitude, currentPositionOfUser!.longitude);
+        currentPositionOfUser!.latitude,
+        currentPositionOfUser!.longitude,
+      );
 
       var directionDetailsPickup =
           await CommonMethods.getDirectionDetailsFromAPI(
               driverCurrentLocationLatLng, userPickUpLocationLatLng);
 
       if (directionDetailsPickup == null) {
+        requestingDirectionDetailsInfo =
+            false; // Reset the flag in case of null
         return;
       }
 
@@ -628,16 +616,27 @@ class _HomePageState extends State<HomePage> {
     if (!requestingDirectionDetailsInfo) {
       requestingDirectionDetailsInfo = true;
 
+      // Check if dropOffLocation is null
       var dropOffLocation =
           Provider.of<AppInfoClass>(context, listen: false).dropOffLocation;
-      var userDropOffLocationLatLng = LatLng(dropOffLocation!.latitudePosition!,
-          dropOffLocation.longitudePosition!);
+
+      if (dropOffLocation == null) {
+        requestingDirectionDetailsInfo = false;
+        return; // Early return to avoid further execution
+      }
+
+      var userDropOffLocationLatLng = LatLng(
+        dropOffLocation.latitudePosition!,
+        dropOffLocation.longitudePosition!,
+      );
 
       var directionDetailsPickup =
           await CommonMethods.getDirectionDetailsFromAPI(
               driverCurrentLocationLatLng, userDropOffLocationLatLng);
 
       if (directionDetailsPickup == null) {
+        requestingDirectionDetailsInfo =
+            false; // Reset the flag in case of null
         return;
       }
 
@@ -679,16 +678,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   sendNotificationToDriver(OnlineNearbyDrivers currentDriver) {
-    //update driver's newTripStatus - assign tripID to current driver
+    // Ensure tripRequestRef and driver UID are not null
+    if (tripRequestRef == null || currentDriver.uidDriver == null) {
+      print("Error: tripRequestRef or driver UID is null.");
+      return;
+    }
+
+    // Update driver's newTripStatus - assign tripID to current driver
     DatabaseReference currentDriverRef = FirebaseDatabase.instance
         .ref()
         .child("drivers")
         .child(currentDriver.uidDriver.toString())
         .child("newTripStatus");
 
-    currentDriverRef.set(tripRequestRef!.key);
+    try {
+      currentDriverRef.set(tripRequestRef!.key);
+    } catch (e) {
+      print("Error updating driver's newTripStatus: $e");
+      return;
+    }
 
-    //get current driver device recognition token
+    // Get current driver's device recognition token
     DatabaseReference tokenOfCurrentDriverRef = FirebaseDatabase.instance
         .ref()
         .child("drivers")
@@ -696,50 +706,64 @@ class _HomePageState extends State<HomePage> {
         .child("deviceToken");
 
     tokenOfCurrentDriverRef.once().then((dataSnapshot) {
-      print("Fetched deviceToken: ${dataSnapshot.snapshot.value}");
       if (dataSnapshot.snapshot.value != null) {
         String deviceToken = dataSnapshot.snapshot.value.toString();
 
-        //send notification
-        PushNotificationService.sendNotificationToSelectedDriver(
-            deviceToken, context, tripRequestRef!.key.toString());
+        // Send notification
+        try {
+          PushNotificationService.sendNotificationToSelectedDriver(
+              deviceToken, context, tripRequestRef!.key.toString());
+        } catch (e) {
+          print("Error sending notification: $e");
+          return;
+        }
       } else {
+        print("No deviceToken found for the driver.");
         return;
       }
 
       const oneTickPerSec = Duration(seconds: 1);
+      Timer? timer;
 
-      var timerCountDown = Timer.periodic(oneTickPerSec, (timer) {
-        requestTimeoutDriver = requestTimeoutDriver - 1;
+      try {
+        timer = Timer.periodic(oneTickPerSec, (timer) {
+          requestTimeoutDriver = requestTimeoutDriver - 1;
 
-        //when trip request is not requesting means trip request cancelled - stop timer
-        if (stateOfApp != "requesting") {
-          timer.cancel();
-          currentDriverRef.set("cancelled");
-          currentDriverRef.onDisconnect();
-          requestTimeoutDriver = 20;
-        }
-
-        //when trip request is accepted by online nearest available driver
-        currentDriverRef.onValue.listen((dataSnapshot) {
-          if (dataSnapshot.snapshot.value.toString() == "accepted") {
+          // When trip request is canceled or state changes
+          if (stateOfApp != "requesting") {
             timer.cancel();
+            currentDriverRef.set("cancelled");
             currentDriverRef.onDisconnect();
             requestTimeoutDriver = 20;
           }
+
+          // Listen for driver acceptance
+          currentDriverRef.onValue.listen((dataSnapshot) {
+            if (dataSnapshot.snapshot.value != null &&
+                dataSnapshot.snapshot.value.toString() == "accepted") {
+              timer.cancel();
+              currentDriverRef.onDisconnect();
+              requestTimeoutDriver = 20;
+            }
+          });
+
+          // If timeout occurs after 20 seconds, notify the next available driver
+          if (requestTimeoutDriver == 0) {
+            timer.cancel();
+            currentDriverRef.set("timeout");
+            currentDriverRef.onDisconnect();
+            requestTimeoutDriver = 20;
+
+            // Search for the next available driver
+            searchDriver();
+          }
         });
-
-        //if 20 seconds passed - send notification to next nearest online available driver
-        if (requestTimeoutDriver == 0) {
-          currentDriverRef.set("timeout");
-          timer.cancel();
-          currentDriverRef.onDisconnect();
-          requestTimeoutDriver = 20;
-
-          //send notification to next nearest online available driver
-          searchDriver();
-        }
-      });
+      } catch (e) {
+        print("Error during timer execution: $e");
+        timer?.cancel();
+      }
+    }).catchError((error) {
+      print("Error fetching driver's device token: $error");
     });
   }
 
@@ -819,159 +843,7 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
         key: sKey,
-        drawer: Container(
-          width: 255,
-          color: Colors.transparent,
-          child: Drawer(
-            backgroundColor: Colors.white,
-            child: ListView(
-              children: [
-                const Divider(
-                  height: 1,
-                  color: Colors.grey,
-                  thickness: 1,
-                ),
-
-                //header
-                Container(
-                  color: Colors.black54,
-                  height: 160,
-                  child: DrawerHeader(
-                    decoration: const BoxDecoration(
-                      color: Colors.white70,
-                    ),
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          "assets/images/avatarman.png",
-                          width: 60,
-                          height: 60,
-                        ),
-                        const SizedBox(
-                          width: 16,
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              userName,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 4,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const ProfilePage(),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                "Profile",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const Divider(
-                  height: 1,
-                  color: Colors.grey,
-                  thickness: 1,
-                ),
-
-                const SizedBox(
-                  height: 10,
-                ),
-
-                //body
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (c) => const TripsHistoryPage()));
-                  },
-                  child: ListTile(
-                    leading: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.history,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    title: const Text(
-                      "History",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                ),
-
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (c) => const AboutPage()));
-                  },
-                  child: ListTile(
-                    leading: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.info,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    title: const Text(
-                      "About",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                ),
-
-                GestureDetector(
-                  onTap: () async {
-                    Navigator.pop(context);
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return SignOutDialog(
-                              title: 'Logout',
-                              description: 'Are you sure you want to logout?',
-                              onSignOut: () async {
-                                await authProvider.signOut(context);
-                              });
-                        });
-                  },
-                  child: ListTile(
-                    leading: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.logout,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    title: const Text(
-                      "Logout",
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        drawer: CustomDrawer(userName: userName, authProvider: authProvider),
         body: Stack(
           children: [
             ///google map
@@ -1046,19 +918,20 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   height: searchContainerHeight,
                   decoration: const BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15),
+                      topRight: Radius.circular(15),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white12,
+                        blurRadius: 15.0,
+                        spreadRadius: 0.5,
+                        offset: Offset(.7, .7),
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.white12,
-                          blurRadius: 15.0,
-                          spreadRadius: 0.5,
-                          offset: Offset(.7, .7),
-                        ),
-                      ]),
+                    ],
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(

@@ -5,6 +5,7 @@ import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:uber_users_app/appInfo/auth_provider.dart';
 import 'package:uber_users_app/authentication/user_information_screen.dart';
 import 'package:uber_users_app/methods/common_methods.dart';
+import 'package:uber_users_app/pages/blocked_screen.dart';
 import 'package:uber_users_app/pages/home_page.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -211,19 +212,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   if (userExits) {
                                     // 2. get user data from database
                                     if (userExistInDatabse) {
-                                      await authProvider
-                                          .getUserDataFromFirebaseDatabase();
-                                      navigate(isSingedIn: true);
+                                      // Check if the driver is blocked
+                                      bool isBlocked = await authProvider
+                                          .checkIfUserIsBlocked();
+                                      if (isBlocked) {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const BlockedScreen(),
+                                          ), // Replace with your actual Block Screen
+                                        );
+                                      } else {
+                                        await authProvider
+                                            .getUserDataFromFirebaseDatabase();
+                                        navigate(isSingedIn: true);
+                                      }
                                     }
-
-                                    // 3. save user data to shared preferences
-                                    //await authProvider.saveUserDataToSharedPref();
-
-                                    // 4. save this user as signed in
-                                    //await authProvider.setSignedIn();
-
-                                    // 5. navigate to Home
-                                    //navigate(isSingedIn: false);
                                   } else {
                                     // navigate to user information screen
                                     navigate(isSingedIn: false);

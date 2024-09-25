@@ -47,10 +47,10 @@ class MyApp extends StatelessWidget {
         navigatorKey: navigatorKey,
         title: 'Uber Drivers App',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData.light(),
-        // ThemeData.dark().copyWith(
-        //   scaffoldBackgroundColor: Colors.white,
-        // ),
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
         home: const AuthCheck(),
       ),
     );
@@ -74,7 +74,7 @@ class AuthCheck extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(color: Colors.black,),
             ),
           ); // Show loading indicator
         }
@@ -92,7 +92,7 @@ class AuthCheck extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
                 body: Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(color: Colors.black,),
                 ),
               );
             }
@@ -108,7 +108,7 @@ class AuthCheck extends StatelessWidget {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Scaffold(
-                      body: Center(child: CircularProgressIndicator()));
+                      body: Center(child: CircularProgressIndicator(color: Colors.black,)));
                 }
 
                 if (snapshot.hasData && snapshot.data == true) {

@@ -22,9 +22,9 @@ class _OTPScreenState extends State<OTPScreen> {
   @override
   Widget build(BuildContext context) {
     final authRepo = Provider.of<AuthenticationProvider>(context, listen: true);
-    return Scaffold(
-      body: SafeArea(
-        child: Center(
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 25.0, horizontal: 35),
             child: Column(
@@ -104,7 +104,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     : const SizedBox.shrink(),
 
                 const SizedBox(
-                  height: 25,
+                  height: 5,
                 ),
 
                 const Text(
@@ -119,12 +119,26 @@ class _OTPScreenState extends State<OTPScreen> {
                   height: 16,
                 ),
 
-                const Text(
-                  'Resend New Code',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                SizedBox(
+                  width: MediaQuery.of(context).size.width *
+                      0.3, // Set button width
+                  height: 50, // Fixed button height
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade400, // Button color
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(10), // Rounded corners
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: const Text(
+                      "Resend",
+                      style: TextStyle(
+                        fontSize: 16, // Button text size
+                        color: Colors.black, // Button text color
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -156,7 +170,7 @@ class _OTPScreenState extends State<OTPScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => const BlockedScreen(),
-              ), 
+              ),
             );
           } else {
             await authProvider.getUserDataFromFirebaseDatabase();

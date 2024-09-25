@@ -81,9 +81,11 @@ class AuthCheck extends StatelessWidget {
               .checkIfUserIsBlocked(), // Check if the driver is blocked
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
+              return const SafeArea(
+                child: Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
                 ),
               );
             }
@@ -98,9 +100,11 @@ class AuthCheck extends StatelessWidget {
                   .checkUserFieldsFilled(), // Check if the profile fields are filled
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Scaffold(
-                    body: Center(
-                      child: CircularProgressIndicator(),
+                  return const SafeArea(
+                    child: Scaffold(
+                      body: Center(
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
                   );
                 }
