@@ -94,7 +94,7 @@ class CommonMethods {
     print("URL: $urlDirectionAPI"); // Debugging: Log the URL
 
     var responseFromDirectionAPI = await sendRequestToAPI(urlDirectionAPI);
-
+  
     if (responseFromDirectionAPI == "error") {
       print("Error in response"); // Debugging: Log error
       return null;
@@ -124,7 +124,6 @@ class CommonMethods {
       print("Error processing response data: $e");
       return null;
     }
-
     return directionDetails;
   }
 

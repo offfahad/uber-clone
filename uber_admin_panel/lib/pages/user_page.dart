@@ -33,14 +33,16 @@ class _UserPageState extends State<UserPage> {
               ),
               Row(
                 children: [
-                  commonMethods.header(2, "USERS ID"),
+                  //commonMethods.header(2, "USERS ID"),
                   commonMethods.header(1, "USER NAME"),
                   commonMethods.header(1, "USER EMAIL"),
                   commonMethods.header(1, "PHONE"),
                   commonMethods.header(1, "ACTIONS"),
                 ],
               ),
-              const SizedBox(),
+              const SizedBox(
+                height: 12,
+              ),
               UsersDataList()
             ],
           ),

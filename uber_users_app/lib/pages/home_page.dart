@@ -516,24 +516,38 @@ class _HomePageState extends State<HomePage> {
       photoDriver = data["driverPhoto"] ?? photoDriver;
       carDetailsDriver = data["carDetails"] ?? carDetailsDriver;
       status = data["status"] ?? status;
-
       if (data["driverLocation"] != null) {
-        double driverLatitude =
-            double.parse(data["driverLocation"]["latitude"].toString());
-        double driverLongitude =
-            double.parse(data["driverLocation"]["longitude"].toString());
-        LatLng driverCurrentLocationLatLng =
-            LatLng(driverLatitude, driverLongitude);
+        var latitudeString = data["driverLocation"]["latitude"].toString();
+        var longitudeString = data["driverLocation"]["longitude"].toString();
 
-        if (status == "accepted") {
-          updateFromDriverCurrentLocationToPickUp(driverCurrentLocationLatLng);
-        } else if (status == "arrived") {
-          setState(() {
-            tripStatusDisplay = 'Driver has Arrived';
-          });
-        } else if (status == "ontrip") {
-          updateFromDriverCurrentLocationToDropOffDestination(
-              driverCurrentLocationLatLng);
+        // Ensure the latitude and longitude are not empty and valid numbers
+        if (latitudeString.isNotEmpty && longitudeString.isNotEmpty) {
+          try {
+            double driverLatitude = double.parse(latitudeString);
+            double driverLongitude = double.parse(longitudeString);
+
+            // Update driver's current location
+            LatLng driverCurrentLocationLatLng =
+                LatLng(driverLatitude, driverLongitude);
+
+            // Update status based on trip phase
+            if (status == "accepted") {
+              updateFromDriverCurrentLocationToPickUp(
+                  driverCurrentLocationLatLng);
+            } else if (status == "arrived") {
+              setState(() {
+                tripStatusDisplay = 'Driver has Arrived';
+              });
+            } else if (status == "ontrip") {
+              updateFromDriverCurrentLocationToDropOffDestination(
+                  driverCurrentLocationLatLng);
+            }
+          } catch (e) {
+            // Log an error if parsing fails
+            print('Error parsing driver location: $e');
+          }
+        } else {
+          print('Driver latitude or longitude is empty.');
         }
       }
 

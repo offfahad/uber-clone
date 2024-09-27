@@ -36,16 +36,21 @@ class _DriverPageState extends State<DriverPage> {
               ),
               Row(
                 children: [
-                  commonMethods.header(1, "PICTURE"),
-                  commonMethods.header(2, "DRIVER ID"),
+                  //commonMethods.header(1, "PICTURE"),
+                  // commonMethods.header(2, "DRIVER ID"),
                   commonMethods.header(1, "NAME"),
                   commonMethods.header(1, "CAR DETAILS"),
                   commonMethods.header(1, "PHONE"),
                   commonMethods.header(1, "TOTAL EARNING"),
                   commonMethods.header(1, "ACTIONS"),
+                  commonMethods.header(1, "VIEW MORE"),
                 ],
               ),
-              const SizedBox(height: 12,),
+              const SizedBox(
+
+                
+                height: 12,
+              ),
               const DriversDataList(),
             ],
           ),

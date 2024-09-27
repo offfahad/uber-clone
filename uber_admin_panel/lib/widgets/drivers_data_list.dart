@@ -1,6 +1,10 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uber_admin_panel/methods/common_methods.dart';
+import 'package:uber_admin_panel/pages/driver_data_screen.dart';
+
+import '../provider/driver_provider.dart';
 
 class DriversDataList extends StatefulWidget {
   const DriversDataList({super.key});
@@ -61,52 +65,58 @@ class _DriversDataListState extends State<DriversDataList> {
         print("Data received: $listItems"); // Log data for debugging
 
         return ListView.builder(
-          padding: EdgeInsets.only(bottom: 5),
+          padding: const EdgeInsets.only(bottom: 5),
           itemCount: listItems.length,
           shrinkWrap: true,
           itemBuilder: ((context, index) {
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // commonMethods.data(
+                //   1,
+                //   Image.network(
+                //     listItems[index]["profilePicture"] != null &&
+                //             listItems[index]["profilePicture"]
+                //                 .toString()
+                //                 .isNotEmpty
+                //         ? listItems[index]["profilePicture"]
+                //         : 'https://via.placeholder.com/100', // Use a placeholder image if the URL is null or empty
+                //     width: 100,
+                //     height: 100,
+                //     errorBuilder: (context, error, stackTrace) {
+                //       return const Icon(
+                //         Icons
+                //             .error, // Show an error icon in case of any issue loading the image
+                //         size: 100,
+                //         color: Colors.red,
+                //       );
+                //     },
+                //   ),
+                // ),
                 commonMethods.data(
                   1,
-                  Image.network(
-                    listItems[index]["photo"].toString(),
-                    width: 100,
-                    height: 100,
-                  ),
-                ),
-                commonMethods.data(
-                  2,
                   Text(
-                    listItems[index]["id"].toString(),
-                    
-                  ),
-                ),
-                commonMethods.data(
-                  1,
-                  Text(
-                    listItems[index]["name"].toString(),
+                    "${listItems[index]["firstName"]} ${listItems[index]["secondName"]}",
                     //style: const TextStyle(color: Colors.white),
                   ),
                 ),
                 commonMethods.data(
                   1,
                   Text(
-                    "${listItems[index]["car_details"]["carModel"]} ${listItems[index]["car_details"]["carNumber"]}",
-                    //style: const TextStyle(color: Colors.white),
+                    "${listItems[index]["vehicleInfo"]["brand"]} ${listItems[index]["vehicleInfo"]["color"]} ${listItems[index]["vehicleInfo"]["productionYear"]}",
+                    // You can apply any TextStyle here if needed
                   ),
                 ),
                 commonMethods.data(
                   1,
                   Text(
-                    listItems[index]["phone"].toString(),
+                    listItems[index]["phoneNumber"].toString(),
                     //style: const TextStyle(color: Colors.white),
                   ),
                 ),
                 commonMethods.data(
                   1,
-                  listItems[index]["earnings"] != null
+                  listItems[index]["earnings"] != ""
                       ? Text(
                           //style: const TextStyle(color: Colors.white),
                           "Rs ${listItems[index]["earnings"].toStringAsFixed(2)}")
@@ -119,20 +129,22 @@ class _DriversDataListState extends State<DriversDataList> {
                   1,
                   listItems[index]["blockStatus"] == "no"
                       ? SizedBox(
-                        height: 20,
-                        width: 10,
-                        child: ElevatedButton(
-                        
-                          
+                          height: 20,
+                          width: 10,
+                          child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(221, 39, 57, 99),
+                              backgroundColor:
+                                  const Color.fromARGB(221, 39, 57, 99),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0),
                               ),
                             ),
                             onPressed: () {
-                              print(
-                                  "Block button pressed for ${listItems[index]["id"]}");
+                              // Call Provider's method to toggle block status
+                              Provider.of<DriverProvider>(context,
+                                      listen: false)
+                                  .toggleBlockStatus(listItems[index]["key"],
+                                      listItems[index]["blockStatus"]);
                             },
                             child: const Text(
                               "Block",
@@ -142,31 +154,69 @@ class _DriversDataListState extends State<DriversDataList> {
                               ),
                             ),
                           ),
-                      )
+                        )
                       : SizedBox(
-                                                height: 20,
-                        width: 10,
-                        child: ElevatedButton(
-                                                     style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(221, 39, 57, 99),
+                          height: 20,
+                          width: 10,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(221, 39, 57, 99),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(0),
                               ),
                             ),
                             onPressed: () {
-                              print(
-                                  "Unblock button pressed for ${listItems[index]["id"]}");
+                              // Call Provider's method to toggle block status
+                              Provider.of<DriverProvider>(context,
+                                      listen: false)
+                                  .toggleBlockStatus(listItems[index]["key"],
+                                      listItems[index]["blockStatus"]);
                             },
                             child: const Text(
                               "Unblock",
                               style: TextStyle(
                                 color: Colors.white,
-                                //fontWeight: FontWeight.bold,
-                                fontSize: 12
+                                fontSize: 12,
                               ),
                             ),
                           ),
+                        ),
+                ),
+                commonMethods.data(
+                  1,
+                  SizedBox(
+                    height: 20,
+                    width: 10,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(221, 39, 57, 99),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(0),
+                        ),
                       ),
+                      onPressed: () {
+                        String driverId = listItems[index]["key"] ??
+                            'UnknownID'; // Safe access with default
+                        print(
+                            "Navigating to DriverDataScreen with driverId: $driverId"); // Debug print
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (c) =>
+                                DriverDataScreen(driverId: driverId),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "View More",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             );

@@ -1,6 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uber_admin_panel/methods/common_methods.dart';
+import 'package:uber_admin_panel/provider/user_provider.dart';
 
 class UsersDataList extends StatefulWidget {
   const UsersDataList({super.key});
@@ -68,12 +70,12 @@ class _UsersDataListState extends State<UsersDataList> {
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                commonMethods.data(
-                  2,
-                  Text(
-                    listItems[index]["id"].toString(),
-                  ),
-                ),
+                // commonMethods.data(
+                //   2,
+                //   Text(
+                //     listItems[index]["id"].toString(),
+                //   ),
+                // ),
                 commonMethods.data(
                   1,
                   Text(
@@ -110,8 +112,11 @@ class _UsersDataListState extends State<UsersDataList> {
                               ),
                             ),
                             onPressed: () {
-                              print(
-                                  "Block button pressed for ${listItems[index]["id"]}");
+                              // Call Provider's method to toggle block status
+                              Provider.of<UserProvider>(context,
+                                      listen: false)
+                                  .toggleBlockStatus(listItems[index]["key"],
+                                      listItems[index]["blockStatus"]);
                             },
                             child: const Text(
                               "Block",
@@ -134,15 +139,18 @@ class _UsersDataListState extends State<UsersDataList> {
                               ),
                             ),
                             onPressed: () {
-                              print(
-                                  "Unblock button pressed for ${listItems[index]["id"]}");
+                              // Call Provider's method to toggle block status
+                              Provider.of<UserProvider>(context,
+                                      listen: false)
+                                  .toggleBlockStatus(listItems[index]["key"],
+                                      listItems[index]["blockStatus"]);
                             },
                             child: const Text(
                               "Unblock",
                               style: TextStyle(
-                                  color: Colors.white,
-                                  //fontWeight: FontWeight.bold,
-                                  fontSize: 12),
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
                             ),
                           ),
                         ),

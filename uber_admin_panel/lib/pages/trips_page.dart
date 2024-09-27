@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import '../methods/common_methods.dart';
 import '../widgets/trips_data_list.dart';
 
-class TripsPage extends StatefulWidget
-{
+class TripsPage extends StatefulWidget {
   static const String id = "\webPageTrips";
 
   const TripsPage({super.key});
@@ -13,13 +12,11 @@ class TripsPage extends StatefulWidget
   State<TripsPage> createState() => _TripsPageState();
 }
 
-class _TripsPageState extends State<TripsPage>
-{
+class _TripsPageState extends State<TripsPage> {
   CommonMethods cMethods = CommonMethods();
 
   @override
-  Widget build(BuildContext context)
-  {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -27,7 +24,6 @@ class _TripsPageState extends State<TripsPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Container(
                 alignment: Alignment.topLeft,
                 child: const Text(
@@ -38,11 +34,9 @@ class _TripsPageState extends State<TripsPage>
                   ),
                 ),
               ),
-
               const SizedBox(
                 height: 18,
               ),
-
               Row(
                 children: [
                   cMethods.header(2, "TRIP ID"),
@@ -54,9 +48,11 @@ class _TripsPageState extends State<TripsPage>
                   cMethods.header(1, "VIEW DETAILS"),
                 ],
               ),
-
+              const SizedBox(
+                height: 12,
+              ),
               //display data
-              TripsDataList(),
+              const TripsDataList(),
             ],
           ),
         ),
