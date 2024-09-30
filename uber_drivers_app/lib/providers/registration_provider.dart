@@ -490,9 +490,7 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
-  
   Future<void> retrieveCurrentDriverInfo() async {
-
     try {
       final driverId = _auth.currentUser!.uid;
       DatabaseReference driverRef =
@@ -552,38 +550,156 @@ class RegistrationProvider extends ChangeNotifier {
       _isLoading = false;
     }
   }
+
+  Future<void> updateCnincInfo(BuildContext context) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      final frontCnincImageUrl =
+          await uploadImageToFirebaseStorage(_cnicFrontImage, "Cninc");
+      final backCnincImageUrl =
+          await uploadImageToFirebaseStorage(_cnicBackImage, "Cninc");
+      // Basic driver data
+      final driverData = {
+        'cnicFrontImage': frontCnincImageUrl,
+        'cnicBackImage': backCnincImageUrl,
+        'cnicNumber': cnicController.text,
+        // URL of uploaded profile photo (if exists)
+      };
+      final userRef =
+          _database.ref().child("drivers").child(_auth.currentUser!.uid);
+      await userRef.update(driverData);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      print("An error occurred while updating basic driver info: $e");
+      _isLoading = false;
+    }
+  }
+
+  Future<void> updateSelfieWithCnincInfo(BuildContext context) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      final faceWithCnincImageUrl = await uploadImageToFirebaseStorage(
+          _cnicWithSelfieImage, "SelfieWithCninc");
+      // Basic driver data
+      final driverData = {
+        'driverFaceWithCnic': faceWithCnincImageUrl,
+        // URL of uploaded profile photo (if exists)
+      };
+      final userRef =
+          _database.ref().child("drivers").child(_auth.currentUser!.uid);
+      await userRef.update(driverData);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      print("An error occurred while updating basic driver info: $e");
+      _isLoading = false;
+    }
+  }
+
+  Future<void> updatedriverLicenseInfo(BuildContext context) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      final drivingLicenseFrontImageUrl = await uploadImageToFirebaseStorage(
+          _drivingLicenseFrontImage, "DrivingLicenseImages");
+      final drivingLicenseBackImageUrl = await uploadImageToFirebaseStorage(
+          _drivingLicenseBackImage, "DrivingLicenseImages");
+      // Basic driver data
+      final driverData = {
+        'driverLicenseFrontImage': drivingLicenseFrontImageUrl,
+        'driverLicenseBackImage': drivingLicenseBackImageUrl,
+        'driverLicenseNumber': drivingLicenseController.text,
+        // URL of uploaded profile photo (if exists)
+      };
+      final userRef =
+          _database.ref().child("drivers").child(_auth.currentUser!.uid);
+      await userRef.update(driverData);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      print("An error occurred while updating basic driver info: $e");
+      _isLoading = false;
+    }
+  }
+
+  Future<void> updateVehicleBasicInfo(BuildContext context) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      // Basic driver data
+      final vehicleData = {
+        'type': selectedVehicle,
+        'brand': brandController.text,
+        'color': colorController.text,
+        'productionYear': productionYearController.text,
+        'registrationPlateNumber': numberPlateController.text,
+      };
+      final userRef = _database
+          .ref()
+          .child("drivers")
+          .child(_auth.currentUser!.uid)
+          .child("vehicleInfo");
+      await userRef.update(vehicleData);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      print("An error occurred while updating basic driver info: $e");
+      _isLoading = false;
+    }
+  }
+
+  Future<void> updateVehicleImage(BuildContext context) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      final vehicleImageUrl =
+          await uploadImageToFirebaseStorage(_vehicleImage, "VehicleImage");
+      // Basic driver data
+      final vehicleData = {
+        'vehiclePicture': vehicleImageUrl,
+      };
+      final userRef = _database
+          .ref()
+          .child("drivers")
+          .child(_auth.currentUser!.uid)
+          .child("vehicleInfo");
+      await userRef.update(vehicleData);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      print("An error occurred while updating basic driver info: $e");
+      _isLoading = false;
+    }
+  }
+
+  Future<void> updateVehicleRegistraionImages(BuildContext context) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      final vehicleRegistrationFrontImageUrl =
+          await uploadImageToFirebaseStorage(
+              _vehicleRegistrationFrontImage, "VehicleRegistrationImages");
+      final vehicleRegistrationBackImageUrl =
+          await uploadImageToFirebaseStorage(
+              _vehicleRegistrationBackImage, "VehicleRegistrationImages");
+      final vehicleData = {
+        'registrationCertificateFrontImage': vehicleRegistrationFrontImageUrl,
+        'registrationCertificateBackImage': vehicleRegistrationBackImageUrl,
+      };
+      final userRef = _database
+          .ref()
+          .child("drivers")
+          .child(_auth.currentUser!.uid)
+          .child("vehicleInfo");
+      await userRef.update(vehicleData);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      print("An error occurred while updating basic driver info: $e");
+      _isLoading = false;
+    }
+  }
 }
-
-
-  // Future<void> saveCNICData() async {
-  //   if (!_isFormValidCninc) {
-  //     throw Exception("Form is not valid");
-  //   }
-  //   try {
-  //     startLoading();
-
-  //     // Upload CNIC images
-  //     final frontImageUrl =
-  //         await uploadImageToFirebaseStorage(_cnicFrontImage, "Cninc");
-  //     final backImageUrl =
-  //         await uploadImageToFirebaseStorage(_cnicBackImage, "Cninc");
-
-  //     // Create CNIC data
-  //     final driverData = {
-  //       'id': _auth.currentUser!.uid,
-  //       'cnicNumber': cnicController.text,
-  //       'cnicFrontImage': frontImageUrl,
-  //       'cnicBackImage': backImageUrl,
-  //     };
-
-  //     // Update driver data in Firebase Realtime Database
-  //     final userRef =
-  //         _database.ref().child("drivers").child(_auth.currentUser!.uid);
-  //     await userRef.update(driverData);
-
-  //     stopLoading();
-  //   } catch (e) {
-  //     stopLoading();
-  //     print("An error occurred while saving CNIC data: $e");
-  //   }
-  // }

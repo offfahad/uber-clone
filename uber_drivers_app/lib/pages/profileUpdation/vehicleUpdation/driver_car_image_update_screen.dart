@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/pages/profileUpdation/cninc_update_screen.dart';
 
 import '../../../providers/registration_provider.dart';
 
@@ -38,7 +39,6 @@ class _DriverCarImageUpdateScreeenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // CNIC Front Side Upload
                 _buildImagePicker(
                   context,
                   'Photo of your vehicle',
@@ -53,11 +53,14 @@ class _DriverCarImageUpdateScreeenState
                   width: MediaQuery.of(context).size.width * 0.9,
                   height: MediaQuery.of(context).size.height * 0.09,
                   child: ElevatedButton(
-                    onPressed: registrationProvider.isVehiclePhotoAdded
+                    onPressed: registrationProvider.isVehiclePhotoAdded &&
+                            registrationProvider.isLoading == false
                         ? () async {
                             try {
-                              //await registrationProvider.saveUserData();
-                              Navigator.pop(context, true);
+                              await registrationProvider
+                                  .updateVehicleImage(context);
+                              commonMethods.displaySnackBar(
+                                  "Vehicle image has been updated", context);
                             } catch (e) {
                               print("Error while saving data: $e");
                             } finally {}
@@ -68,8 +71,12 @@ class _DriverCarImageUpdateScreeenState
                           ? Colors.green
                           : Colors.grey,
                     ),
-                    child: const Text('Done',
-                        style: TextStyle(color: Colors.white)),
+                    child: registrationProvider.isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.black,
+                          )
+                        : const Text('Done',
+                            style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],

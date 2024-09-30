@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/pages/profileUpdation/cninc_update_screen.dart';
 
 import '../../../providers/registration_provider.dart';
 
@@ -72,12 +73,16 @@ class _VehicleRegistrationUpdateScreenState
                                   null &&
                               registrationProvider
                                       .vehicleRegistrationBackImage !=
-                                  null
+                                  null &&
+                              registrationProvider.isLoading == false
                           ? () async {
                               if (_formKey.currentState?.validate() == true) {
                                 try {
-                                  //await registrationProvider.saveUserData();
-                                  Navigator.pop(context, true);
+                                  await registrationProvider
+                                      .updateVehicleRegistraionImages(context);
+                                  commonMethods.displaySnackBar(
+                                      "Vehicle registration certificate images update",
+                                      context);
                                 } catch (e) {
                                   print("Error while saving data: $e");
                                 } finally {}
@@ -94,8 +99,12 @@ class _VehicleRegistrationUpdateScreenState
                             ? Colors.green
                             : Colors.grey,
                       ),
-                      child: const Text('Update',
-                          style: TextStyle(color: Colors.white)),
+                      child: registrationProvider.isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.black,
+                            )
+                          : const Text('Update',
+                              style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],

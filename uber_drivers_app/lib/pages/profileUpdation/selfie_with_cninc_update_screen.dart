@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/methods/common_method.dart';
 
 import '../../providers/registration_provider.dart';
 
@@ -13,6 +14,8 @@ class SelfieWithCnincUpdateScreen extends StatefulWidget {
   State<SelfieWithCnincUpdateScreen> createState() =>
       _SelfieWithCnincUpdateScreenState();
 }
+
+CommonMethods commonMethods = CommonMethods();
 
 class _SelfieWithCnincUpdateScreenState
     extends State<SelfieWithCnincUpdateScreen> {
@@ -53,24 +56,32 @@ class _SelfieWithCnincUpdateScreenState
                   width: MediaQuery.of(context).size.width * 0.9,
                   height: MediaQuery.of(context).size.height * 0.07,
                   child: ElevatedButton(
-                    onPressed: registrationProvider.cnicWithSelfieImage != null
-                        ? () async {
-                            try {
-                              //await registrationProvider.saveUserData();
-                              Navigator.pop(context, true);
-                            } catch (e) {
-                              print("Error while saving data: $e");
-                            } finally {}
-                          }
-                        : null,
+                    onPressed:
+                        registrationProvider.cnicWithSelfieImage != null &&
+                                registrationProvider.isLoading == false
+                            ? () async {
+                                try {
+                                  await registrationProvider
+                                      .updateSelfieWithCnincInfo(context);
+                                  commonMethods.displaySnackBar(
+                                      "Data has been updated.", context);
+                                } catch (e) {
+                                  print("Error while saving data: $e");
+                                } finally {}
+                              }
+                            : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor:
                           registrationProvider.cnicWithSelfieImage != null
                               ? Colors.green
                               : Colors.grey,
                     ),
-                    child: const Text('Update',
-                        style: TextStyle(color: Colors.white)),
+                    child: registrationProvider.isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.black,
+                          )
+                        : const Text('Update',
+                            style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],

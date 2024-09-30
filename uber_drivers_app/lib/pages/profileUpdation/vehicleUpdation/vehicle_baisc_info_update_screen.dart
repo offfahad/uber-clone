@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/pages/profileUpdation/cninc_update_screen.dart';
 
 import '../../../providers/registration_provider.dart';
 
@@ -234,12 +235,15 @@ class _VehicleBaiscInfoUpdateScreenState
                     width: MediaQuery.of(context).size.width * 0.9,
                     height: MediaQuery.of(context).size.height * 0.07,
                     child: ElevatedButton(
-                      onPressed: registrationProvider.isVehicleBasicFormValid
+                      onPressed: registrationProvider.isVehicleBasicFormValid &&
+                              registrationProvider.isLoading == false
                           ? () async {
                               if (_formKey.currentState?.validate() == true) {
                                 try {
-                                  //await registrationProvider.saveUserData();
-                                  Navigator.pop(context, true);
+                                  await registrationProvider
+                                      .updateVehicleBasicInfo(context);
+                                  commonMethods.displaySnackBar(
+                                      "Vehicle data has been updated", context);
                                 } catch (e) {
                                   print("Error while saving data: $e");
                                 } finally {}
@@ -252,8 +256,12 @@ class _VehicleBaiscInfoUpdateScreenState
                                 ? Colors.green
                                 : Colors.grey,
                       ),
-                      child: const Text('Update',
-                          style: TextStyle(color: Colors.white)),
+                      child: registrationProvider.isLoading
+                          ? CircularProgressIndicator(
+                              color: Colors.black,
+                            )
+                          : const Text('Update',
+                              style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],

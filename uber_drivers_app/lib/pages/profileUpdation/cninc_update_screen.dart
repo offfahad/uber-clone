@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/methods/common_method.dart';
 
 import '../../providers/registration_provider.dart';
 
@@ -13,7 +14,7 @@ class CnincUpdateScreen extends StatefulWidget {
   @override
   State<CnincUpdateScreen> createState() => _CnincUpdateScreenState();
 }
-
+CommonMethods commonMethods = CommonMethods();
 final _formKey = GlobalKey<FormState>();
 
 class _CnincUpdateScreenState extends State<CnincUpdateScreen> {
@@ -102,12 +103,15 @@ class _CnincUpdateScreenState extends State<CnincUpdateScreen> {
                     width: MediaQuery.of(context).size.width * 0.9,
                     height: MediaQuery.of(context).size.height * 0.07,
                     child: ElevatedButton(
-                      onPressed: registrationProvider.isFormValidCninc
+                      onPressed: registrationProvider.isFormValidCninc &&
+                              registrationProvider.isLoading == false
                           ? () async {
                               if (_formKey.currentState?.validate() == true) {
                                 try {
-                                  //await registrationProvider.saveUserData();
-                                  Navigator.pop(context, true);
+                                  await registrationProvider
+                                      .updateCnincInfo(context);
+                                                                    commonMethods.displaySnackBar(
+                                      "Data has been updated.", context);
                                 } catch (e) {
                                   print("Error while saving data: $e");
                                 } finally {}
@@ -119,8 +123,12 @@ class _CnincUpdateScreenState extends State<CnincUpdateScreen> {
                             ? Colors.green
                             : Colors.grey,
                       ),
-                      child: const Text('Update',
-                          style: TextStyle(color: Colors.white)),
+                      child: registrationProvider.isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.black,
+                            )
+                          : const Text('Update',
+                              style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],
