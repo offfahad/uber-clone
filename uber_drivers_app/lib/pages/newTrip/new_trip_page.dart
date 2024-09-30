@@ -349,10 +349,10 @@ class _NewTripPageState extends State<NewTripPage> {
     Map<String, dynamic> driverDataMap = {
       "status": "accepted",
       "driverId": FirebaseAuth.instance.currentUser!.uid,
-      "driverName": driverName,
+      "driverName": "$driverName $driverSecondName",
       "driverPhone": driverPhone,
       "driverPhoto": driverPhoto,
-      "carDetails": "$carColor - $carModel - $carNumber",
+      "carDetails": "$carModel - $carNumber - $carColor",
     };
 
     Map<String, dynamic> driverCurrentLocation = {
@@ -372,7 +372,7 @@ class _NewTripPageState extends State<NewTripPage> {
         .child("driverLocation")
         .update(driverCurrentLocation);
   }
- 
+
   @override
   void initState() {
     // TODO: implement initState
@@ -383,209 +383,214 @@ class _NewTripPageState extends State<NewTripPage> {
   @override
   Widget build(BuildContext context) {
     makeMarker();
-    return Scaffold(
-      body: Stack(
-        children: [
-          SafeArea(
-            child: GoogleMap(
-              padding: EdgeInsets.only(bottom: googleMapPaddingFromBottom),
-              mapType: MapType.normal,
-              myLocationEnabled: true,
-              zoomControlsEnabled: false,
-              myLocationButtonEnabled: false,
-              markers: markersSet,
-              circles: circlesSet,
-              polylines: polyLinesSet,
-              initialCameraPosition: googlePlexInitialPosition,
-              onMapCreated: (GoogleMapController mapController) async {
-                controllerGoogleMap = mapController;
-                //themeMethods.updateMapTheme(controllerGoogleMap!);
-                googleMapCompleterController.complete(controllerGoogleMap);
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children: [
+            SafeArea(
+              child: GoogleMap(
+                padding: EdgeInsets.only(bottom: googleMapPaddingFromBottom),
+                mapType: MapType.normal,
+                myLocationEnabled: true,
+                zoomControlsEnabled: false,
+                myLocationButtonEnabled: false,
+                markers: markersSet,
+                circles: circlesSet,
+                polylines: polyLinesSet,
+                initialCameraPosition: googlePlexInitialPosition,
+                onMapCreated: (GoogleMapController mapController) async {
+                  controllerGoogleMap = mapController;
+                  //themeMethods.updateMapTheme(controllerGoogleMap!);
+                  googleMapCompleterController.complete(controllerGoogleMap);
 
-                setState(() {
-                  googleMapPaddingFromBottom = 262;
-                });
+                  setState(() {
+                    googleMapPaddingFromBottom = 262;
+                  });
 
-                var driverCurrentLocationLatLng = LatLng(
-                    driverCurrentPosition!.latitude,
-                    driverCurrentPosition!.longitude);
+                  var driverCurrentLocationLatLng = LatLng(
+                      driverCurrentPosition!.latitude,
+                      driverCurrentPosition!.longitude);
 
-                var userPickUpLocationLatLng =
-                    widget.newTripDetailsInfo!.pickUpLatLng;
+                  var userPickUpLocationLatLng =
+                      widget.newTripDetailsInfo!.pickUpLatLng;
 
-                await obtainDirectionAndDrawRoute(
-                    driverCurrentLocationLatLng, userPickUpLocationLatLng);
+                  await obtainDirectionAndDrawRoute(
+                      driverCurrentLocationLatLng, userPickUpLocationLatLng);
 
-                getLiveLocationUpdatesOfDriver();
-              },
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.black87,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(17),
-                  topLeft: Radius.circular(17),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 17,
-                    spreadRadius: 0.5,
-                  )
-                ],
+                  getLiveLocationUpdatesOfDriver();
+                },
               ),
-              height: 265,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Text(
-                        "$durationText - $distanceText",
-                        style: const TextStyle(
-                            color: Colors.green,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          widget.newTripDetailsInfo!.userName ?? "No Name",
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(17),
+                    topLeft: Radius.circular(17),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white12,
+                      blurRadius: 17,
+                      spreadRadius: 0.5,
+                    )
+                  ],
+                ),
+                height: 275,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Text(
+                          "$durationText - $distanceText",
                           style: const TextStyle(
                               color: Colors.green,
-                              fontSize: 20,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            launchUrl(
-                              Uri.parse(
-                                  "tel://${widget.newTripDetailsInfo!.userPhone}"),
-                            );
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Icon(Icons.phone_android_outlined),
-                          ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      children: [
-                        Image.asset(
-                          "assets/images/initial.png",
-                          height: 16,
-                          width: 16,
-                        ),
-                        Expanded(
-                          child: Text(
-                            widget.newTripDetailsInfo!.pickupAddress.toString(),
-                            overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            widget.newTripDetailsInfo!.userName ?? "No Name",
                             style: const TextStyle(
-                                fontSize: 18, color: Colors.grey),
+                                color: Colors.green,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      children: [
-                        Image.asset(
-                          "assets/images/final.png",
-                          height: 16,
-                          width: 16,
-                        ),
-                        Expanded(
-                          child: Text(
-                            widget.newTripDetailsInfo!.dropOffAddress
-                                .toString(),
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 18, color: Colors.grey),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    Center(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (statusOfTrip == "accepted") {
-                            setState(() {
-                              buttonTitleText = "START TRIP";
-                              buttonColor = Colors.green;
-                            });
-                            statusOfTrip = "arrived";
-                            FirebaseDatabase.instance
-                                .ref()
-                                .child("tripRequest")
-                                .child(widget.newTripDetailsInfo!.tripID!)
-                                .child("status")
-                                .set("arrived");
-
-                            showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (BuildContext context) =>
-                                  const LoadingDialog(
-                                messageText: 'Please wait...',
+                          GestureDetector(
+                            onTap: () {
+                              launchUrl(
+                                Uri.parse(
+                                    "tel://${widget.newTripDetailsInfo!.userPhone}"),
+                              );
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Icon(Icons.phone_android_outlined),
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Image.asset(
+                              "assets/images/initial.png",
+                              height: 16,
+                              width: 16,
+                            ),
+                            Flexible(
+                              child: Text(
+                                widget.newTripDetailsInfo!.pickupAddress
+                                    .toString(),
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                    fontSize: 18, color: Colors.white),
                               ),
-                            );
-
-                            await obtainDirectionAndDrawRoute(
-                                widget.newTripDetailsInfo!.pickUpLatLng,
-                                widget.newTripDetailsInfo!.dropOffLatLng!);
-
-                            Navigator.pop(context);
-                          } else if (statusOfTrip == "arrived") {
-                            setState(() {
-                              buttonTitleText = "END TRIP";
-                              buttonColor = Colors.amber;
-                              statusOfTrip = "ontrip";
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Row(
+                        children: [
+                          Image.asset(
+                            "assets/images/final.png",
+                            height: 16,
+                            width: 16,
+                          ),
+                          Expanded(
+                            child: Text(
+                              widget.newTripDetailsInfo!.dropOffAddress
+                                  .toString(),
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  fontSize: 18, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (statusOfTrip == "accepted") {
+                              setState(() {
+                                buttonTitleText = "START TRIP";
+                                buttonColor = Colors.green;
+                              });
+                              statusOfTrip = "arrived";
                               FirebaseDatabase.instance
                                   .ref()
                                   .child("tripRequest")
                                   .child(widget.newTripDetailsInfo!.tripID!)
                                   .child("status")
-                                  .set("ontrip");
-                            });
-                          } else if (statusOfTrip == "ontrip") {
-                            endTripNow();
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: buttonColor),
-                        child: Text(
-                          buttonTitleText,
-                          style: const TextStyle(color: Colors.white),
+                                  .set("arrived");
+
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    const LoadingDialog(
+                                  messageText: 'Please wait...',
+                                ),
+                              );
+
+                              await obtainDirectionAndDrawRoute(
+                                  widget.newTripDetailsInfo!.pickUpLatLng,
+                                  widget.newTripDetailsInfo!.dropOffLatLng!);
+
+                              Navigator.pop(context);
+                            } else if (statusOfTrip == "arrived") {
+                              setState(() {
+                                buttonTitleText = "END TRIP";
+                                buttonColor = Colors.amber;
+                                statusOfTrip = "ontrip";
+                                FirebaseDatabase.instance
+                                    .ref()
+                                    .child("tripRequest")
+                                    .child(widget.newTripDetailsInfo!.tripID!)
+                                    .child("status")
+                                    .set("ontrip");
+                              });
+                            } else if (statusOfTrip == "ontrip") {
+                              endTripNow();
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: buttonColor),
+                          child: Text(
+                            buttonTitleText,
+                            style: const TextStyle(color: Colors.white),
+                          ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

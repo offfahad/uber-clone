@@ -20,48 +20,50 @@ class _EarningsPageState extends State<EarningsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.indigo,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: Container(
-              color: Colors.indigo,
-              width: 300,
-              child: Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Column(
-                  children: [
-                    Image.asset(
-                      "assets/images/totalearnings.png",
-                      width: 120,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    const Text(
-                      "Total Earnings:",
-                      style: TextStyle(
-                        color: Colors.white,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.indigo,
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(
+              child: Container(
+                color: Colors.indigo,
+                width: 300,
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                    children: [
+                      Image.asset(
+                        "assets/images/totalearnings.png",
+                        width: 120,
                       ),
-                    ),
-                    Consumer<RegistrationProvider>(
-                      builder: (context, provider, child) => Text(
-                        "Rs ${provider.driverEarnings}",
-                        style: const TextStyle(
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Text(
+                        "Total Earnings:",
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                  ],
+                      Consumer<RegistrationProvider>(
+                        builder: (context, provider, child) => Text(
+                          "Rs ${provider.driverEarnings}",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

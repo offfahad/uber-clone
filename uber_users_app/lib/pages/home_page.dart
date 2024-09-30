@@ -656,7 +656,7 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         tripStatusDisplay =
-            "Driving to DropOff Location - ${directionDetailsPickup.durationTextString}";
+            "Drop Off Location - ${directionDetailsPickup.durationTextString}";
       });
 
       requestingDirectionDetailsInfo = false;
@@ -1615,11 +1615,13 @@ class _HomePageState extends State<HomePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            tripStatusDisplay,
-                            style: const TextStyle(
-                              fontSize: 19,
-                              color: Colors.white,
+                          Expanded(
+                            child: Text(
+                              tripStatusDisplay,
+                              style: const TextStyle(
+                                fontSize: 19,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ],
@@ -1681,7 +1683,7 @@ class _HomePageState extends State<HomePage> {
                       ),
 
                       const SizedBox(
-                        height: 19,
+                        height: 15,
                       ),
 
                       const Divider(
@@ -1691,7 +1693,7 @@ class _HomePageState extends State<HomePage> {
                       ),
 
                       const SizedBox(
-                        height: 19,
+                        height: 15,
                       ),
 
                       //call driver btn

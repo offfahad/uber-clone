@@ -33,13 +33,13 @@ class _NotificationDialogState extends State<NotificationDialog> {
 
       if (tripRequestStatus == "accepted") {
         timer.cancel();
-        driverTripRequestTimeout = 20;
+        driverTripRequestTimeout = 60;
         return;
       }
 
       if (driverTripRequestTimeout == 0) {
         timer.cancel();
-        driverTripRequestTimeout = 20;
+        driverTripRequestTimeout = 60;
         audioPlayer.stop();
 
         if (mounted) {

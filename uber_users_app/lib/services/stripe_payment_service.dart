@@ -39,13 +39,21 @@ class StripePaymentService {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Paid successfully")),
       );
+      // Payment was successful, send "paid" back
+      Navigator.pop(context, "paid");
     } on StripeException catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Payment Cancelled")),
       );
+      // Payment was cancelled, send "no paid" back
+      Navigator.pop(context, "no paid");
     } catch (e) {
       print("Error displaying payment sheet: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Payment Failed")),
+      );
+      // Handle any other errors (optionally)
     }
   }
 

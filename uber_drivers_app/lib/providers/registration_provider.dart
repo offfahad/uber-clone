@@ -350,8 +350,8 @@ class RegistrationProvider extends ChangeNotifier {
         drivingLicenseBackImage: drivingLicenseBackImageUrl,
         blockStatus: "no",
         deviceToken: '',
-        earnings: '',
-        driverRattings: '',
+        earnings: '0',
+        driverRattings: '0',
         vehicleInfo: VehicleInfo(
           type: selectedVehicle.toString(),
           brand: brandController.text,
@@ -465,21 +465,23 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
-  // Fetch the driver's earnings from Firebase Database
+// Fetch the driver's earnings from Firebase Database
   Future<void> fetchDriverEarnings() async {
-    if (_isEarningFetched) {
-      return;
-    }
     try {
       final userId = _auth.currentUser!.uid;
       DatabaseReference driverRef =
           _database.ref().child("drivers").child(userId);
 
+      // Retrieve the earnings value from Firebase
       final snapshot = await driverRef.child("earnings").get();
       if (snapshot.exists) {
+        // Parse the earnings as a double
         double earnings = double.tryParse(snapshot.value.toString()) ?? 0.0;
-        _driverEarnings = earnings;
-        _isEarningFetched = true;
+
+        // Store the earnings as double
+        _driverEarnings = double.parse(
+            earnings.toStringAsFixed(2)); // Round to 2 decimal places
+
         notifyListeners(); // Notify listeners to update the UI
       } else {
         _driverEarnings = 0.0;
@@ -512,6 +514,9 @@ class RegistrationProvider extends ChangeNotifier {
         address = data['address'] ?? '';
         ratting = data['driverRattings'] ?? '';
         driverPhoto = data['profilePicture'] ?? '';
+        carModel = data['vehicleInfo']['brand'] ?? '';
+        carColor = data['vehicleInfo']['color'] ?? '';
+        carNumber = data['vehicleInfo']['registrationPlateNumber'] ?? '';
 
         _currentDriverInfo = true;
         // Notify listeners to update UI

@@ -47,45 +47,47 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context)
   {
-    return Scaffold(
-      body: TabBarView(
-        physics: const NeverScrollableScrollPhysics(),
-        controller: controller,
-        children: const [
-          HomePage(),
-          EarningsPage(),
-          TripsPage(),
-          ProfilePage(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const
-        [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.credit_card),
-              label: "Earnings"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.account_tree),
-              label: "Trips"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: "Profile"
-          ),
-        ],
-        currentIndex: indexSelected,
-        //backgroundColor: Colors.grey,
-        unselectedItemColor: Colors.grey,
-        selectedItemColor: Colors.black,
-        showSelectedLabels: true,
-        selectedLabelStyle: const TextStyle(fontSize: 12),
-        type: BottomNavigationBarType.fixed,
-        onTap: onBarItemClicked,
+    return SafeArea(
+      child: Scaffold(
+        body: TabBarView(
+          physics: const NeverScrollableScrollPhysics(),
+          controller: controller,
+          children: const [
+            HomePage(),
+            EarningsPage(),
+            TripsPage(),
+            ProfilePage(),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const
+          [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: "Home"
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.credit_card),
+                label: "Earnings"
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.account_tree),
+                label: "Trips"
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person),
+                label: "Profile"
+            ),
+          ],
+          currentIndex: indexSelected,
+          //backgroundColor: Colors.grey,
+          unselectedItemColor: Colors.grey,
+          selectedItemColor: Colors.black,
+          showSelectedLabels: true,
+          selectedLabelStyle: const TextStyle(fontSize: 12),
+          type: BottomNavigationBarType.fixed,
+          onTap: onBarItemClicked,
+        ),
       ),
     );
   }

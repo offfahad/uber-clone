@@ -75,20 +75,12 @@ class PushNotificationSystem {
     final currentContext = navigatorKey.currentContext;
 
     if (currentContext != null) {
-      // Show loading dialog
-      showDialog(
-        context: currentContext,
-        barrierDismissible: false,
-        builder: (BuildContext context) =>
-            const LoadingDialog(messageText: "Getting details..."),
-      );
 
       // Reference to the trip request
       DatabaseReference tripRequestsRef =
           FirebaseDatabase.instance.ref().child("tripRequest").child(tripID);
 
       tripRequestsRef.once().then((dataSnapshot) {
-        Navigator.pop(currentContext);
 
         // Log the snapshot to see the structure and content
         log("DataSnapshot: ${dataSnapshot.snapshot.value}");

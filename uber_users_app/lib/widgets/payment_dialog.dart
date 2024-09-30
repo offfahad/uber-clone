@@ -106,7 +106,6 @@ class _PaymentDialogState extends State<PaymentDialog> {
 
         // If payment is successful, you can handle it here
         paymentIntent = null;
-        Navigator.pop(context, "paid");
       }
     } catch (e) {
       print("Exception: $e");

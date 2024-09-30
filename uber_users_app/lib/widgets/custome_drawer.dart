@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:googleapis/analytics/v3.dart';
 import 'package:uber_users_app/appInfo/auth_provider.dart';
+import 'package:uber_users_app/global/global_var.dart';
 import 'package:uber_users_app/pages/about_page.dart';
 import 'package:uber_users_app/pages/profile_page.dart';
 import 'package:uber_users_app/pages/trips_history_page.dart';
@@ -7,7 +9,8 @@ import 'package:uber_users_app/widgets/sign_out_dialog.dart';
 
 class CustomDrawer extends StatelessWidget {
   final String userName;
-  final AuthenticationProvider authProvider; // Pass the auth provider for sign out
+  final AuthenticationProvider
+      authProvider; // Pass the auth provider for sign out
 
   const CustomDrawer({
     Key? key,
@@ -20,68 +23,34 @@ class CustomDrawer extends StatelessWidget {
     return Drawer(
       backgroundColor: Colors.white,
       child: ListView(
+        padding: EdgeInsets.zero,
         children: [
-          const Divider(
-            height: 1,
-            color: Colors.grey,
-            thickness: 1,
-          ),
-
-          //header
-          Container(
-            color: Colors.black54,
-            height: 160,
-            child: DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.white70,
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    "assets/images/avatarman.png",
-                    width: 60,
-                    height: 60,
-                  ),
-                  const SizedBox(width: 16),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        userName,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ProfilePage(),
-                            ),
-                          );
-                        },
-                        child: const Text(
-                          "Profile",
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          UserAccountsDrawerHeader(
+            decoration: const BoxDecoration(color: Colors.white),
+            currentAccountPicture: const CircleAvatar(
+              backgroundImage: AssetImage("assets/images/avatarman.png"),
             ),
+            
+            accountName: Text(userName, style: const TextStyle(color: Colors.black),),
+            accountEmail: Text(userEmail, style: const TextStyle(color: Colors.black),),
           ),
 
-          const Divider(
-            height: 1,
-            color: Colors.black,
-            thickness: 1,
+          ListTile(
+            leading: const Icon(
+              Icons.account_box,
+              color: Colors.black,
+            ),
+            title: const Text(
+              "Account",
+              style: TextStyle(color: Colors.black),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
           ),
-          const SizedBox(height: 10),
 
           //body
           ListTile(
@@ -96,11 +65,29 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const TripsHistoryPage()),
+                MaterialPageRoute(
+                    builder: (context) => const TripsHistoryPage()),
               );
             },
           ),
-
+          ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                ;
+              }),
+          ListTile(
+              leading: const Icon(Icons.privacy_tip),
+              title: const Text('Privacy'),
+              onTap: () {
+                ;
+              }),
+          ListTile(
+              leading: const Icon(Icons.help),
+              title: const Text('Help'),
+              onTap: () {
+                ;
+              }),
           ListTile(
             leading: const Icon(
               Icons.info,
@@ -117,6 +104,13 @@ class CustomDrawer extends StatelessWidget {
               );
             },
           ),
+
+          ListTile(
+              leading: const Icon(Icons.star_rate),
+              title: const Text('Rate Us'),
+              onTap: () {
+                ;
+              }),
 
           ListTile(
             leading: const Icon(

@@ -79,17 +79,20 @@ class _PaymentDialogState extends State<PaymentDialog> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                //Navigator.pop(context);
-
+                Navigator.pop(context);
                 cMethods.turnOnLocationUpdatesForHomePage();
 
-                Restart.restartApp();
+                //Restart.restartApp();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.black,
               ),
               child: const Text(
                 "COLLECT CASH",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
               ),
             ),
             const SizedBox(
