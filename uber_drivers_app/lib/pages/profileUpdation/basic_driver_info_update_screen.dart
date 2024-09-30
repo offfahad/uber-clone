@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uber_drivers_app/methods/common_method.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 class BasicDriverInfoUpdateScreen extends StatefulWidget {
@@ -15,7 +16,7 @@ class BasicDriverInfoUpdateScreen extends StatefulWidget {
 class _BasicDriverInfoUpdateScreenState
     extends State<BasicDriverInfoUpdateScreen> {
   final _formKey = GlobalKey<FormState>();
-
+  CommonMethods commonMethods = CommonMethods();
   @override
   Widget build(BuildContext context) {
     return Consumer<RegistrationProvider>(
@@ -206,6 +207,7 @@ class _BasicDriverInfoUpdateScreenState
                               }
                               return null;
                             },
+                            enabled: false,
                             onChanged: (_) =>
                                 registrationProvider.checkBasicFormValidity(),
                           ),
@@ -240,14 +242,17 @@ class _BasicDriverInfoUpdateScreenState
                   const SizedBox(height: 16),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.9,
-                    height: MediaQuery.of(context).size.height * 0.09,
+                    height: MediaQuery.of(context).size.height * 0.07,
                     child: ElevatedButton(
                       onPressed: registrationProvider.isFormValidBasic
                           ? () async {
                               if (_formKey.currentState?.validate() == true) {
                                 try {
-                                  //await registrationProvider.saveUserData();
+                                  await registrationProvider
+                                      .updateBasicDriverInfo(context);
                                   Navigator.pop(context, true);
+                                  commonMethods.displaySnackBar(
+                                      "Data has been updated.", context);
                                 } catch (e) {
                                   print("Error while saving data: $e");
                                 } finally {}
@@ -259,7 +264,7 @@ class _BasicDriverInfoUpdateScreenState
                             ? Colors.green
                             : Colors.grey,
                       ),
-                      child: const Text('Done',
+                      child: const Text('Update',
                           style: TextStyle(color: Colors.white)),
                     ),
                   ),

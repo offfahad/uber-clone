@@ -100,7 +100,7 @@ class _CnincUpdateScreenState extends State<CnincUpdateScreen> {
                   // Submit button
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.9,
-                    height: MediaQuery.of(context).size.height * 0.09,
+                    height: MediaQuery.of(context).size.height * 0.07,
                     child: ElevatedButton(
                       onPressed: registrationProvider.isFormValidCninc
                           ? () async {
@@ -119,7 +119,7 @@ class _CnincUpdateScreenState extends State<CnincUpdateScreen> {
                             ? Colors.green
                             : Colors.grey,
                       ),
-                      child: const Text('Done',
+                      child: const Text('Update',
                           style: TextStyle(color: Colors.white)),
                     ),
                   ),

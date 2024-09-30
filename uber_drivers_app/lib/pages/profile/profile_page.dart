@@ -1,8 +1,9 @@
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/pages/profileUpdation/driver_main_info.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
+
 import '../../global/global.dart';
 import '../../widgets/ratting_stars.dart';
 
@@ -27,7 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Center(
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+                    const EdgeInsets.only(top: 40, bottom: 20),
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   width: MediaQuery.of(context).size.width * 0.9,
@@ -49,12 +50,25 @@ class _ProfilePageState extends State<ProfilePage> {
                       Stack(
                         children: [
                           Container(
+                            width: 100.0,
+                            height: 80.0,
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                            child: CircleAvatar(
-                              radius: 36.0,
-                              backgroundColor: const Color.fromRGBO(0, 0, 0, 0),
-                              backgroundImage: 
-                              NetworkImage(driverPhoto),
+                            child: CachedNetworkImage(
+                              imageUrl: driverPhoto,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
                             ),
                           ),
                         ],
@@ -79,13 +93,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                     Icons.phone,
                                     size: 12.0,
                                   ),
-                                  Container(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(8, 4, 4, 4),
-                                    child: Text(
-                                      driverPhone,
-                                      style: const TextStyle(
-                                        fontSize: 12,
+                                  Flexible(
+                                    child: Container(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(8, 4, 4, 4),
+                                      child: Text(
+                                        driverPhone,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                        ),
+                                        overflow: TextOverflow.visible,
                                       ),
                                     ),
                                   ),
@@ -98,12 +115,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Icons.email,
                                       size: 12.0,
                                     ),
-                                    Container(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(8, 4, 4, 4),
-                                      child: Text(
-                                        driverEmail,
-                                        style: const TextStyle(fontSize: 12),
+                                    Flexible(
+                                      child: Container(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            8, 4, 4, 4),
+                                        child: Text(
+                                          driverEmail,
+                                          style: const TextStyle(fontSize: 12),
+                                          overflow: TextOverflow
+                                              .visible, // Allow text to wrap
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -115,17 +136,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                       Icons.location_city,
                                       size: 12.0,
                                     ),
-                                    Container(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(8, 4, 4, 4),
-                                      child: Text(
-                                        address,
-                                        style: const TextStyle(fontSize: 12),
+                                    Flexible(
+                                      child: Container(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            8, 4, 4, 4),
+                                        child: Text(
+                                          address,
+                                          style: const TextStyle(fontSize: 12),
+                                          overflow: TextOverflow
+                                              .visible, // Allow text to wrap
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 5,),
+                              const SizedBox(
+                                height: 5,
+                              ),
                               RatingStars(ratting: ratting),
                             ],
                           ),

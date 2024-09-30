@@ -94,7 +94,7 @@ class _VehicleBaiscInfoUpdateScreenState
                           value: registrationProvider.selectedVehicle == "Bike",
                           onChanged: (bool? value) {
                             if (value == true) {
-                              registrationProvider.setSelectedVehicle("bike");
+                              registrationProvider.setSelectedVehicle("Bike");
                             }
                           },
                         ),
@@ -232,7 +232,7 @@ class _VehicleBaiscInfoUpdateScreenState
                   ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.9,
-                    height: MediaQuery.of(context).size.height * 0.09,
+                    height: MediaQuery.of(context).size.height * 0.07,
                     child: ElevatedButton(
                       onPressed: registrationProvider.isVehicleBasicFormValid
                           ? () async {
@@ -252,7 +252,7 @@ class _VehicleBaiscInfoUpdateScreenState
                                 ? Colors.green
                                 : Colors.grey,
                       ),
-                      child: const Text('Done',
+                      child: const Text('Update',
                           style: TextStyle(color: Colors.white)),
                     ),
                   ),

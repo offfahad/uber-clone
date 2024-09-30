@@ -531,7 +531,35 @@ class RegistrationProvider extends ChangeNotifier {
       stopFetchLoading();
     }
   }
+
+  Future<void> updateBasicDriverInfo(BuildContext context) async {
+    if (!_isFormValidBasic) {
+      commonMethods.displaySnackBar("Form is not valid", context);
+      notifyListeners();
+    }
+    try {
+      // Basic driver data
+      final driverData = {
+        'firstName': firstNameController.text,
+        'lastName': lastNameController.text,
+        'email': emailController.text,
+        'address': addressController.text,
+        'phone': phoneController.text,
+        'dob': dobController.text,
+        'profilePhoto':
+            profilePhoto ?? '', // URL of uploaded profile photo (if exists)
+      };
+      final userRef =
+          _database.ref().child("drivers").child(_auth.currentUser!.uid);
+      await userRef.update(driverData);
+      notifyListeners();
+    } catch (e) {
+      print("An error occurred while updating basic driver info: $e");
+    }
+  }
 }
+
+
   // Future<void> saveCNICData() async {
   //   if (!_isFormValidCninc) {
   //     throw Exception("Form is not valid");

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/pages/auth/register_screen.dart';
 import 'package:uber_drivers_app/pages/dashboard.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
+import 'package:uber_drivers_app/providers/dashboard_provider.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
 import 'package:uber_drivers_app/widgets/blocked_screen.dart';
 
@@ -34,11 +35,14 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
+          create: (_) => DashboardProvider(),
+        ),
+        ChangeNotifierProvider(
           create: (_) => AuthenticationProvider(),
         ),
         ChangeNotifierProvider(
           create: (_) => RegistrationProvider(),
-        )
+        ),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
@@ -53,6 +57,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class AuthCheck extends StatelessWidget {
   const AuthCheck({super.key});
 
@@ -70,7 +75,9 @@ class AuthCheck extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(
-              child: CircularProgressIndicator(color: Colors.black,),
+              child: CircularProgressIndicator(
+                color: Colors.black,
+              ),
             ),
           ); // Show loading indicator
         }
@@ -88,7 +95,9 @@ class AuthCheck extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
                 body: Center(
-                  child: CircularProgressIndicator(color: Colors.black,),
+                  child: CircularProgressIndicator(
+                    color: Colors.black,
+                  ),
                 ),
               );
             }
@@ -104,7 +113,10 @@ class AuthCheck extends StatelessWidget {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Scaffold(
-                      body: Center(child: CircularProgressIndicator(color: Colors.black,)));
+                      body: Center(
+                          child: CircularProgressIndicator(
+                    color: Colors.black,
+                  )));
                 }
 
                 if (snapshot.hasData && snapshot.data == true) {

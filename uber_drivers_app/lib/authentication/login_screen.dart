@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => LoadingDialog(messageText: "Allowing you to Login..."),
+      builder: (BuildContext context) => const LoadingDialog(messageText: "Allowing you to Login..."),
     );
 
     final User? userFirebase = (
