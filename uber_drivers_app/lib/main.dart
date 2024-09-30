@@ -8,6 +8,7 @@ import 'package:uber_drivers_app/pages/dashboard.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
 import 'package:uber_drivers_app/providers/dashboard_provider.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
+import 'package:uber_drivers_app/providers/trips_provider.dart';
 import 'package:uber_drivers_app/widgets/blocked_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -42,6 +43,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => RegistrationProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => TripProvider(),
         ),
       ],
       child: MaterialApp(
