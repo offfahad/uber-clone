@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/pages/profileUpdation/driver_main_info.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
+import 'package:uber_drivers_app/providers/registration_provider.dart';
 
 import '../../global/global.dart';
 import '../../widgets/ratting_stars.dart';
@@ -16,6 +17,14 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<RegistrationProvider>(context, listen: false)
+        .retrieveCurrentDriverInfo();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthenticationProvider>(context);
 
@@ -27,8 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
             //image
             Center(
               child: Padding(
-                padding:
-                    const EdgeInsets.only(top: 40, bottom: 20),
+                padding: const EdgeInsets.only(top: 40, bottom: 20),
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   width: MediaQuery.of(context).size.width * 0.9,
@@ -51,7 +59,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           Container(
                             width: 100.0,
-                            height: 80.0,
+                            height: 70.0,
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                             child: CachedNetworkImage(
                               imageUrl: driverPhoto,

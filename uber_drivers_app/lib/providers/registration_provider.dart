@@ -12,6 +12,7 @@ import 'package:uber_drivers_app/methods/common_method.dart';
 import 'package:uber_drivers_app/methods/image_picker_service.dart';
 import 'package:uber_drivers_app/models/driver.dart';
 import 'package:uber_drivers_app/models/vehicleInfo.dart';
+import 'package:uber_drivers_app/pages/profile/profile_page.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -41,11 +42,8 @@ class RegistrationProvider extends ChangeNotifier {
   XFile? _vehicleRegistrationBackImage;
   bool _isDataFetched = false;
   bool get isDataFetched => _isDataFetched;
-  bool _isEarningFetched = false;
   bool _currentDriverInfo = false;
-
   double _driverEarnings = 0.0;
-
   get driverEarnings => _driverEarnings;
 
   // TextEditingControllers
@@ -129,7 +127,7 @@ class RegistrationProvider extends ChangeNotifier {
           phoneController.text.isNotEmpty &&
           addressController.text.isNotEmpty &&
           dobController.text.isNotEmpty &&
-          _isPhotoAdded;
+          _profilePhoto != null;
       notifyListeners();
     });
   }
@@ -492,10 +490,9 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
+  
   Future<void> retrieveCurrentDriverInfo() async {
-    if (_currentDriverInfo) {
-      return;
-    }
+
     try {
       final driverId = _auth.currentUser!.uid;
       DatabaseReference driverRef =
@@ -518,43 +515,41 @@ class RegistrationProvider extends ChangeNotifier {
         carColor = data['vehicleInfo']['color'] ?? '';
         carNumber = data['vehicleInfo']['registrationPlateNumber'] ?? '';
 
-        _currentDriverInfo = true;
         // Notify listeners to update UI
-        stopFetchLoading();
         notifyListeners();
       } else {
         print("No data available for this user.");
-        stopFetchLoading();
       }
     } catch (e) {
       print("An error occurred while fetching user data: $e");
-      stopFetchLoading();
     }
   }
 
   Future<void> updateBasicDriverInfo(BuildContext context) async {
-    if (!_isFormValidBasic) {
-      commonMethods.displaySnackBar("Form is not valid", context);
-      notifyListeners();
-    }
     try {
+      _isLoading = true;
+      notifyListeners();
+      final newProfilePicture =
+          await uploadImageToFirebaseStorage(_profilePhoto, "ProfilePicture");
       // Basic driver data
       final driverData = {
         'firstName': firstNameController.text,
-        'lastName': lastNameController.text,
+        'secondName': lastNameController.text,
         'email': emailController.text,
         'address': addressController.text,
-        'phone': phoneController.text,
+        'phoneNumber': phoneController.text,
         'dob': dobController.text,
-        'profilePhoto':
-            profilePhoto ?? '', // URL of uploaded profile photo (if exists)
+        'profilePicture': newProfilePicture,
+        // URL of uploaded profile photo (if exists)
       };
       final userRef =
           _database.ref().child("drivers").child(_auth.currentUser!.uid);
       await userRef.update(driverData);
+      _isLoading = false;
       notifyListeners();
     } catch (e) {
       print("An error occurred while updating basic driver info: $e");
+      _isLoading = false;
     }
   }
 }

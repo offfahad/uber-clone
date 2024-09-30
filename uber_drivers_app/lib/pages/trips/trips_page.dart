@@ -26,7 +26,7 @@ class _TripsPageState extends State<TripsPage> {
     return Scaffold(
       backgroundColor: Colors.indigo,
       body: tripProvider.isLoading
-          ? Center(child: CircularProgressIndicator(color: Colors.white,))
+          ? const Center(child: CircularProgressIndicator(color: Colors.white,))
           : Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

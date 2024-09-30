@@ -39,9 +39,7 @@ class _BasicDriverInfoUpdateScreenState
           child: SingleChildScrollView(
             child: Form(
               key: _formKey,
-              onChanged: () {
-                registrationProvider.checkBasicFormValidity();
-              },
+              onChanged: registrationProvider.checkBasicFormValidity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -244,13 +242,13 @@ class _BasicDriverInfoUpdateScreenState
                     width: MediaQuery.of(context).size.width * 0.9,
                     height: MediaQuery.of(context).size.height * 0.07,
                     child: ElevatedButton(
-                      onPressed: registrationProvider.isFormValidBasic
+                      onPressed: registrationProvider.isLoading == false && registrationProvider.isFormValidBasic
                           ? () async {
                               if (_formKey.currentState?.validate() == true) {
                                 try {
                                   await registrationProvider
                                       .updateBasicDriverInfo(context);
-                                  Navigator.pop(context, true);
+
                                   commonMethods.displaySnackBar(
                                       "Data has been updated.", context);
                                 } catch (e) {
@@ -260,12 +258,13 @@ class _BasicDriverInfoUpdateScreenState
                             }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: registrationProvider.isFormValidBasic
-                            ? Colors.green
-                            : Colors.grey,
-                      ),
-                      child: const Text('Update',
-                          style: TextStyle(color: Colors.white)),
+                          backgroundColor: Colors.green),
+                      child: registrationProvider.isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.black,
+                            )
+                          : const Text('Update',
+                              style: TextStyle(color: Colors.white)),
                     ),
                   ),
                 ],

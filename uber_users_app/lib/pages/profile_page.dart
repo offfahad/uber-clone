@@ -1,8 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_geofire/flutter_geofire.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:uber_users_app/global/global_var.dart';
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -112,9 +108,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
-            ),
+            ), 
             //driver email
             Padding(
               padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 4),
