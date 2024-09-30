@@ -1,13 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:provider/provider.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:uber_drivers_app/pages/profileUpdation/driver_main_info.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
-
-import '../../authentication/login_screen.dart';
 import '../../global/global.dart';
 import '../../widgets/ratting_stars.dart';
 
@@ -57,8 +52,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                             child: CircleAvatar(
                               radius: 36.0,
-                              backgroundColor: Colors.transparent,
-                              backgroundImage: NetworkImage(driverPhoto),
+                              backgroundColor: const Color.fromRGBO(0, 0, 0, 0),
+                              backgroundImage: 
+                              NetworkImage(driverPhoto),
                             ),
                           ),
                         ],

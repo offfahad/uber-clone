@@ -1,12 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:provider/provider.dart';
-import 'package:uber_drivers_app/providers/auth_provider.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
 
-import '../../methods/image_picker_service.dart';
 
 class CNICScreen extends StatefulWidget {
   const CNICScreen({super.key});

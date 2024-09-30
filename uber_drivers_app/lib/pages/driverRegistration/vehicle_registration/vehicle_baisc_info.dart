@@ -14,7 +14,6 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final registrationProvider = Provider.of<RegistrationProvider>(context);
     return Consumer<RegistrationProvider>(
       builder: (context, registrationProvider, child) => Scaffold(
         appBar: AppBar(
@@ -92,7 +91,7 @@ class _VehicleBasicInfoScreenState extends State<VehicleBasicInfoScreen> {
                           value: registrationProvider.selectedVehicle == "Bike",
                           onChanged: (bool? value) {
                             if (value == true) {
-                              registrationProvider.setSelectedVehicle("bike");
+                              registrationProvider.setSelectedVehicle("Bike");
                             }
                           },
                         ),

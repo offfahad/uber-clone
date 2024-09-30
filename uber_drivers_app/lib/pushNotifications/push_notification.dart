@@ -5,12 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_notification_channel/flutter_notification_channel.dart';
 import 'package:flutter_notification_channel/notification_importance.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:uber_drivers_app/widgets/loading_dialog.dart';
-
 import '../global/global.dart';
 import '../main.dart';
 import '../models/trip_details.dart';
@@ -29,6 +26,7 @@ class PushNotificationSystem {
     referenceOnlineDriver.set(deviceRecognitionToken);
     firebaseCloudMessaging.subscribeToTopic("drivers");
     firebaseCloudMessaging.subscribeToTopic("users");
+    return null;
   }
 
   startListeningForNewNotification(BuildContext context) async {

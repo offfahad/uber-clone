@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:restart_app/restart_app.dart';
 import 'package:uber_drivers_app/methods/common_method.dart';
 
 class PaymentDialog extends StatefulWidget {

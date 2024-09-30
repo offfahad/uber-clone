@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/methods/common_method.dart';
-import 'package:uber_drivers_app/pages/auth/register_screen.dart';
 import 'package:uber_drivers_app/pages/dashboard.dart';
 import 'package:uber_drivers_app/pages/driverRegistration/driver_registration.dart';
-import 'package:uber_drivers_app/pages/home/home_page.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
 import 'package:uber_drivers_app/widgets/blocked_screen.dart';
 

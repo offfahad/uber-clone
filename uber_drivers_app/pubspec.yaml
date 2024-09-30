@@ -60,6 +60,8 @@ dependencies:
   pinput: ^5.0.0
   image_cropper: 
   path_provider:
+  cached_network_image: 
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

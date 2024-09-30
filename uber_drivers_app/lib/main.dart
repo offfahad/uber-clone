@@ -3,11 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:uber_drivers_app/authentication/login_screen.dart';
 import 'package:uber_drivers_app/pages/auth/register_screen.dart';
 import 'package:uber_drivers_app/pages/dashboard.dart';
-import 'package:uber_drivers_app/pages/driverRegistration/driver_registration.dart';
-import 'package:uber_drivers_app/pages/home/home_page.dart';
 import 'package:uber_drivers_app/providers/auth_provider.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
 import 'package:uber_drivers_app/widgets/blocked_screen.dart';
@@ -56,7 +53,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 class AuthCheck extends StatelessWidget {
   const AuthCheck({super.key});
 

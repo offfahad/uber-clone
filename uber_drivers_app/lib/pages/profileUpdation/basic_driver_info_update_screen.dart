@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
 
-import '../../providers/auth_provider.dart';
-
 class BasicDriverInfoUpdateScreen extends StatefulWidget {
   const BasicDriverInfoUpdateScreen({super.key});
 
