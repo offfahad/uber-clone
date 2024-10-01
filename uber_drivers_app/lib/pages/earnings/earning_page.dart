@@ -14,8 +14,11 @@ class _EarningsPageState extends State<EarningsPage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<RegistrationProvider>(context, listen: false)
-        .fetchDriverEarnings();
+    // Fetch the earnings as soon as the page is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<RegistrationProvider>(context, listen: false)
+          .fetchDriverEarnings();
+    });
   }
 
   @override
@@ -48,14 +51,24 @@ class _EarningsPageState extends State<EarningsPage> {
                         ),
                       ),
                       Consumer<RegistrationProvider>(
-                        builder: (context, provider, child) => Text(
-                          "Rs ${provider.driverEarnings}",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        builder: (context, provider, child) {
+                          // Check if data is still being fetched
+                          if (provider.driverEarnings == null) {
+                            return const CircularProgressIndicator(
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            );
+                          } else {
+                            return Text(
+                              "Rs ${provider.driverEarnings}",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ],
                   ),

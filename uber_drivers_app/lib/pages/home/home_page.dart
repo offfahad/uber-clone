@@ -10,6 +10,7 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uber_drivers_app/global/global.dart';
 import 'package:uber_drivers_app/providers/registration_provider.dart';
 
@@ -47,6 +48,25 @@ class _HomePageState extends State<HomePage> {
         CameraPosition(target: positionOfUserInLatLng, zoom: 15);
     controllerGoogleMap!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+  }
+
+  _loadDriverStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDriverAvailable = prefs.getBool('isDriverAvailable') ?? false;
+      if (isDriverAvailable) {
+        colorToShow = Colors.pink;
+        titleToShow = "GO OFFLINE NOW";
+      } else {
+        colorToShow = Colors.green;
+        titleToShow = "GO ONLINE NOW";
+      }
+    });
+  }
+
+  _saveDriverStatus(bool status) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDriverAvailable', status);
   }
 
   goOnlineNow() {
@@ -108,9 +128,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _loadDriverStatus();
     initializePushNotificationSystem();
     Provider.of<RegistrationProvider>(context, listen: false)
         .retrieveCurrentDriverInfo();
+    
   }
 
   @override
@@ -130,19 +152,19 @@ class _HomePageState extends State<HomePage> {
               onMapCreated: (GoogleMapController mapController) {
                 controllerGoogleMap = mapController;
                 //themeMethods.updateMapTheme(controllerGoogleMap!);
-      
+
                 googleMapCompleterController.complete(controllerGoogleMap);
-      
+
                 getCurrentLiveLocationOfDriver();
               },
             ),
-      
+
             Container(
               height: 136,
               width: double.infinity,
               //color: Colors.black12,
             ),
-      
+
             ///go online offline button
             Positioned(
               top: 40,
@@ -216,8 +238,8 @@ class _HomePageState extends State<HomePage> {
                                             },
                                             child: const Text(
                                               "BACK",
-                                              style:
-                                                  TextStyle(color: Colors.black),
+                                              style: TextStyle(
+                                                  color: Colors.black),
                                             ),
                                           ),
                                         ),
@@ -230,40 +252,43 @@ class _HomePageState extends State<HomePage> {
                                               if (!isDriverAvailable) {
                                                 //go online
                                                 goOnlineNow();
-      
+
                                                 //get driver location updates
                                                 setAndGetLocationUpdates();
-      
+
                                                 Navigator.pop(context);
-      
+
                                                 setState(() {
                                                   colorToShow = Colors.pink;
-                                                  titleToShow = "GO OFFLINE NOW";
+                                                  titleToShow =
+                                                      "GO OFFLINE NOW";
                                                   isDriverAvailable = true;
                                                 });
+                                                _saveDriverStatus(true);
                                               } else {
                                                 //go offline
                                                 goOfflineNow();
-      
+
                                                 Navigator.pop(context);
-      
+
                                                 setState(() {
                                                   colorToShow = Colors.green;
                                                   titleToShow = "GO ONLINE NOW";
                                                   isDriverAvailable = false;
                                                 });
+                                                _saveDriverStatus(false);
                                               }
                                             },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  (titleToShow == "GO ONLINE NOW")
-                                                      ? Colors.green
-                                                      : Colors.pink,
+                                              backgroundColor: (titleToShow ==
+                                                      "GO ONLINE NOW")
+                                                  ? Colors.green
+                                                  : Colors.pink,
                                             ),
                                             child: const Text(
                                               "CONFIRM",
-                                              style:
-                                                  TextStyle(color: Colors.white),
+                                              style: TextStyle(
+                                                  color: Colors.white),
                                             ),
                                           ),
                                         ),

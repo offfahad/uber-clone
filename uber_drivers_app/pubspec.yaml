@@ -61,6 +61,7 @@ dependencies:
   image_cropper: 
   path_provider:
   cached_network_image: '3.3.1'
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:
