@@ -5,7 +5,7 @@ import 'package:uber_admin_panel/methods/common_methods.dart';
 import 'package:uber_admin_panel/widgets/drivers_data_list.dart';
 
 class DriverPage extends StatefulWidget {
-  static const String id = "\webDriverUsers";
+  static const String id = "\webPageDrivers";
   const DriverPage({super.key});
 
   @override

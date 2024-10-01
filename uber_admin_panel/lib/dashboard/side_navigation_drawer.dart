@@ -40,18 +40,23 @@ class _SideNavigationDrawerState extends State<SideNavigationDrawer> {
   Widget build(BuildContext context) {
     return AdminScaffold(
       
-      backgroundColor: Color.fromRGBO(255, 255, 255, 1),
+      //backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: false,
-        iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Color.fromARGB(221, 39, 57, 99),
+        iconTheme: IconThemeData(color: Colors.white),
         title: const Text(
           "Admin Web Panel",
           style: TextStyle(
-              fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
+              fontWeight: FontWeight.w600, color: Colors.white, fontSize: 14),
+        
         ),
       ),
       sideBar: SideBar(
+        backgroundColor: Color.fromARGB(221, 39, 57, 99),
+        textStyle: TextStyle(color: Colors.white),
+        activeBackgroundColor: Color.fromARGB(221, 39, 57, 99),
+        activeTextStyle: TextStyle(color: Colors.white),
         items: const [
           AdminMenuItem(
             title: "Drivers",
@@ -68,54 +73,17 @@ class _SideNavigationDrawerState extends State<SideNavigationDrawer> {
             route: TripsPage.id,
             icon: CupertinoIcons.location_fill,
           ),
+          AdminMenuItem(
+            title: "Earnings",
+            route: TripsPage.id,
+            icon: CupertinoIcons.money_dollar,
+          ),
+
         ],
         selectedRoute: DriverPage.id,
         onSelected: (itemSelected) {
           sendAdminTo(itemSelected);
         },
-        header: Container(
-          height: 52,
-          width: double.infinity,
-          color: const Color.fromARGB(221, 39, 57, 99),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.accessibility,
-                color: Colors.white,
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Icon(
-                Icons.settings,
-                color: Colors.white,
-              )
-            ],
-          ),
-        ),
-        footer: Container(
-          
-          height: 52,
-          width: double.infinity,
-          color: const Color.fromARGB(221, 39, 57, 99),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.admin_panel_settings_outlined,
-                color: Colors.white,
-              ),
-              SizedBox(
-                width: 10,
-              ),
-              Icon(
-                Icons.computer,
-                color: Colors.white,
-              )
-            ],
-          ),
-        ),
       ),
       body: chosenScreen,
     );

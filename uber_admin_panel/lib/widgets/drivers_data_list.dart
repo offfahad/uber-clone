@@ -74,27 +74,6 @@ class _DriversDataListState extends State<DriversDataList> {
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // commonMethods.data(
-                //   1,
-                //   Image.network(
-                //     listItems[index]["profilePicture"] != null &&
-                //             listItems[index]["profilePicture"]
-                //                 .toString()
-                //                 .isNotEmpty
-                //         ? listItems[index]["profilePicture"]
-                //         : 'https://via.placeholder.com/100', // Use a placeholder image if the URL is null or empty
-                //     width: 100,
-                //     height: 100,
-                //     errorBuilder: (context, error, stackTrace) {
-                //       return const Icon(
-                //         Icons
-                //             .error, // Show an error icon in case of any issue loading the image
-                //         size: 100,
-                //         color: Colors.red,
-                //       );
-                //     },
-                //   ),
-                // ),
                 commonMethods.data(
                   1,
                   Text(
