@@ -66,7 +66,8 @@ class CommonMethods {
       model.longitudePosition = position.longitude;
       model.latitudePosition = position.latitude;
 
-      Provider.of<AppInfoClass>(context, listen: false).updatePickUpLocation(model);
+      Provider.of<AppInfoClass>(context, listen: false)
+          .updatePickUpLocation(model);
     }
 
     return humanReadableAddress;
@@ -94,7 +95,7 @@ class CommonMethods {
     print("URL: $urlDirectionAPI"); // Debugging: Log the URL
 
     var responseFromDirectionAPI = await sendRequestToAPI(urlDirectionAPI);
-  
+
     if (responseFromDirectionAPI == "error") {
       print("Error in response"); // Debugging: Log error
       return null;

@@ -11,10 +11,14 @@ import 'loading_dialog.dart';
 
 class NotificationDialog extends StatefulWidget {
   TripDetails? tripDetailsInfo;
+  String? fareAmount;
+  String? bidAmount;
 
   NotificationDialog({
     super.key,
     this.tripDetailsInfo,
+    this.fareAmount,
+    this.bidAmount,
   });
 
   @override
@@ -108,6 +112,8 @@ class _NotificationDialogState extends State<NotificationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final String biddedAmount = bidAmount == "0.0" ? "No Bid" : bidAmount;
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -124,7 +130,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(
-              height: 30.0,
+              height: 15.0,
             ),
 
             Image.asset(
@@ -133,7 +139,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
             ),
 
             const SizedBox(
-              height: 16.0,
+              height: 15.0,
             ),
 
             //title
@@ -220,12 +226,26 @@ class _NotificationDialogState extends State<NotificationDialog> {
                       ),
                     ],
                   ),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Text(
+                    "Actual Fare Amount: $fareAmount",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "Bidded Amount: $bidAmount",
+                    style: const TextStyle(fontSize: 16),
+                  ),
                 ],
               ),
             ),
 
             const SizedBox(
-              height: 20,
+              height: 15,
             ),
 
             const Divider(

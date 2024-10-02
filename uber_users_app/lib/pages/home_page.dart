@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
   String selectedPaymentMethod = "Cash"; // Default selection
   TextEditingController bidController = TextEditingController();
   double actualFareAmountCar = 0.0; // To store the actual fare amount
-  double? bidAmount; // To store the entered bid amount
+  double? bidAmount = 0.00; // To store the entered bid amount
   String selectedVehicle = "Car";
   String estimatedTimeCar = "";
   double actualFareAmount = 0.0;
@@ -401,7 +401,7 @@ class _HomePageState extends State<HomePage> {
 
     // Guard against no drivers collection
     Geofire.queryAtLocation(currentPositionOfUser?.latitude ?? 0.0,
-            currentPositionOfUser?.longitude ?? 0.0, 22)
+            currentPositionOfUser?.longitude ?? 0.0, 42)
         ?.listen((driverEvent) {
       if (driverEvent != null) {
         var onlineDriverChild = driverEvent["callBack"];
@@ -500,9 +500,13 @@ class _HomePageState extends State<HomePage> {
       "driverName": "",
       "driverPhone": "",
       "driverPhoto": "",
-      "fareAmount": "",
+      "fareAmount":
+          selectedVehicle == "Car" ? actualFareAmountCar.toString() : actualFareAmount.toString(),
       "status": "new",
+      "bidAmount": bidAmount.toString(),
+      "vehicleType": selectedVehicle.toString(),
     };
+    print("Bidded Amount ${bidAmount}");
 
     tripRequestRef?.set(dataMap);
 
@@ -562,11 +566,16 @@ class _HomePageState extends State<HomePage> {
       }
 
       if (status == "ended") {
+        // Parse the actual fare amount from the trip data
         double fareAmount = double.parse(data["fareAmount"].toString());
+
+        // Determine the amount to pass to the PaymentDialog based on bidAmount
+        double? finalFareAmount = bidAmount! > 0.00 ? bidAmount : fareAmount;
+
         var responseFromPaymentDialog = await showDialog(
           context: context,
           builder: (BuildContext context) =>
-              PaymentDialog(fareAmount: fareAmount.toString()),
+              PaymentDialog(fareAmount: finalFareAmount.toString()),
         );
 
         if (responseFromPaymentDialog == "paid") {
@@ -618,7 +627,7 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         tripStatusDisplay =
-            "Driver is Coming - ${directionDetailsPickup.durationTextString}";
+            "Driver is Coming ${directionDetailsPickup.durationTextString}";
       });
 
       requestingDirectionDetailsInfo = false;
@@ -656,7 +665,7 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         tripStatusDisplay =
-            "Drop Off Location - ${directionDetailsPickup.durationTextString}";
+            "Drop Off Location ${directionDetailsPickup.durationTextString}";
       });
 
       requestingDirectionDetailsInfo = false;
@@ -748,7 +757,7 @@ class _HomePageState extends State<HomePage> {
             timer.cancel();
             currentDriverRef.set("cancelled");
             currentDriverRef.onDisconnect();
-            requestTimeoutDriver = 20;
+            requestTimeoutDriver = 60;
           }
 
           // Listen for driver acceptance
@@ -757,16 +766,16 @@ class _HomePageState extends State<HomePage> {
                 dataSnapshot.snapshot.value.toString() == "accepted") {
               timer.cancel();
               currentDriverRef.onDisconnect();
-              requestTimeoutDriver = 20;
+              requestTimeoutDriver = 60;
             }
           });
 
-          // If timeout occurs after 20 seconds, notify the next available driver
+          // If timeout occurs after 60 seconds, notify the next available driver
           if (requestTimeoutDriver == 0) {
             timer.cancel();
             currentDriverRef.set("timeout");
             currentDriverRef.onDisconnect();
-            requestTimeoutDriver = 20;
+            requestTimeoutDriver = 60;
 
             // Search for the next available driver
             searchDriver();
@@ -840,7 +849,7 @@ class _HomePageState extends State<HomePage> {
       } else if (selectedVehicle == "Bike") {
         setState(() {
           actualFareAmount =
-              actualFareAmountCar * 0.5; // Bike fare is 50% of car fare
+              actualFareAmountCar * 0.4; // Bike fare is 40% of car fare
           int updatedMinutes =
               (totalMinutes * 0.8).toInt(); // Decrease time by 20%
           estimatedTime = commonMethods
@@ -1451,9 +1460,9 @@ class _HomePageState extends State<HomePage> {
                               height: 50,
                               child: BidDialogWidget(
                                 initialFareAmount: actualFareAmount,
-                                onBidAmountChanged: (bidAmount) {
+                                onBidAmountChanged: (bidAmountNew) {
                                   setState(() {
-                                    bidAmount = bidAmount;
+                                    bidAmount = bidAmountNew;
                                   });
                                 },
                               ),
@@ -1606,25 +1615,22 @@ class _HomePageState extends State<HomePage> {
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    
                     children: [
                       const SizedBox(
                         height: 5,
                       ),
 
                       //trip status display text
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              tripStatusDisplay,
-                              style: const TextStyle(
-                                fontSize: 19,
-                                color: Colors.white,
-                              ),
-                            ),
+                      Expanded(
+                        child: Text(
+                          tripStatusDisplay,
+                          style: const TextStyle(
+                            fontSize: 19,
+                            color: Colors.white,
                           ),
-                        ],
+                          textAlign: TextAlign.center,
+                        ),
                       ),
 
                       const SizedBox(

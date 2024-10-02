@@ -73,13 +73,11 @@ class PushNotificationSystem {
     final currentContext = navigatorKey.currentContext;
 
     if (currentContext != null) {
-
       // Reference to the trip request
       DatabaseReference tripRequestsRef =
           FirebaseDatabase.instance.ref().child("tripRequest").child(tripID);
 
       tripRequestsRef.once().then((dataSnapshot) {
-
         // Log the snapshot to see the structure and content
         log("DataSnapshot: ${dataSnapshot.snapshot.value}");
 
@@ -126,6 +124,8 @@ class PushNotificationSystem {
           // User details
           tripDetailsInfo.userName = data["userName"].toString();
           tripDetailsInfo.userPhone = data["userPhone"].toString();
+          bidAmount = data["bidAmount"].toString();
+          fareAmount = data["fareAmount"].toString();
 
           // Trip ID
           tripDetailsInfo.tripID = tripID;
@@ -135,6 +135,8 @@ class PushNotificationSystem {
             context: currentContext,
             builder: (BuildContext context) => NotificationDialog(
               tripDetailsInfo: tripDetailsInfo,
+              bidAmount: bidAmount,
+              fareAmount: fareAmount,
             ),
           );
         } catch (e, stackTrace) {

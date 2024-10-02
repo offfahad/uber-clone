@@ -16,7 +16,7 @@ StreamSubscription<Position>? positionStreamHomePage;
 StreamSubscription<Position>? positionStreamNewTripPage;
 
 
-int driverTripRequestTimeout = 20;
+int driverTripRequestTimeout = 60;
 
 final audioPlayer = AssetsAudioPlayer();
 
@@ -32,3 +32,5 @@ String carNumber = "";
 String driverSecondName = "";
 String address = "";
 String ratting = "";
+String bidAmount = "";
+String fareAmount = "";
