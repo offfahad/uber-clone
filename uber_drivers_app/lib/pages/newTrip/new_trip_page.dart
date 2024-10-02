@@ -293,15 +293,23 @@ class _NewTripPageState extends State<NewTripPage> {
             widget.newTripDetailsInfo!.pickUpLatLng!,
             driverCurrentLocationLatLng);
     Navigator.pop(context);
-    String fareamount =
-        (commonMethods.calculateFareAmountInPKR(directionDetailsEndTripInfo!))
-            .toString();
+    // String fareamount =
+    //     (commonMethods.calculateFareAmountInPKR(directionDetailsEndTripInfo!))
+    //         .toString();
+    String finalFareAmount = "0";
+    // Placeholder for actual fare calculation
+    if (bidAmount != "null") {
+      finalFareAmount = bidAmount.toString();
+    } else {
+      finalFareAmount = fareAmount.toString();
+    }
+
     FirebaseDatabase.instance
         .ref()
         .child("tripRequest")
         .child(widget.newTripDetailsInfo!.tripID!)
         .child("fareAmount")
-        .set(fareamount);
+        .set(finalFareAmount);
 
     FirebaseDatabase.instance
         .ref()
@@ -312,9 +320,9 @@ class _NewTripPageState extends State<NewTripPage> {
 
     positionStreamNewTripPage!.cancel();
 
-    displayLoadingDialog(fareamount);
+    displayLoadingDialog(finalFareAmount);
 
-    saveFareAmountToDriverTotalEearning(fareamount);
+    saveFareAmountToDriverTotalEearning(finalFareAmount);
   }
 
   displayLoadingDialog(faremmount) {
