@@ -112,7 +112,8 @@ class _NotificationDialogState extends State<NotificationDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final String biddedAmount = bidAmount == "0.0" ? "No Bid" : "Rs $bidAmount";
+    final String biddedAmount =
+        bidAmount == "null" ? "No Bid" : "Rs $bidAmount";
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -229,17 +230,22 @@ class _NotificationDialogState extends State<NotificationDialog> {
                   const SizedBox(
                     height: 15,
                   ),
-                  Text(
-                    "Actual Fare Amount: Rs $fareAmount",
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "Bidded Amount: $biddedAmount",
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Actual Fare Amount: Rs $fareAmount",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        "Bidded Amount: $biddedAmount",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
