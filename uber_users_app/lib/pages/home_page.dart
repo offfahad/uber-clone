@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
   String selectedPaymentMethod = "Cash"; // Default selection
   TextEditingController bidController = TextEditingController();
   double actualFareAmountCar = 0.0; // To store the actual fare amount
-  double? bidAmount = 0.00; // To store the entered bid amount
+  double? bidAmount; // To store the entered bid amount
   String selectedVehicle = "Car";
   String estimatedTimeCar = "";
   double actualFareAmount = 0.0;
@@ -500,8 +500,9 @@ class _HomePageState extends State<HomePage> {
       "driverName": "",
       "driverPhone": "",
       "driverPhoto": "",
-      "fareAmount":
-          selectedVehicle == "Car" ? actualFareAmountCar.toString() : actualFareAmount.toString(),
+      "fareAmount": selectedVehicle == "Car"
+          ? actualFareAmountCar.toString()
+          : actualFareAmount.toString(),
       "status": "new",
       "bidAmount": bidAmount.toString(),
       "vehicleType": selectedVehicle.toString(),
@@ -807,7 +808,7 @@ class _HomePageState extends State<HomePage> {
                 .pickUpLocation!
                 .placeName)
         : 'Fetching Your Current Location.';
-
+    
     if (tripDirectionDetailsInfo != null) {
       var fareString = cMethods.calculateFareAmountInPKR(
         tripDirectionDetailsInfo!,
@@ -856,6 +857,10 @@ class _HomePageState extends State<HomePage> {
               .formatTime(updatedMinutes); // Convert back to hours and minutes
         });
       }
+    }
+
+    if(tripDirectionDetailsInfo != null){
+      calculateFareAndTime();
     }
 
     final authProvider =
@@ -1615,7 +1620,6 @@ class _HomePageState extends State<HomePage> {
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    
                     children: [
                       const SizedBox(
                         height: 5,
@@ -1735,7 +1739,7 @@ class _HomePageState extends State<HomePage> {
                                 const Text(
                                   "Call",
                                   style: TextStyle(
-                                    color: Colors.grey,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
