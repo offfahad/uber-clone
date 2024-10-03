@@ -104,7 +104,7 @@ class _OTPScreenState extends State<OTPScreen> {
                     : const SizedBox.shrink(),
 
                 const SizedBox(
-                  height: 5,
+                  height: 25,
                 ),
 
                 const Text(

@@ -571,7 +571,7 @@ class _HomePageState extends State<HomePage> {
         double fareAmount = double.parse(data["fareAmount"].toString());
 
         // Determine the amount to pass to the PaymentDialog based on bidAmount
-        double? finalFareAmount = bidAmount! > 0.00 ? bidAmount : fareAmount;
+        double? finalFareAmount = bidAmount ?? fareAmount;
 
         var responseFromPaymentDialog = await showDialog(
           context: context,
@@ -758,7 +758,7 @@ class _HomePageState extends State<HomePage> {
             timer.cancel();
             currentDriverRef.set("cancelled");
             currentDriverRef.onDisconnect();
-            requestTimeoutDriver = 60;
+            requestTimeoutDriver = 40;
           }
 
           // Listen for driver acceptance
@@ -767,16 +767,16 @@ class _HomePageState extends State<HomePage> {
                 dataSnapshot.snapshot.value.toString() == "accepted") {
               timer.cancel();
               currentDriverRef.onDisconnect();
-              requestTimeoutDriver = 60;
+              requestTimeoutDriver = 40;
             }
           });
 
-          // If timeout occurs after 60 seconds, notify the next available driver
+          // If timeout occurs after 40 seconds, notify the next available driver
           if (requestTimeoutDriver == 0) {
             timer.cancel();
             currentDriverRef.set("timeout");
             currentDriverRef.onDisconnect();
-            requestTimeoutDriver = 60;
+            requestTimeoutDriver = 40;
 
             // Search for the next available driver
             searchDriver();
@@ -808,7 +808,7 @@ class _HomePageState extends State<HomePage> {
                 .pickUpLocation!
                 .placeName)
         : 'Fetching Your Current Location.';
-    
+
     if (tripDirectionDetailsInfo != null) {
       var fareString = cMethods.calculateFareAmountInPKR(
         tripDirectionDetailsInfo!,
@@ -859,7 +859,7 @@ class _HomePageState extends State<HomePage> {
       }
     }
 
-    if(tripDirectionDetailsInfo != null){
+    if (tripDirectionDetailsInfo != null) {
       calculateFareAndTime();
     }
 
@@ -902,7 +902,7 @@ class _HomePageState extends State<HomePage> {
             ///drawer button
             Positioned(
               top: 20,
-              left: 25,
+              left: 20,
               child: GestureDetector(
                 onTap: () {
                   if (isDrawerOpened == true) {
@@ -914,7 +914,7 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(15),
                     boxShadow: const [
                       BoxShadow(
                         color: Colors.black26,
@@ -926,7 +926,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: CircleAvatar(
                     backgroundColor: Colors.white60,
-                    radius: 25,
+                    radius: 30,
                     child: Icon(
                       isDrawerOpened == true ? Icons.menu : Icons.close,
                       color: Colors.black87,
@@ -1619,24 +1619,25 @@ class _HomePageState extends State<HomePage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(
                         height: 5,
                       ),
-
                       //trip status display text
-                      Expanded(
-                        child: Text(
-                          tripStatusDisplay,
-                          style: const TextStyle(
-                            fontSize: 19,
-                            color: Colors.white,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            tripStatusDisplay,
+                            style: const TextStyle(
+                              fontSize: 19,
+                              color: Colors.white,
+                              overflow: TextOverflow.visible,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
-                        ),
+                        ],
                       ),
-
                       const SizedBox(
                         height: 19,
                       ),

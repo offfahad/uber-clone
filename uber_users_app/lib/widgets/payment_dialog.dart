@@ -63,8 +63,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
                 Navigator.pop(context, "paid");
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-              child:
-                  const Text("PAY CASH", style: TextStyle(color: Colors.white)),
+              child: const Text("PAY WITH CASH",
+                  style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -72,10 +72,18 @@ class _PaymentDialogState extends State<PaymentDialog> {
                 await makePayment();
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-              child: const Text("PAY ONLINE",
+              child: const Text("PAY WITH CREDIT CARD",
                   style: TextStyle(color: Colors.white)),
             ),
             const SizedBox(height: 41),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context, "paid");
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+              child: const Text("OK", style: TextStyle(color: Colors.white)),
+            ),
+            const SizedBox(height: 31),
           ],
         ),
       ),

@@ -486,7 +486,8 @@ class _NewTripPageState extends State<NewTripPage> {
                             },
                             child: const Padding(
                               padding: EdgeInsets.all(10),
-                              child: Icon(Icons.phone_android_outlined),
+                              child: Icon(Icons.phone_android_outlined,
+                                  color: Colors.white),
                             ),
                           )
                         ],

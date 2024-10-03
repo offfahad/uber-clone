@@ -10,9 +10,9 @@ import '../pages/newTrip/new_trip_page.dart';
 import 'loading_dialog.dart';
 
 class NotificationDialog extends StatefulWidget {
-  TripDetails? tripDetailsInfo;
-  String? fareAmount;
-  String? bidAmount;
+  final TripDetails? tripDetailsInfo;
+  final String? fareAmount;
+  final String? bidAmount;
 
   NotificationDialog({
     super.key,
@@ -28,26 +28,26 @@ class NotificationDialog extends StatefulWidget {
 class _NotificationDialogState extends State<NotificationDialog> {
   String tripRequestStatus = "";
   CommonMethods cMethods = CommonMethods();
+  late Timer timer;
 
   cancelNotificationDialogAfter20Sec() {
     const oneTickPerSecond = Duration(seconds: 1);
 
-    var timerCountDown = Timer.periodic(oneTickPerSecond, (timer) {
+    timer = Timer.periodic(oneTickPerSecond, (timer) {
       driverTripRequestTimeout = driverTripRequestTimeout - 1;
 
       if (tripRequestStatus == "accepted") {
         timer.cancel();
-        driverTripRequestTimeout = 60;
+        driverTripRequestTimeout = 40;
         return;
       }
 
       if (driverTripRequestTimeout == 0) {
         timer.cancel();
-        driverTripRequestTimeout = 60;
+        driverTripRequestTimeout = 40;
         audioPlayer.stop();
 
         if (mounted) {
-          // Check if the widget is still mounted
           Navigator.pop(context);
         }
       }
@@ -56,10 +56,14 @@ class _NotificationDialogState extends State<NotificationDialog> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-
     cancelNotificationDialogAfter20Sec();
+  }
+
+  @override
+  void dispose() {
+    timer.cancel(); // Cancel timer when widget is disposed
+    super.dispose();
   }
 
   checkAvailabilityOfTripRequest(BuildContext context) async {
@@ -67,7 +71,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) => const LoadingDialog(
-        messageText: 'please wait...',
+        messageText: 'Please wait...',
       ),
     );
 
@@ -78,42 +82,45 @@ class _NotificationDialogState extends State<NotificationDialog> {
         .child("newTripStatus");
 
     await driverTripStatusRef.once().then((snap) async {
-      Navigator.pop(context);
-      Navigator.pop(context);
-
-      String newTripStatusValue = "";
-      if (snap.snapshot.value != null) {
-        newTripStatusValue = snap.snapshot.value.toString();
-      } else {
-        cMethods.displaySnackBar("Trip Request Not Found.", context);
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        Navigator.pop(context); // Close notification dialog
       }
 
-      if (newTripStatusValue == widget.tripDetailsInfo!.tripID) {
+      String newTripStatusValue = snap.snapshot.value?.toString() ?? "";
+
+      if (newTripStatusValue == widget.tripDetailsInfo?.tripID) {
         driverTripStatusRef.set("accepted");
 
-        //disable homepage location updates
+        // Disable homepage location updates
         cMethods.turnOffLocationUpdatesForHomePage();
 
         await Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (c) =>
-                    NewTripPage(newTripDetailsInfo: widget.tripDetailsInfo)));
-      } else if (newTripStatusValue == "cancelled") {
-        cMethods.displaySnackBar(
-            "Trip Request has been Cancelled by user.", context);
-      } else if (newTripStatusValue == "timeout") {
-        cMethods.displaySnackBar("Trip Request timed out.", context);
+          context,
+          MaterialPageRoute(
+            builder: (c) =>
+                NewTripPage(newTripDetailsInfo: widget.tripDetailsInfo),
+          ),
+        );
       } else {
-        cMethods.displaySnackBar("Trip Request removed. Not Found.", context);
+        String message = newTripStatusValue == "cancelled"
+            ? "Trip Request has been Cancelled by user."
+            : newTripStatusValue == "timeout"
+                ? "Trip Request timed out."
+                : "Trip Request removed. Not Found.";
+        cMethods.displaySnackBar(message, context);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final String biddedAmount =
-        bidAmount == "null" ? "No Bid" : "Rs $bidAmount";
+    // Null safety and string handling
+    final String fareAmount = widget.fareAmount ?? "N/A";
+    final String bidAmount =
+        widget.bidAmount == "null" || widget.bidAmount == null
+            ? "No Bid"
+            : "Rs ${widget.bidAmount}";
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -130,20 +137,15 @@ class _NotificationDialogState extends State<NotificationDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(
-              height: 15.0,
-            ),
+            const SizedBox(height: 15.0),
 
             Image.asset(
               "assets/images/uberexec.png",
               width: 140,
             ),
 
-            const SizedBox(
-              height: 15.0,
-            ),
+            const SizedBox(height: 15.0),
 
-            //title
             const Text(
               "NEW TRIP REQUEST",
               style: TextStyle(
@@ -153,122 +155,84 @@ class _NotificationDialogState extends State<NotificationDialog> {
               ),
             ),
 
-            const SizedBox(
-              height: 20.0,
-            ),
+            const SizedBox(height: 20.0),
 
-            const Divider(
-              height: 1,
-              color: Colors.black,
-              thickness: 1,
-            ),
+            const Divider(height: 1, color: Colors.black, thickness: 1),
 
-            const SizedBox(
-              height: 10.0,
-            ),
+            const SizedBox(height: 10.0),
 
-            //pick - dropoff
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  //pickup
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        "assets/images/initial.png",
-                        height: 16,
-                        width: 16,
-                      ),
-                      const SizedBox(
-                        width: 18,
-                      ),
+                      Image.asset("assets/images/initial.png",
+                          height: 16, width: 16),
+                      const SizedBox(width: 18),
                       Expanded(
                         child: Text(
-                          widget.tripDetailsInfo!.pickupAddress.toString(),
+                          widget.tripDetailsInfo?.pickupAddress ?? "Unknown",
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                          ),
+                              color: Colors.black, fontSize: 18),
                         ),
                       ),
                     ],
                   ),
-
-                  const SizedBox(
-                    height: 15,
-                  ),
-
-                  //dropoff
+                  const SizedBox(height: 15),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Image.asset(
-                        "assets/images/final.png",
-                        height: 16,
-                        width: 16,
-                      ),
-                      const SizedBox(
-                        width: 18,
-                      ),
+                      Image.asset("assets/images/final.png",
+                          height: 16, width: 16),
+                      const SizedBox(width: 18),
                       Expanded(
                         child: Text(
-                          widget.tripDetailsInfo!.dropOffAddress.toString(),
+                          widget.tripDetailsInfo?.dropOffAddress ?? "Unknown",
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                          ),
+                              color: Colors.black, fontSize: 18),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Actual Fare Amount: Rs $fareAmount",
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        "Bidded Amount: $biddedAmount",
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  )
                 ],
               ),
             ),
 
-            const SizedBox(
-              height: 15,
+            const SizedBox(height: 15.0),
+            // Fare and Bid Amount at the Start
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Actual Fare Amount: Rs $fareAmount",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    "Bidded Amount: $bidAmount",
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
             ),
 
-            const Divider(
-              height: 1,
-              color: Colors.black,
-              thickness: 1,
-            ),
+            const SizedBox(height: 15),
 
-            const SizedBox(
-              height: 8,
-            ),
+            const Divider(height: 1, color: Colors.black, thickness: 1),
 
-            //decline btn - accept btn
+            const SizedBox(height: 8),
+
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(
                     child: ElevatedButton(
@@ -277,38 +241,28 @@ class _NotificationDialogState extends State<NotificationDialog> {
                         Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pink,
-                      ),
+                          backgroundColor: Colors.pink),
                       child: const Text(
                         "DECLINE",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         audioPlayer.stop();
-
                         setState(() {
                           tripRequestStatus = "accepted";
                         });
-
                         await checkAvailabilityOfTripRequest(context);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                      ),
+                          backgroundColor: Colors.green),
                       child: const Text(
                         "ACCEPT",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -316,9 +270,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
               ),
             ),
 
-            const SizedBox(
-              height: 10.0,
-            ),
+            const SizedBox(height: 10.0),
           ],
         ),
       ),
