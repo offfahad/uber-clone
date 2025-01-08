@@ -59,10 +59,11 @@ This repository contains a ride-sharing platform similar to Uber, developed with
   - Connectivity check (`connectivity_plus`)
 
 5. ## Future Enhancements
+- Add state management in the project.
 - Add in-app chat functionality between users and drivers.
 - Support for multi-language localization.
 - Advanced analytics dashboard for the admin panel.
-
+  
 6. ## Contributions
 - Contributions are welcome! Please create a pull request with a detailed explanation of your changes.
 
