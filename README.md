@@ -6,6 +6,9 @@ This repository contains a ride-sharing platform similar to Uber, developed with
 2. **Driver App** – For drivers to accept ride requests and manage trips.
 3. **Admin Panel** – For managing platform operations and monitoring activities.
 
+## Note
+- The project is missing some state management features, which can be added as a contribution.
+
 4. ## Features
 
 ### **User App**
